@@ -1,0 +1,66 @@
+{
+  "name": "othello-webpack",
+  "version": "1.0.0",
+  "description": "Othello game",
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "cross-env CI=true react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "lint": "eslint ./src/**/*.ts ./src/**/*.tsx"
+  },
+  "author": "P.G. Wobben",
+  "license": "ISC",
+  "devDependencies": {
+    "@testing-library/react": "^13.3.0",
+    "@types/jasmine": "^4.0.3",
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "@types/three": "^0.143.0",
+    "browserify-fs": "^1.0.0",
+    "cross-env": "^7.0.3",
+    "i": "^0.3.7",
+    "jasmine": "^4.3.0",
+    "jasmine-browser-runner": "^1.1.0",
+    "jasmine-core": "^4.3.0",
+    "jasmine-enzyme": "^7.1.2",
+    "jasmine-spec-reporter": "^7.0.0",
+    "jasmine-ts": "^0.4.0",
+    "jsxobj": "^1.1.0",
+    "npm": "^8.17.0",
+    "react-scripts": "^5.0.1",
+    "style-loader": "^3.3.1",
+    "ts-loader": "^9.3.1",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.10.0",
+    "@emotion/styled": "^11.10.0",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/material": "^5.10.0",
+    "@react-three/drei": "^9.21.0",
+    "@react-three/fiber": "^8.3.1",
+    "@reduxjs/toolkit": "^1.8.4",
+    "oidc-react": "^2.0.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-globe.gl": "^2.22.2",
+    "react-redux": "^8.0.2",
+    "react-router-dom": "^6.3.0",
+    "three": "^0.143.0",
+    "three-globe": "^2.24.7"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
