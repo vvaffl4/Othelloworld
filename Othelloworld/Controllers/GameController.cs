@@ -119,7 +119,8 @@ namespace Othelloworld.Controllers
 					new PlayerInGame
 					{
 						GameToken = gameToken,
-						Username = account.UserName
+						Username = account.UserName,
+						IsHost = true
 					}
 				},
 				Board = new int[8][]

@@ -29,8 +29,9 @@ createRoot(
               </Route>
               <Route path="play" element={<Play />}>
                 <Route path=":gameToken" element={<Game />} />
-                <Route index element={<CreateGame /> }/>
+                {/*<Route index element={<CreateGame /> }/>*/}
               </Route>
+              {/*<Route path="play" element={<Play />}/>*/}
             </Route>
           </Routes>
         </BrowserRouter>

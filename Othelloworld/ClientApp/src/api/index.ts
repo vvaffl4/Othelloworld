@@ -1,5 +1,4 @@
 ﻿import Game from "../model/Game";
-import PlayerInGame from "../model/PlayerInGame";
 import Token from "../model/Token";
 import { Country } from "../store/World";
 
