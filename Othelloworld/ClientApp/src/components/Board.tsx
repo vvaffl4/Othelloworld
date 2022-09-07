@@ -4,8 +4,8 @@ import { shallowEqual } from 'react-redux';
 import * as THREE from 'three';
 import Placeholder from './Placeholder';
 import Stone from './Stone';
-import { putStone } from './store/Game';
-import { useAppDispatch, useAppSelector } from './store/Hooks';
+import { putStone } from '../store/Game';
+import { useAppDispatch, useAppSelector } from '../store/Hooks';
 
 const Board: FC<{position: Vector3 }> = (props) => {
   const boardSpaces = 8;
@@ -42,7 +42,7 @@ const Board: FC<{position: Vector3 }> = (props) => {
   }, [board]);
 
   return (
-    <React.Fragment>
+    <>
       <mesh
         name='board'
         material={[
@@ -85,7 +85,7 @@ const Board: FC<{position: Vector3 }> = (props) => {
           ]}
         />
       ))}
-    </React.Fragment>
+    </>
   )
 }
 

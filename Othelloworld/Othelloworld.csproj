@@ -63,19 +63,19 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\src\components\Staging.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\CreateGame.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\CreateGame.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\Game.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\GameItem.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\GameList.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\Home.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\GameItem.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\GameList.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\Home.tsx" />
     <TypeScriptCompile Include="ClientApp\src\model\Account.ts" />
     <TypeScriptCompile Include="ClientApp\src\model\Game.ts" />
     <TypeScriptCompile Include="ClientApp\src\model\Player.ts" />
     <TypeScriptCompile Include="ClientApp\src\model\PlayerInGame.ts" />
     <TypeScriptCompile Include="ClientApp\src\model\Token.ts" />
-    <TypeScriptCompile Include="ClientApp\src\Play.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\ProfileAvatar.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\RGlobe.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\Play.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\ProfileAvatar.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\RGlobe.tsx" />
     <TypeScriptCompile Include="ClientApp\src\store\Auth.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\Game.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\Games.ts" />
@@ -89,6 +89,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ClientApp\src\components\threejs\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 

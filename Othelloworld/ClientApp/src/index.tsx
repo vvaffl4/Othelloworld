@@ -1,17 +1,16 @@
-import { AuthProvider } from "oidc-react";
 import React from "react";
 import { createRoot } from 'react-dom/client';
 import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import App from "./App";
+import App from "./components/App";
 import Game from "./components/Game";
-import CreateGame from "./CreateGame";
-import GameList from "./GameList";
-import Home from "./Home";
-import HomeContainer from "./HomeContainer";
+import CreateGame from "./components/CreateGame";
+import GameList from "./components/GameList";
+import Home from "./components/Home";
+import HomeContainer from "./components/HomeContainer";
 import "./index.css";
-import Play from "./Play";
-import Register from "./Register";
+import Play from "./components/Play";
+import Register from "./components/Register";
 import store from "./store";
 
 createRoot(

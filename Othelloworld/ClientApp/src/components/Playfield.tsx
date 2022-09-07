@@ -6,9 +6,9 @@ import { ReactReduxContext, shallowEqual } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import * as THREE from 'three';
 import Board from './Board';
-import { Color } from './model/PlayerInGame';
-import { fetchGame } from './store/Game';
-import { useAppDispatch, useAppSelector } from './store/Hooks';
+import { Color } from '../model/PlayerInGame';
+import { fetchGame } from '../store/Game';
+import { useAppDispatch, useAppSelector } from '../store/Hooks';
 
 const Playfield: FC = () => {
   const theme = useTheme();

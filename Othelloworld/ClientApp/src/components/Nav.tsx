@@ -5,7 +5,7 @@ import { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import Login from "./Login";
 import ProfileAvatar from "./ProfileAvatar";
-import { useAppDispatch, useAppSelector } from "./store/Hooks";
+import { useAppDispatch, useAppSelector } from "../store/Hooks";
 
 const Nav: FC = () => {
   const theme = useTheme();

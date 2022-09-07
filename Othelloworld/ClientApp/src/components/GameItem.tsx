@@ -1,12 +1,12 @@
 ﻿import { Button, Collapse, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 
 import * as React from 'react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { useAppDispatch, useAppSelector } from './store/Hooks';
+import { useAppDispatch, useAppSelector } from '../store/Hooks';
 import { useNavigate } from 'react-router-dom';
-import { setGame } from './store/Game';
+import { setGame } from '../store/Game';
 
 const GameItem: FC<{ token: string }> = ({ token }) => {
   const [open, setOpen] = React.useState(false);
@@ -36,7 +36,7 @@ const GameItem: FC<{ token: string }> = ({ token }) => {
         <TableCell component="th" scope="row">
           {game.name}
         </TableCell>
-        <TableCell align="right">{game.players.find(player => player.isHost)!.username}</TableCell>
+        <TableCell align="right">{game.players && game.players.find(player => player.isHost)!.username}</TableCell>
         <TableCell align="right">{game.description}</TableCell>
         <TableCell align="right">Normal</TableCell>
       </TableRow>

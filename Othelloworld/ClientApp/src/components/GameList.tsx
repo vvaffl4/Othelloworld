@@ -1,10 +1,10 @@
 ﻿import { Button, ButtonGroup, Container, Grid, LinearProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { FC, Suspense, useEffect, useState } from 'react';
 import GameItem from './GameItem';
-import { useAppDispatch, useAppSelector } from './store/Hooks';
+import { useAppDispatch, useAppSelector } from '../store/Hooks';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import AddIcon from '@mui/icons-material/Add';
-import { fetchGames } from './store/Games';
+import { fetchGames } from '../store/Games';
 import { useNavigate } from 'react-router-dom';
 
 const GameList: FC = () => {

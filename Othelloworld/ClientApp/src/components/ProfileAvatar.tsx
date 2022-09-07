@@ -1,9 +1,9 @@
 ﻿import { styled } from '@mui/material/styles';
 import { Avatar, Badge, Collapse, Divider, FormControlLabel, IconButton, ListItemButton, ListItemText, Menu, MenuItem, Switch, Theme, Tooltip, useTheme } from '@mui/material';
 import { FC, useState } from 'react';
-import { useAppDispatch } from './store/Hooks';
-import { setPaletteMode } from './store/UserInterface';
-import { logout } from './store/Auth';
+import { useAppDispatch } from '../store/Hooks';
+import { setPaletteMode } from '../store/UserInterface';
+import { logout } from '../store/Auth';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {

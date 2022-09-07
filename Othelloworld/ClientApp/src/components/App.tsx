@@ -4,9 +4,9 @@ import { useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
 import Nav from "./Nav";
 import RGlobe from "./RGlobe";
-import { useAppSelector } from "./store/Hooks";
-import { setPaletteMode } from "./store/UserInterface";
-import createTheme from "./Theme";
+import { useAppSelector } from "../store/Hooks";
+import { setPaletteMode } from "../store/UserInterface";
+import createTheme from "../Theme";
 
 const App = () => {
   const dispatch = useDispatch();

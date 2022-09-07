@@ -1,8 +1,8 @@
 import { Box, Button, Checkbox, Container, Divider, FormControlLabel, Paper, Stack, TextField, Typography, useTheme } from "@mui/material";
 import { FC, useEffect, useState } from "react";
-import { register } from "./store/Auth";
-import { useAppDispatch, useAppSelector } from "./store/Hooks";
-import { changeWorldSettings } from "./store/World";
+import { register } from "../store/Auth";
+import { useAppDispatch, useAppSelector } from "../store/Hooks";
+import { changeWorldSettings } from "../store/World";
 
 interface FormProps {
   username: string;

@@ -3,10 +3,10 @@ import React from 'react';
 import { FC, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import Globe, { GlobeMethods } from 'react-globe.gl';
-import { funcWith3Types, funcWithType } from './util';
+import { funcWith3Types, funcWithType } from '../util';
 import 'flag-icons/css/flag-icons.min.css';
-import { useAppDispatch, useAppSelector } from './store/Hooks';
-import { Coords, Country, fetchCountries, Polygon, selectCountry } from './store/World';
+import { useAppDispatch, useAppSelector } from '../store/Hooks';
+import { Coords, Country, fetchCountries, Polygon, selectCountry } from '../store/World';
 import { shallowEqual } from 'react-redux';
 
 const RGlobe: FC = () => {

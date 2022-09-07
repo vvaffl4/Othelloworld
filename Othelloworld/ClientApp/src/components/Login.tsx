@@ -1,8 +1,8 @@
 import { Button, List, ListItem, Popover, TextField } from '@mui/material';
 import { pink } from '@mui/material/colors';
 import { ChangeEvent, FC, useState } from 'react';
-import { login } from './store/Auth';
-import { useAppDispatch } from './store/Hooks';
+import { login } from '../store/Auth';
+import { useAppDispatch } from '../store/Hooks';
 
 const Login: FC = () => {
   const dispatch = useAppDispatch();

@@ -79,7 +79,7 @@ const checkIfValid = (board: number[][], position: [number, number], directions:
 const createPlaceholderMap = (board: number[][], color: Color) => {
 	const directions: [number, number][] = [
 		[-1, -1], [0, -1], [1, -1],
-		[-1,  0],					 [1,  0],
+		[-1,  0],		   [1,  0],
 		[-1,  1], [0,  1], [1,  1]
 	];
 	const opponent = Number(color == Color.white ? Color.black : Color.white);

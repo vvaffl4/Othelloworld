@@ -1,9 +1,9 @@
 ﻿import { Button, Checkbox, Container, Divider, FormControlLabel, Grid, Paper, TextField, Typography } from '@mui/material';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createGame } from './store/Game';
-import { useAppDispatch, useAppSelector } from './store/Hooks';
-import { changeWorldSettings, selectAndFocusCountry } from './store/World';
+import { createGame } from '../store/Game';
+import { useAppDispatch, useAppSelector } from '../store/Hooks';
+import { changeWorldSettings, selectAndFocusCountry } from '../store/World';
 
 const CreateGame: FC = () => {
   const dispatch = useAppDispatch();
