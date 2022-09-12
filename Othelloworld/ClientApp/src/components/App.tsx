@@ -1,4 +1,4 @@
-import { CssBaseline, ThemeProvider, useMediaQuery } from "@mui/material";
+import { Button, CssBaseline, ThemeProvider, useMediaQuery } from "@mui/material";
 import React, { useEffect, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
@@ -7,14 +7,44 @@ import RGlobe from "./RGlobe";
 import { useAppSelector } from "../store/Hooks";
 import { setPaletteMode } from "../store/UserInterface";
 import createTheme from "../Theme";
+import { useSnackbar } from "notistack";
+
+
 
 const App = () => {
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar(); 
   const dispatch = useDispatch();
   const darkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const isDarkModeEnabled = useAppSelector(state => state.ui.mode);
 
+  const challengeActions = snackbarId => (
+    <>
+      <Button onClick={() => { closeSnackbar(snackbarId) }}>
+        Accept
+      </Button>
+      <Button onClick={() => { closeSnackbar(snackbarId) }}>
+        Decline
+      </Button>
+    </>
+  );
+
+  const errorActions = snackbarId => (
+    <>
+      <Button
+        color="inherit"
+        onClick={() => { closeSnackbar(snackbarId) }}
+      >
+        Close
+      </Button>
+    </>
+  );
+
   useEffect(() => {
     dispatch(setPaletteMode(darkMode ? 'dark' : 'light'));
+
+    enqueueSnackbar("You've gotten a challenge from... ", { persist: true, action: challengeActions });
+    enqueueSnackbar("Error, error, error ", { variant: 'error', action: errorActions });
+
   }, []);
 
   const theme = useMemo(() =>
@@ -34,6 +64,8 @@ const App = () => {
       >
         <RGlobe />
         <Outlet />
+        {/*<Challenge />*/}
+        {/*<ErrorMessage/>*/}
       </div>
     </ThemeProvider>
   );

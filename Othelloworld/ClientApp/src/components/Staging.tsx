@@ -1,9 +1,9 @@
-﻿import { Box, Container, Grid, Typography, useTheme } from '@mui/material';
+﻿import { Box, Container, Grid, Typography, Paper } from '@mui/material';
 import { FC } from 'react';
 import { useAppSelector } from '../store/Hooks';
+import PlayerCard from './PlayerCard';
 
 const Staging: FC = () => {
-  const theme = useTheme();
   const game = useAppSelector(state => state.game);
 
 	return (
@@ -11,53 +11,119 @@ const Staging: FC = () => {
       component='div'
       sx={{
         position: 'absolute',
-        top: 400,
+        top: 500,
         bottom: 0,
         left: 0,
         right: 0
       }}
     >
-      <Box
-        component="div"
+      <Paper
+        elevation={5}
         sx={{
-          backgroundColor: 'black'
+          background: 'none'
 				}}
       >
-        <Box
-          component="span"
+        <Grid
+          container
           sx={{
-            position: 'absolute',
-            top: '-50px',
-            left: 0,
-            display: 'block',
-            width: '100px',
-            height: '50px',
-            overflow: 'hidden',
-            ':after': {
-              content: '""',
-              width: '100px',
-              height: '100px',
-              borderRadius: '100px',
-              background: 'rgba(0, 0, 0, 0)',
-              position: 'absolute',
-              top: '-100px',
-              left: '-40px',
-						}
+            display: 'flex'
           }}
-        />
-        <Grid container>
+        >
+          <Grid
+            item
+            sx={{
+              display: 'flex',
+              flex: 1,
+              height: '250px',
+              backgroundColor: (theme) => theme.palette.background.paper
+            }}
+          >
+            <Box
+              component="span"
+              sx={{
+                mr: 'auto'
+              }}
+            />
+            <PlayerCard player={game.players
+              ? game.players[0].player
+              : undefined} />
+          </Grid>
+          <Grid
+            item
+            flex={1}
+          >
+            <Box
+              component="div"
+              sx={{
+                position: 'relative',
+                marginTop: '100px',
+                width: '500px',
+                background: 'rgba(0, 0, 0, 0.5)',
+                overflowY: 'show'
+				      }}
+            >
+              <Box
+                component="span"
+                sx={{
+                  position: 'absolute',
+                  top: '-100px',
+                  left: '50%',
+                  marginLeft: '-250px',
+                  display: 'block',
+                  width: '500px',
+                  height: '250px',
+                  overflow: 'hidden',
+                  ':after': {
+                    content: '" "',
+                    position: 'absolute',
+                    top: '-400px',
+                    left: '-150px',
+                    width: '800px',
+                    height: '800px',
+                    backgroundColor: 'transparent',
+                    border: (theme) => `150px solid ${theme.palette.background.paper}`,
+                    borderRadius: '400px',
+                    boxSizing: 'border-box'
+						      }
+                }}
+              />
+            </Box>
+          </Grid>
+          <Grid
+            item
+            sx={{
+              display: 'flex',
+              flex: 1,
+              height: '250px',
+              backgroundColor: (theme) => theme.palette.background.paper
+            }}
+          >
+            <Box
+              component="span"
+              sx={{
+                ml: 'auto',
+                backgroundColor: (theme) => theme.palette.background.paper
+              }}
+            />
+            <PlayerCard />
+          </Grid>
+        </Grid>
+        <Grid
+          container
+          sx={{
+            backgroundColor: (theme) => theme.palette.background.paper
+          }}
+        >
           <Grid item xs={6}> 
             <Typography
-             variant="h3"
+              variant="h3"
             >
-            { game.players && game.players[0].username }
           </Typography>
           </Grid>
           <Grid item xs={6}>
-            {game.players && game.players[0].username}
           </Grid>
         </Grid>
-      </Box>
+      </Paper>
 		</Container>
 	);
 }

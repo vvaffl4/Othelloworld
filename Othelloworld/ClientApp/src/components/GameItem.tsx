@@ -16,7 +16,7 @@ const GameItem: FC<{ token: string }> = ({ token }) => {
 
   const handlePlay = () => {
     dispatch(setGame(game));
-    navigate(`../play/${game.token}`);
+    navigate(`../${game.token}`);
 	}
 
   return (

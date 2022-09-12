@@ -12,6 +12,7 @@ import "./index.css";
 import Play from "./components/Play";
 import Register from "./components/Register";
 import store from "./store";
+import { SnackbarProvider } from "notistack";
 
 createRoot(
   document.getElementById('root')!
@@ -19,22 +20,28 @@ createRoot(
   .render(
     <React.StrictMode>
       <Provider store={store}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<App />}>
-              <Route element={<HomeContainer />}>
-                <Route index element={<Home />} />
-                <Route path="register" element={<Register />} />
-                <Route path="browse" element={<GameList />} />
+        <SnackbarProvider maxSnack={3}
+          preventDuplicate
+          autoHideDuration={6000}
+        >
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<App />}>
+                <Route element={<HomeContainer />}>
+                  <Route index element={<Home />} />
+                  <Route path="register" element={<Register />} />
+                  <Route path="browse" element={<GameList />} />
+                </Route>
+                <Route path="play">
+                  <Route path="new" element={<CreateGame />} />
+                  <Route path="browse" element={<GameList />} />
+                  <Route path="" element={<Play />} />
+                </Route> 
+                {/*<Route path="play" element={<Play />}/>*/}
               </Route>
-              <Route path="play" element={<Play />}>
-                <Route path=":gameToken" element={<Game />} />
-                {/*<Route index element={<CreateGame /> }/>*/}
-              </Route>
-              {/*<Route path="play" element={<Play />}/>*/}
-            </Route>
-          </Routes>
-        </BrowserRouter>
+            </Routes>
+            </BrowserRouter>
+          </SnackbarProvider>
         </Provider>
     </React.StrictMode>
   );

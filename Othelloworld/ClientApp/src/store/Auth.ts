@@ -8,6 +8,7 @@ interface AuthState extends Token {
 
 const initialState: AuthState = {
 	token: '',
+	username: '',
 	expires: '',
 	authenticated: false
 };
@@ -16,8 +17,9 @@ const authSlice = createSlice({
 	name: 'auth',
 	initialState,
 	reducers: {
-		setToken: (state, action: PayloadAction<{ token: string, expires: string }>) => {
+		setToken: (state, action: PayloadAction<Token>) => {
 			state.token = action.payload.token;
+			state.username = action.payload.username;
 			state.expires = action.payload.expires;
 			state.authenticated = true;
 		},
@@ -32,9 +34,9 @@ const authSlice = createSlice({
 export const register = (username: string, email: string, password: string): ApiRequest => async (dispatch, _, { register }) =>
 	register(username, email, password)
 		.then(token => dispatch(authSlice.actions.setToken(token)));
-export const login = (identifier: string, password: string): ApiRequest => async (dispatch, _, { login }) =>
-	login(identifier, password)
-		.then(token => dispatch(authSlice.actions.setToken(token)));
+export const login = (email: string, password: string): ApiRequest => async (dispatch, _, { login }) =>
+	login(email, password)
+		.then((token) => dispatch(authSlice.actions.setToken(token)));
 export const logout = () => (dispatch: Dispatch) =>
 	dispatch(authSlice.actions.unsetToken())
 

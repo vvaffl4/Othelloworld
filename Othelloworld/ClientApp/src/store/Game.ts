@@ -4,24 +4,34 @@ import Game from '../model/Game';
 import PlayerInGame, { Color } from '../model/PlayerInGame';
 
 type PlayerType = 1 | 2;
+type CameraMode = 'perspective' | 'orthographic';
+
+interface Controls {
+	mode: CameraMode
+}
 
 // Define a type for the slice state
 interface GameState {
-	token?: string;
+	hasGame: boolean;
 	players?: [PlayerInGame, PlayerInGame];
 	player?: PlayerType,
 	turn?: PlayerType,
 	board: number[][],
 	placeholders: [number, number][]
+	controls: Controls
 }
 
 // Define the initial state using that type
 const initialState: GameState = {
+	hasGame: false,
 	players: undefined,
 	player: 1,
 	turn: 1,
 	board: [],
-	placeholders: []
+	placeholders: [],
+	controls: {
+		mode: 'perspective'
+	}
 }
 
 const allDirections: [number, number][] = [
@@ -95,15 +105,12 @@ const createPlaceholderMap = (board: number[][], color: Color) => {
 	];
 
 	// Every Row
-	return board.reduce<[number, number][]>((state, row, yIndex) => [
-		...state,
+	return board.reduce<[number, number][]>((state, row, yIndex) => 
 		// Every Column
-		...row.reduce<[number, number][]>((state, cell, xIndex) => {
-			if (cell !== opponent) return state;
-
-			return [
-				...state,
-				...directions.reduce<[number, number][]>((state, direction) => {
+		row.reduce((state, cell, xIndex) => 
+			(cell !== opponent) 
+				? state
+				: directions.reduce((state, direction) => {
 				const [locX, locY]: [number, number] = [xIndex + direction[0], yIndex + direction[1]];
 
 				if (locX < 0 || locY < 0 || locX > 7 || locY > 7
@@ -127,10 +134,9 @@ const createPlaceholderMap = (board: number[][], color: Color) => {
 				}
 
 				return state;
-				}, [])
-			]
-		}, [])
-	], []);
+				}, state)
+		, state)
+	, []);
 }
 
 export const gameSlice = createSlice({
@@ -155,11 +161,12 @@ export const gameSlice = createSlice({
 			state.board = action.payload;
 		},
 		setGame: (state, action: PayloadAction<Game>) => {
-			state.token = action.payload.token;
+			state.hasGame = true;
+			state.turn = action.payload.playerTurn as PlayerType;
 			state.board = action.payload.board;
 			state.players = action.payload.players;
 
-			state.placeholders = createPlaceholderMap(state.board, Color.white);
+			state.placeholders = createPlaceholderMap(state.board, action.payload.playerTurn);
 		},
 		putStone: (state, { payload: [locX, locY] }: PayloadAction<[number, number]>) => {
 			if (locX < 0
@@ -176,9 +183,14 @@ export const gameSlice = createSlice({
 					state.board[position[1]][position[0]] = state.player!;
 				});
 			});
+		},
+		toggleCameraMode: (state) => {
+			state.controls.mode = state.controls.mode === 'perspective'
+				? 'orthographic'
+				: 'perspective';
 		}
-	},
-})
+	}
+});
 
 export const createGame = (game: Pick<Game, 'name' | 'description'>): ApiRequest =>
 	async (dispatch, getState, { createGame }) =>
@@ -188,18 +200,18 @@ export const createGame = (game: Pick<Game, 'name' | 'description'>): ApiRequest
 //export const joinGame = (token: string): ApiRequest =>
 
 
-export const fetchGame = (gameToken: string): ApiRequest =>
+export const fetchGame = (): ApiRequest =>
 	async (dispatch, getState, { getGame }) =>
-		getGame(getState().auth, gameToken)
+		getGame(getState().auth)
 			.then(game => dispatch(setGame(game)))
 			.catch(console.error);
 
-export const putStone = (gameToken: string, position: [number, number]): ApiRequest =>
+export const putStone = (position: [number, number]): ApiRequest =>
 	async (dispatch, getState, { putStone }) =>
 		putStone(getState().auth, position)
 			.then(game => dispatch(setGame(game)))
 			.catch(console.error);
 
-export const { startGame, setBoard, setGame } = gameSlice.actions
+export const { startGame, setBoard, setGame, toggleCameraMode } = gameSlice.actions
 
 export default gameSlice.reducer

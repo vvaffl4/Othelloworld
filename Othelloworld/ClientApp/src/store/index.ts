@@ -1,5 +1,5 @@
 ﻿import { configureStore } from '@reduxjs/toolkit'
-import Api from '../api';
+import * as Api from '../api';
 import ui from './UserInterface';
 import nav from './Nav';
 import world from './World';
@@ -8,8 +8,8 @@ import games from './Games';
 import game from './Game'
 // ...
 
-const authState = localStorage.getItem('auth')
-  ? JSON.parse(localStorage.getItem('auth')!)
+const authState = sessionStorage.getItem('auth')
+  ? JSON.parse(sessionStorage.getItem('auth')!)
   : {}
 
 const store = configureStore({
@@ -33,7 +33,7 @@ const store = configureStore({
 })
 
 store.subscribe(() => {
-  localStorage.setItem('auth', JSON.stringify(store.getState().auth));
+  sessionStorage.setItem('auth', JSON.stringify(store.getState().auth));
 })
 
 export default store;

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Othelloworld.Data.Models
 {
@@ -12,6 +13,7 @@ namespace Othelloworld.Data.Models
 
 	public class PlayerInGame
 	{
+		[JsonIgnore]
 		[ForeignKey("Player_Username_ID")]
 		public string Username { get; set; }
 
@@ -20,6 +22,7 @@ namespace Othelloworld.Data.Models
 		public bool IsHost { get; set; }
 		public Color Color { get; set; }
 
+		[JsonIgnore]
 		[ForeignKey("Game_Token_ID")]
 		public string GameToken { get; set; }
 		public Game Game { get; set; }

@@ -8,19 +8,13 @@ import ProfileAvatar from "./ProfileAvatar";
 import { useAppDispatch, useAppSelector } from "../store/Hooks";
 
 const Nav: FC = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const auth = useAppSelector(state => state.auth.authenticated);
-
-  const handleRegister = () => {
-    navigate('register');
-  }
+  const authenticated = useAppSelector(state => state.auth.authenticated);
 
   return (
     <AppBar>
       <Toolbar sx={{ minHeight: '56px !important' }}>
-        { auth && (
+        { authenticated && (
           <div
             style={{
               height: '100%',
@@ -87,7 +81,7 @@ const Nav: FC = () => {
           ))} */}
         </div>
         <div style={{ flexGrow: 0 }}>
-          { auth ? (
+          { authenticated ? (
             <ProfileAvatar/>
           ) : (
             <ButtonGroup 

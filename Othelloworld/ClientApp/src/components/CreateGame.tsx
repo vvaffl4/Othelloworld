@@ -25,11 +25,11 @@ const CreateGame: FC = () => {
     dispatch(selectAndFocusCountry({ isoCode: 'nl', altitude: 1 }));
   }, []);
 
-  useEffect(() => {
-    if (game.token) {
-      navigate(game.token);
-		}
-	}, [game])
+ // useEffect(() => {
+ //   if (game.token) {
+ //     navigate(game.token);
+	//	}
+	//}, [game])
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);

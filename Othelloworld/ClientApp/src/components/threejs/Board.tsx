@@ -4,8 +4,8 @@ import { shallowEqual } from 'react-redux';
 import * as THREE from 'three';
 import Placeholder from './Placeholder';
 import Stone from './Stone';
-import { putStone } from '../store/Game';
-import { useAppDispatch, useAppSelector } from '../store/Hooks';
+import { putStone } from '../../store/Game';
+import { useAppDispatch, useAppSelector } from '../../store/Hooks';
 
 const Board: FC<{position: Vector3 }> = (props) => {
   const boardSpaces = 8;
@@ -16,10 +16,8 @@ const Board: FC<{position: Vector3 }> = (props) => {
   const [turn, setTurn] = useState<number>(1);
 
   const dispatch = useAppDispatch();
-  const board = useAppSelector(state => state.game.board, shallowEqual);
-  const placeholders = useAppSelector(state => state.game.placeholders, shallowEqual);
-  const gameToken = useAppSelector(state => state.game.token);
-
+  const game = useAppSelector(state => state.game, shallowEqual);
+ 
   useEffect(() => {
     for (let i = 0; i < boardSpaces * boardSpaces; i++) {
         ref.current!.addGroup(
@@ -35,11 +33,9 @@ const Board: FC<{position: Vector3 }> = (props) => {
       const xIndex = index % 8
       const yIndex = Math.floor(index / 8);
 
-      console.log('test');
-
-      dispatch(putStone(gameToken!, [xIndex, yIndex])); 
+      dispatch(putStone([xIndex, yIndex])); 
     }
-  }, [board]);
+  }, [game.board]);
 
   return (
     <>
@@ -57,7 +53,7 @@ const Board: FC<{position: Vector3 }> = (props) => {
           args={[5, 5, 8, 8]}
         />
       </mesh>
-      {board
+      {game.board
         .map((row, yIndex) =>
           row.map((cell, xIndex) => {
             const index = yIndex * 8 + xIndex;
@@ -74,10 +70,10 @@ const Board: FC<{position: Vector3 }> = (props) => {
               />
             )
           }))}
-      {placeholders.map(([ posX, posY ], index) => (
+      {game.placeholders.map(([ posX, posY ], index) => (
         <Placeholder
           key={index}
-          num={1}
+          num={game.turn!}
           position={[
             -(spaceSize * ((boardSpaces - 1) * 0.5)) + posX * spaceSize,
             0.01,

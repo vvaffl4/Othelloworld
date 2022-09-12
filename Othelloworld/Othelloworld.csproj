@@ -34,7 +34,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\components\Challenge.tsx" />
+    <None Remove="ClientApp\src\components\ErrorMessage.tsx" />
+    <None Remove="ClientApp\src\components\PlayerCard.tsx" />
+    <None Remove="ClientApp\src\components\Score.tsx" />
     <None Remove="ClientApp\src\components\Staging.tsx" />
+    <None Remove="ClientApp\src\components\threejs\Camera.tsx" />
+    <None Remove="ClientApp\src\components\threejs\ControlledCamera.tsx" />
+    <None Remove="ClientApp\src\components\Timeline.tsx" />
     <None Remove="ClientApp\src\CreateGame.tsx" />
     <None Remove="ClientApp\src\Game.tsx" />
     <None Remove="ClientApp\src\GameItem.tsx" />
@@ -62,12 +69,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\components\Challenge.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\components\ErrorMessage.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\PlayerCard.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\Score.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\Staging.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\CreateGame.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\Game.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\GameItem.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\GameList.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\Home.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\threejs\Camera.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\threejs\ControlledCamera.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\Timeline.tsx" />
     <TypeScriptCompile Include="ClientApp\src\model\Account.ts" />
     <TypeScriptCompile Include="ClientApp\src\model\Game.ts" />
     <TypeScriptCompile Include="ClientApp\src\model\Player.ts" />
@@ -89,7 +105,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ClientApp\src\components\threejs\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 

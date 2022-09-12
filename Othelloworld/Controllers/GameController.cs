@@ -7,14 +7,10 @@ using Microsoft.Extensions.Logging;
 using Othelloworld.Data;
 using Othelloworld.Data.Models;
 using Othelloworld.Data.Repos;
+using Othelloworld.Services;
 using Othelloworld.Util;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,18 +22,24 @@ namespace Othelloworld.Controllers
 	public class GameController : Controller
 	{
 		private readonly IGameRepository _gameRepository;
+		private readonly IGameService _gameService;
 		private readonly IPlayerRepository _playerRepository;
+		private readonly IAccountService _accountService;
 		private readonly UserManager<Account> _userManager;
 		private readonly ILogger<GameController> _logger;
 
 		public GameController(
 			IGameRepository gameRepository,
+			IGameService gameService,
 			IPlayerRepository playerRepository,
+			IAccountService accountService,
 			UserManager<Account> userManager,
 			ILogger<GameController> logger)
 		{
 			_gameRepository = gameRepository;
+			_gameService = gameService;
 			_playerRepository = playerRepository;
+			_accountService = accountService;
 			_userManager = userManager;
 			_logger = logger;
 		}
@@ -47,7 +49,7 @@ namespace Othelloworld.Controllers
 		/// </summary>
 		/// <param name="search"></param>
 		/// <returns></returns>
-		[HttpGet("/search")]
+		[HttpGet("search")]
 		public ActionResult<IEnumerable<Game>> SearchGames(string search) =>
 			_gameRepository.FindByCondition(g =>
 				g.Name.Contains(search)
@@ -59,7 +61,7 @@ namespace Othelloworld.Controllers
 		/// <param name="pageNumber"></param>
 		/// <param name="pageSize"></param>
 		/// <returns></returns>
-		[HttpGet]
+		[HttpGet("pages")]
 		[Produces("application/json")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -67,25 +69,13 @@ namespace Othelloworld.Controllers
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		public async Task<ActionResult<PagedList<Game>>> GetGames([FromQuery] int pageNumber, int pageSize)
 		{
-			//var authorization = Request.Headers["Authorization"]
-			//	.FirstOrDefault()
-			//	.Replace("bearer ", "", true, CultureInfo.CurrentCulture);
-
-			//var token = JwtHelper.ReadJwtToken(authorization);
-
-			//var id = token.Claims.First(claim => claim.Type == JwtRegisteredClaimNames.Sub).Value;
-
-			//var account = await _userManager.FindByIdAsync(id);
-
-			//Debug.WriteLine($"Account: {account.UserName}");
-
 			return await _gameRepository.GetGames(pageNumber, pageSize);
 		}
 
 		/// <summary>
 		/// Create a game
 		/// </summary>
-		/// <param name="game"></param>
+		/// <param name="model"></param>
 		/// <returns>Game</returns>
 		[HttpPost]
 		[Consumes("application/json")]
@@ -97,44 +87,13 @@ namespace Othelloworld.Controllers
 			if (model == null) return BadRequest("Game is null");
 			if (model.Name == null) return BadRequest("Invalid model state for game");
 
-			var authorization = Request.Headers["Authorization"]
-				.FirstOrDefault()
-				.Replace("bearer ", "", true, CultureInfo.CurrentCulture);
-
-			var token = JwtHelper.ReadJwtToken(authorization);
-
-			var id = token.Claims.First(claim => claim.Type == JwtRegisteredClaimNames.Sub).Value;
+			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
 
 			var account = await _userManager.FindByIdAsync(id);
 
-			var gameToken = Guid.NewGuid().ToString();
-			var game = new Game
-			{
-				Token = gameToken,
-				Name = model.Name,
-				Description = model.Description,
-				PlayerTurn = Color.white,
-				Players = new PlayerInGame[]
-				{
-					new PlayerInGame
-					{
-						GameToken = gameToken,
-						Username = account.UserName,
-						IsHost = true
-					}
-				},
-				Board = new int[8][]
-				{
-					new int[8] { 0, 0, 0, 0, 0, 0, 0, 0 },
-					new int[8] { 0, 0, 0, 0, 0, 0, 0, 0 },
-					new int[8] { 0, 0, 0, 0, 0, 0, 0, 0 },
-					new int[8] { 0, 0, 0, 1, 2, 0, 0, 0 },
-					new int[8] { 0, 0, 0, 2, 1, 0, 0, 0 },
-					new int[8] { 0, 0, 0, 0, 0, 0, 0, 0 },
-					new int[8] { 0, 0, 0, 0, 0, 0, 0, 0 },
-					new int[8] { 0, 0, 0, 0, 0, 0, 0, 0 }
-				}
-			};
+			if (account == null) return BadRequest("Token is invalid");
+
+			var game = _gameService.CreateNewGame(account.UserName, model.Name, model.Description);
 
 			_gameRepository.CreateGame(game);
 			return Created("CreateGame", game);
@@ -144,150 +103,63 @@ namespace Othelloworld.Controllers
 		/// Gets active game
 		/// </summary>
 		/// <returns></returns>
-		[HttpGet("{token}")]
+		[HttpGet]
 		[Produces("application/json")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		public ActionResult<Game> GetGame(string token)
+		public async Task<ActionResult<Game>> GetGameAsync()
 		{
-			if (token.Length < 1 || token == null) return BadRequest("Invalid token");
-			var game = _gameRepository.GetGame(token);
-			if (game == null) return NotFound("Game " + token + " does not exist");
+			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			var account = await _userManager.FindByIdAsync(id);
+
+			if (account == null) return BadRequest("Token is invalid");
+
+			account.Player = _playerRepository.GetPlayer(account.UserName);
+
+			if (account.Player.PlayerInGame == null) return BadRequest("Player doesn't have a game");
+
+			var game = _gameRepository.GetGame(account.Player.PlayerInGame.GameToken);
+
 			return Ok(game);
 		}
 
-		private class Result
-		{
-			public bool valid;
-			public int[][][] paths;
-		}
-
-		static U Reduce<T, R, U>(T list, Func<U, R, U> func, U acc) where T : IEnumerable<R>
-		{
-			foreach (var i in list)
-				acc = func(acc, i);
-
-			return acc;
-		}
-
-		private Result checkIfValid(int[][] board, int[] position, int turn)
-		{
-			var directions = new int[8][] {
-				new int[2]{-1, -1}, new int[2]{0, -1}, new int[2]{1, -1},
-				new int[2]{-1,  0},                    new int[2]{1,  0},
-				new int[2]{-1,  1}, new int[2]{0,  1}, new int[2]{1,  1}
-			};
-
-			if (board[position[1]][position[0]] != (int)Color.none)
-			{
-				return new Result
-				{
-					valid = false
-				};
-			}
-
-			return Reduce<int[][], int[], Result>(directions, (result, direction) =>
-			{
-				var hasOpponent = false;
-				var path = Array.Empty<int[]>();
-
-				for (int index = 1,
-					xIndex = index * direction[0] + position[0],
-					yIndex = index * direction[1] + position[1];
-
-					xIndex > -1 && yIndex > -1 && xIndex < 8 && yIndex < 8;
-
-					++index,
-					xIndex = index * direction[0] + position[0],
-					yIndex = index * direction[1] + position[1])
-				{
-					if (board[yIndex][xIndex] == turn + 1 && hasOpponent)
-					{
-						return new Result
-						{
-							valid = true,
-							paths = result.paths.Concat(new int[][][] { path }).ToArray()
-
-						};
-					}
-					else if (board[yIndex][xIndex] == 1 - turn + 1)
-					{
-						hasOpponent = true;
-						path = path.Concat(new int[][] { new int[] { xIndex, yIndex } }).ToArray();
-					}
-					else
-					{
-						break;
-					}
-				}
-
-				return result;
-			},
-				new Result
-				{
-					valid = false,
-					paths = new int[][][] {
-						new int[][] { position }
-					}
-				});
-		}
-
-		[HttpPut("{gameToken}/{accountToken}")]
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="position"></param>
+		/// <returns></returns>
+		[HttpPut]
 		[Consumes("application/json")]
 		[Produces("application/json")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		public async Task<ActionResult<Game>> PutStoneAsync(string gameToken, string accountToken, [FromBody] int[] position)
+		public async Task<ActionResult<Game>> PutStoneAsync([FromBody] int[] position)
 		{
-			var authorization = Request.Headers["Authorization"]
-				.FirstOrDefault()
-				.Replace("bearer ", "", true, CultureInfo.CurrentCulture);
+			if (position.Length != 2) return BadRequest("Position is invalid");
+			var pos = (position[0], position[1]);
+			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
 
-			var token = JwtHelper.ReadJwtToken(authorization);
+			var account = await _userManager.FindByIdAsync(id);
+			account.Player = _playerRepository.GetPlayer(account.UserName);
 
-			var id = token.Claims.First(claim => claim.Type == JwtRegisteredClaimNames.Sub).Value;
-
-			var account = await await _userManager.FindByIdAsync(id)
-				.ContinueWith(async task =>
-				{
-					var account = await task;
-					account.Player = _playerRepository.GetPlayer(account.UserName);
-					account.Player.PlayerInGame.Game = _gameRepository.GetGame(account.Player.PlayerInGame.GameToken);
-					return account;
-				});
-				
-			var game = account.Player.PlayerInGame.Game;
+			if (account.Player.PlayerInGame == null) return BadRequest("Player doesn't have a game");
+							
+			var game = _gameRepository.GetGame(account.Player.PlayerInGame.GameToken);
 
 			if (game.PlayerTurn != account.Player.PlayerInGame.Color) return BadRequest("Not your turn");
-			
-			var result = checkIfValid(game.Board, position, (int)game.PlayerTurn - 1);
 
-			if (result.valid)
+			var gameService = new GameService();
+			try
 			{
-				var board = game.Board;
+				var result = gameService.PutStone(game, pos);
 
-				result.paths.ToList()
-					.ForEach(path => path.ToList()
-						.ForEach(location =>
-							board[location[1]][location[0]] = (int)game.PlayerTurn
-						)
-					);
+				_gameRepository.UpdateGame(result);
 
-				game.Board = board;
-				if (game.PlayerTurn == Color.white)
-				{
-					game.PlayerTurn = Color.black;
-				}
-				else
-				{
-					game.PlayerTurn = Color.white;
-				}
-
-				_gameRepository.UpdateGame(game);
-				return Ok(game);
+				return Ok(result);
+			} catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
 			}
-
-			return BadRequest("Not a valid action.");
 		}
 
 		public class CreateGameModel

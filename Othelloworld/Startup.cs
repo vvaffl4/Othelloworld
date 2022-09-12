@@ -14,12 +14,11 @@ using System.Text.Json.Serialization;
 using Othelloworld.Data.Repos;
 using Microsoft.AspNetCore.Identity;
 using Othelloworld.Data.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Collections.Generic;
+using Othelloworld.Services;
 
 namespace Othelloworld
 {
@@ -77,17 +76,6 @@ namespace Othelloworld
 				.AddRoles<IdentityRole>()
 				.AddEntityFrameworkStores<OthelloDbContext>();
 
-			//services.AddIdentityServer()
-			//		.AddApiAuthorization<Account, OthelloDbContext>();
-
-			//services.AddAuthentication()
-			//		.AddIdentityServerJwt();
-
-
-			//var Issuer = "https://mysite.com";
-			//var Audience = "https://mysite.com";
-			//var SigningKey = "12345@4321";
-
 			services.AddAuthentication(auth =>
 			{
 				auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -110,7 +98,9 @@ namespace Othelloworld
 
 			services
 				.AddScoped<IGameRepository, GameRepository>()
-				.AddScoped<IPlayerRepository, PlayerRepository>();
+				.AddScoped<IGameService, GameService>()
+				.AddScoped<IPlayerRepository, PlayerRepository>()
+				.AddScoped<IAccountService, AccountService>();
 
 			services.AddControllers()
 				.AddJsonOptions(x => {

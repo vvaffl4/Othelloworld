@@ -1,4 +1,5 @@
-﻿using JWT.Algorithms;
+﻿using Duende.IdentityServer.Extensions;
+using JWT.Algorithms;
 using JWT.Builder;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -27,17 +28,6 @@ namespace Othelloworld.Controllers
 		private readonly IConfiguration _configuration;
 		private readonly UserManager<Account> _userManager;
 		private readonly SignInManager<Account> _signInManager;
-
-		private string _privateKey = "-----BEGIN RSA PRIVATE KEY-----\r\nMIIBOgIBAAJBAIlam3rj1P7MQu/O11E5u/6h8ndr+FdsRk6813uLwADZFNP6mP5v\r\n81sY2/uk5FyWJReWIJD3IE4upyUHRIRD1nUCAwEAAQJATwb1zCgH5a4KmUVt90r7\r\nkk8FXZaepVYjwau/Y1MN3q4tpfibzqafELG42kBBFwzmwRX/nE4qELhl0NvlblQT\r\nhQIhANn5OxfKSsbsiyPd00tCoS6nGXYstnt9xotga//UZ/aTAiEAoVDg09qBLr6s\r\nnPP/IX6BPgLZmtleGX5wCNu9Pwls29cCIQDIj+jttPclHlXQxLU8lKxWju6ArBek\r\nfVCIwknddgXK/QIgeHkebxlQQMjFwLG4aBtCCj22pZ6QWBnFMdhpjRpM4iECIHry\r\n8y4yJHZqv8zpisBVuWP092u6xUWatdA9hAKxAv7u\r\n-----END RSA PRIVATE KEY-----";
-		private string _publicKey = "-----BEGIN PUBLIC KEY-----\r\nMFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIlam3rj1P7MQu/O11E5u/6h8ndr+Fds\r\nRk6813uLwADZFNP6mP5v81sY2/uk5FyWJReWIJD3IE4upyUHRIRD1nUCAwEAAQ==\r\n-----END PUBLIC KEY-----";
-		//		private readonly AccountRepository _repository;
-		//		private readonly ILogger<AccountController> _logger;
-
-		//		public AccountController(AccountRepository repo, ILogger<AccountController> logger)
-		//		{
-		//			_repository = repo;
-		//			_logger = logger;
-		//		}
 
 		public AccountController(
 			IConfiguration configuration,
@@ -77,21 +67,20 @@ namespace Othelloworld.Controllers
 		public async Task<IActionResult> Login(LoginModel model)
 		{
 			if (!ModelState.IsValid) return BadRequest("Supplied bad model");
+			if (model.Email.IsNullOrEmpty() || model.Password.IsNullOrEmpty()) BadRequest("Email or Password is incorrect!");
 
 			var account = await _userManager.FindByEmailAsync(model.Email);
 			var result = await _signInManager.PasswordSignInAsync(account.UserName, model.Password, false, false);
-
-			Debug.WriteLine($"LoginModel: {model.Email}, {model.Password}");
-			Debug.WriteLine($"Account: {account.UserName}");
-			Debug.WriteLine($"Result: {result}");
 
 			if (!result.Succeeded) return BadRequest(result.ToString());
 
 			var roles = await _userManager.GetRolesAsync(account);
 
-			var claims = new List<Claim>();
-			claims.Add(new Claim("id", account.Id));
-			claims.Add(new Claim("username", account.UserName));
+			var claims = new List<Claim>
+			{
+				new Claim("id", account.Id),
+				new Claim("username", account.UserName)
+			};
 
 			// Add roles as multiple claims
 			foreach (var role in roles)
@@ -109,6 +98,7 @@ namespace Othelloworld.Controllers
 
 			return Ok(new { 
 				token = new JwtSecurityTokenHandler().WriteToken(token),
+				username = account.UserName,
 				expires = token.ValidTo
 			});
 		}
