@@ -38,8 +38,7 @@ createRoot(
                   <Route path="browse" element={<GameList />} />
                   <Route path="" element={<Play />} />
                 </Route> 
-                <Route path="profile" element={<Profile /> }>
-                </Route>
+                <Route path="profile/:username" element={<Profile /> }/>
               </Route>
             </Routes>
             </BrowserRouter>

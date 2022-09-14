@@ -28,6 +28,7 @@ interface WorldState {
 		orbitControl: boolean;
 		orbitAutoRotate: boolean;
 		countrySelectMaxCount: number;
+		show: boolean;
 	},
 	countries: Country[],
 	selected: Country[],
@@ -40,7 +41,8 @@ const initialState: WorldState = {
 		countrySelect: false,
 		orbitControl: false,
 		orbitAutoRotate: true,
-		countrySelectMaxCount: 1
+		countrySelectMaxCount: 1,
+		show: true
 	},
 	countries: [],
 	selected: [],

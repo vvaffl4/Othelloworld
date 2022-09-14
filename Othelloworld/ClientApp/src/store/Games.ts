@@ -2,7 +2,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { ApiRequest } from "."
 import Game from "../model/Game"
-import PlayerInGame from "../model/PlayerInGame"
 
 
 export type Library<T extends number | string, U> = {

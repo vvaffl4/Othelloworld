@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '../store/Hooks';
 import Score from './Score';
 import Timeline from './Timeline';
 import Camera from './threejs/Camera';
+import { changeWorldSettings } from '../store/World';
 
 const Playfield: FC = () => {
   const ContextBridge = useContextBridge(ReactReduxContext);
@@ -33,6 +34,10 @@ const Playfield: FC = () => {
       clearInterval(intervalId);
 		}
   }, [game.turn]);
+
+  useEffect(() => {
+    dispatch(changeWorldSettings({ show: false }));
+  }, []);
 
   const [emptyCount, whiteCount, blackCount] = game.board.reduce((state, value) =>
     value.reduce((state, value) => [

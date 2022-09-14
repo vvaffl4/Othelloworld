@@ -1,10 +1,26 @@
-﻿import { Box, Container, Paper, Typography } from '@mui/material';
-import { FC } from 'react';
+﻿import { Box, Container, Paper, Stack, Typography } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { getPlayer } from '../api';
+import Player from '../model/Player';
 import { useAppSelector } from '../store/Hooks';
 import BadgeAvatar from './BadgeAvatar';
 
 const Profile: FC = () => {
-	const player = useAppSelector(state => state.auth.username);
+	const { username } = useParams();
+	const auth = useAppSelector(state => state.auth);
+	const [ player, setPlayer ] = useState<Player>()
+
+	useEffect(() => {
+		if (auth.token
+			&& auth.token.length > 0
+			&& username) {
+			getPlayer(auth, username)
+				.then((player) => {
+					setPlayer(player);
+				});
+		}
+	}, [auth.token, username]);
 
 	return (
 		<Box
@@ -19,14 +35,22 @@ const Profile: FC = () => {
 			<Container>
 				<Paper>
 					<BadgeAvatar countryIso="nl" />
-					<Typography
-						variant="h2"
-					>
-						{player}
-					</Typography>
-					<Typography>
-						{ }
-					</Typography>
+					<Stack direction="row">
+						<Typography
+							variant="h2"
+						>
+							{player?.username}
+						</Typography>
+						<Typography>
+							{player?.amountWon}
+						</Typography>
+						<Typography>
+							{player?.amountDraw}
+						</Typography>
+						<Typography>
+							{player?.amountLost}
+						</Typography>
+					</Stack>
 				</Paper>
 			</Container>
 		</Box>
