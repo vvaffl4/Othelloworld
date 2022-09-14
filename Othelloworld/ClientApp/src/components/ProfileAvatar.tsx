@@ -4,6 +4,7 @@ import { FC, useState } from 'react';
 import { useAppDispatch } from '../store/Hooks';
 import { setPaletteMode } from '../store/UserInterface';
 import { logout } from '../store/Auth';
+import BadgeAvatar from './BadgeAvatar';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -62,23 +63,7 @@ const ProfileAvatar: FC = () => {
           onClick={handleOpenUserMenu}
           sx={{ p: 0 }}
         >
-          <StyledBadge
-            overlap="circular"
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            variant="dot"
-          >
-            <Avatar alt="username">
-              <span
-                className='fi fi-nl fis'
-                style={{
-                  display: 'inline-block',
-                  fontSize: 36,
-                  width: '100%',
-                  height: '100%'
-                }}
-              />
-            </Avatar>
-          </StyledBadge>
+          <BadgeAvatar countryIso="nl" />
         </IconButton>
       </Tooltip >
       <Menu

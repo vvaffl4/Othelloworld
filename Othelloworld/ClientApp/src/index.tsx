@@ -7,6 +7,7 @@ import Game from "./components/Game";
 import CreateGame from "./components/CreateGame";
 import GameList from "./components/GameList";
 import Home from "./components/Home";
+import Profile from "./components/Profile";
 import HomeContainer from "./components/HomeContainer";
 import "./index.css";
 import Play from "./components/Play";
@@ -37,7 +38,8 @@ createRoot(
                   <Route path="browse" element={<GameList />} />
                   <Route path="" element={<Play />} />
                 </Route> 
-                {/*<Route path="play" element={<Play />}/>*/}
+                <Route path="profile" element={<Profile /> }>
+                </Route>
               </Route>
             </Routes>
             </BrowserRouter>

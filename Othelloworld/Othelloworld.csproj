@@ -34,9 +34,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\components\BadgeAvatar.tsx" />
     <None Remove="ClientApp\src\components\Challenge.tsx" />
     <None Remove="ClientApp\src\components\ErrorMessage.tsx" />
     <None Remove="ClientApp\src\components\PlayerCard.tsx" />
+    <None Remove="ClientApp\src\components\Profile.tsx" />
     <None Remove="ClientApp\src\components\Score.tsx" />
     <None Remove="ClientApp\src\components\Staging.tsx" />
     <None Remove="ClientApp\src\components\threejs\Camera.tsx" />
@@ -69,11 +71,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\components\BadgeAvatar.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\Challenge.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\components\ErrorMessage.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\PlayerCard.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\Profile.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\Score.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\Staging.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\CreateGame.tsx" />
