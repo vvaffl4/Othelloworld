@@ -6,37 +6,41 @@ using Othelloworld.Data.Models;
 using Othelloworld.Services;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using static Duende.IdentityServer.Models.IdentityResources;
+using System.Xml.Linq;
 
 namespace Othelloworld.Pages
 {
+	public class Movie
+	{
+		public string Title { get; set; }
+		public string ReleaseDate { get; set; }
+		public string Genre { get; set; }
+		public string Price { get; set; }
+
+	}
+
 	public class IndexModel : PageModel
 	{
-		private SignInManager<Account> _signInManager;
 
-		[BindProperty]
-		public string Username { get; set; }
-
-		[BindProperty]
-		public string Password { get; set; }
-
-		public IndexModel (SignInManager<Account> signInManager)
+		public IActionResult OnGet()
 		{
-			_signInManager = signInManager;
+			return Page();
 		}
 
-		public void OnGet()
-		{
-		}
+		[BindProperty]
+		public Movie Movie { get; set; } = default!;
 
+
+		// To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
 		public async Task<IActionResult> OnPostAsync()
 		{
-			var result = await _signInManager.PasswordSignInAsync(Username, Password, false, false);
-
-			if (!result.Succeeded) return Page();
-
-			Debug.WriteLine("Logged in");
-
-			return Page();
+			if (!ModelState.IsValid || Movie == null)
+			{
+				return Page();
+			}
+			
+			return RedirectToPage("./Admin");
 		}
 	}
 }

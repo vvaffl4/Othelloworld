@@ -319,6 +319,7 @@ namespace Othelloworld.Data
 			builder.Entity<PlayerInGame>(entity =>
 				entity.HasOne(playerInGame => playerInGame.Player)
 					.WithMany(player => player.PlayerInGame));
+
 					//.HasForeignKey<PlayerInGame>(playerInGame => playerInGame.Username)
 					//.HasPrincipalKey<Player>(player => player.Username));
 
