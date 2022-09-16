@@ -9,6 +9,7 @@ interface FormProps {
   email: string;
   password: string;
   validation: string;
+  country: string
 }
 
 const Register: FC = () => {
@@ -20,7 +21,8 @@ const Register: FC = () => {
     username: '',
     email: '',
     password: '',
-    validation: ''
+    validation: '',
+    country: ''
   });
   const [errors, setErrors] = useState<string[]>([]);
 
@@ -58,7 +60,8 @@ const Register: FC = () => {
       dispatch(register(
         form.username,
         form.email,
-        form.password
+        form.password,
+        form.country
       ));
     } else {
       newErrors.push('validation');
@@ -173,12 +176,13 @@ const Register: FC = () => {
               <TextField
                 required
                 id="standard-required"
-                name="player_name"
+                name="country"
                 label="Required"
                 variant="standard"
                 value={country
                   ? country.properties.NAME
                   : ''}
+                onChange={handleChange}
               />
             </Box>
           </Stack>

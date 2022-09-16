@@ -31,12 +31,12 @@ const authSlice = createSlice({
 	}
 });
 
-export const register = (username: string, email: string, password: string): ApiRequest => async (dispatch, _, { register }) =>
-	register(username, email, password)
+export const register = (username: string, email: string, password: string, country: string): ApiRequest => async (dispatch, _, { register }) =>
+	register(username, email, password, country)
 		.then(token => dispatch(authSlice.actions.setToken(token)));
 export const login = (email: string, password: string): ApiRequest => async (dispatch, _, { login }) =>
 	login(email, password)
-		.then((token) => dispatch(authSlice.actions.setToken(token)));
+		.then(token => dispatch(authSlice.actions.setToken(token)));
 export const logout = () => (dispatch: Dispatch) =>
 	dispatch(authSlice.actions.unsetToken())
 

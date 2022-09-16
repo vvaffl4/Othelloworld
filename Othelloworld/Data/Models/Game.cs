@@ -7,10 +7,11 @@ using System.Text.Json.Serialization;
 
 namespace Othelloworld.Data.Models
 {
-	public enum Status
+	public enum GameStatus
 	{
 		Staging = 0,
-		Playing = 1
+		Playing = 1,
+		Finished = 2
 	}
 
 	public class Game
@@ -23,7 +24,7 @@ namespace Othelloworld.Data.Models
 		[Required]
 		public string Name { get; set; }
 
-		public Status Status { get; set; }
+		public GameStatus Status { get; set; }
 		public virtual ICollection<PlayerInGame> Players { get; set; }
 		public Color PlayerTurn { get; set; }
 		public string Description { get; set; }

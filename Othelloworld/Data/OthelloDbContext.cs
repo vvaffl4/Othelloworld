@@ -1,4 +1,5 @@
-﻿using Duende.IdentityServer.EntityFramework.Options;
+﻿
+using Duende.IdentityServer.EntityFramework.Options;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -17,7 +18,7 @@ namespace Othelloworld.Data
 	public class OthelloDbContext : IdentityDbContext<Account>
 	{
 		private DbSet<Account> Accounts { get; set; }
-		private DbSet<Player> Players { get; set; }
+		public DbSet<Player> Players { get; set; }
 		private DbSet<Game> Games { get; set; }
 		private DbSet<PlayerInGame> PlayersInGame { get; set; }
 
@@ -151,80 +152,47 @@ namespace Othelloworld.Data
 				}
 			});
 
-			//var accounts = new Account[]
-			//{
-			//	new Account{
-			//		Token = Guid.NewGuid().ToString(),
-			//		Username = "hello",
-			//		Email = "hellohappy@world.com",
-			//		Password = "password"
-			//	},
-			//	new Account{
-			//		Token = Guid.NewGuid().ToString(),
-			//		Username = "hello1",
-			//		Email = "hello1happy@world.com",
-			//		Password = "password"
-			//	},
-			//	new Account{
-			//		Token = Guid.NewGuid().ToString(),
-			//		Username = "hello2",
-			//		Email = "hello2happy@world.com",
-			//		Password = "password"
-			//	},
-			//	new Account{
-			//		Token = Guid.NewGuid().ToString(),
-			//		Username = "hello3",
-			//		Email = "hello3happy@world.com",
-			//		Password = "password"
-			//	},
-			//	new Account{
-			//		Token = Guid.NewGuid().ToString(),
-			//		Username = "hello4",
-			//		Email = "hello4happy@world.com",
-			//		Password = "password"
-			//	}
-			//};
-
-
-
-
-
 			var players = new Player[]
 			{
 				new Player
 				{
 					Username = "admin",
-					amountWon = 2,
-					amountLost = 3,
-					amountDraw = 0
-				},
+					AmountWon = 2,
+					AmountLost = 3,
+					AmountDraw = 0,
+					Country = "nl"
+				}, 
 				new Player
 				{
 					Username = "hello1",
-					amountWon = 2,
-					amountLost = 3,
-					amountDraw = 0
+					AmountWon = 2,
+					AmountLost = 3,
+					AmountDraw = 0,
+					Country = "de"
 				},
 				new Player
 				{
 					Username = "hello2",
-					amountWon = 2,
-					amountLost = 3,
-					amountDraw = 0
+					AmountWon = 2,
+					AmountLost = 3,
+					AmountDraw = 0,
+					Country = "gb"
 				},
 				new Player
 				{
 					Username = "hello3",
-					amountWon = 2,
-					amountLost = 3,
-					amountDraw = 0
+					AmountWon = 2,
+					AmountLost = 3,
+					AmountDraw = 0,
+					Country = "nl"
 				},
 				new Player
 				{
 					Username = "hello4",
-					amountWon = 2,
-					amountLost = 3,
-					amountDraw = 0
+					AmountWon = 2,
+					AmountLost = 3,
+					AmountDraw = 0,
+					Country = ""
 				},
 			};
 
@@ -271,7 +239,7 @@ namespace Othelloworld.Data
 					Token = gameTokens[0],
 					Name = "Game",
 					Description = "A description",
-					Status = Status.Playing,
+					Status = GameStatus.Playing,
 					PlayerTurn = Color.white,
 					Board = new IEnumerable<Color>[]
 					{
@@ -289,7 +257,7 @@ namespace Othelloworld.Data
 					Token = gameTokens[1],
 					Name = "Game1",
 					Description = "A description1",
-					Status = Status.Playing,
+					Status = GameStatus.Playing,
 					PlayerTurn = Color.black,
 					Board = new IEnumerable<Color>[]
 					{
@@ -350,9 +318,9 @@ namespace Othelloworld.Data
 
 			builder.Entity<PlayerInGame>(entity =>
 				entity.HasOne(playerInGame => playerInGame.Player)
-					.WithOne(player => player.PlayerInGame)
-					.HasForeignKey<PlayerInGame>(playerInGame => playerInGame.Username)
-					.HasPrincipalKey<Player>(player => player.Username));
+					.WithMany(player => player.PlayerInGame));
+					//.HasForeignKey<PlayerInGame>(playerInGame => playerInGame.Username)
+					//.HasPrincipalKey<Player>(player => player.Username));
 
 			builder.Entity<PlayerInGame>().HasData(playersInGame);
 		}

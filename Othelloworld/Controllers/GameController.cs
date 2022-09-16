@@ -73,6 +73,30 @@ namespace Othelloworld.Controllers
 		}
 
 		/// <summary>
+		/// Gets active game
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet]
+		[Produces("application/json")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		public async Task<ActionResult<Game>> GetGameAsync()
+		{
+			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			var account = await _userManager.FindByIdAsync(id);
+
+			if (account == null) return BadRequest("Token is invalid");
+
+			account.Player = _playerRepository.GetPlayer(account.UserName);
+
+			if (account.Player.PlayerInGame == null) return BadRequest("Player doesn't have a game");
+
+			var game = _gameRepository.GetGame(account.Player.PlayerInGame.First().GameToken);
+
+			return Ok(game);
+		}
+
+		/// <summary>
 		/// Create a game
 		/// </summary>
 		/// <param name="model"></param>
@@ -100,34 +124,10 @@ namespace Othelloworld.Controllers
 		}
 
 		/// <summary>
-		/// Gets active game
-		/// </summary>
-		/// <returns></returns>
-		[HttpGet]
-		[Produces("application/json")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		public async Task<ActionResult<Game>> GetGameAsync()
-		{
-			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
-			var account = await _userManager.FindByIdAsync(id);
-
-			if (account == null) return BadRequest("Token is invalid");
-
-			account.Player = _playerRepository.GetPlayer(account.UserName);
-
-			if (account.Player.PlayerInGame == null) return BadRequest("Player doesn't have a game");
-
-			var game = _gameRepository.GetGame(account.Player.PlayerInGame.GameToken);
-
-			return Ok(game);
-		}
-
-		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="position"></param>
-		/// <returns></returns>
+		/// <returns>Game</returns>
 		[HttpPut]
 		[Consumes("application/json")]
 		[Produces("application/json")]
@@ -142,11 +142,11 @@ namespace Othelloworld.Controllers
 			var account = await _userManager.FindByIdAsync(id);
 			account.Player = _playerRepository.GetPlayer(account.UserName);
 
-			if (account.Player.PlayerInGame == null) return BadRequest("Player doesn't have a game");
+			if (account.Player.PlayerInGame.First() == null) return BadRequest("Player doesn't have a game");
 							
-			var game = _gameRepository.GetGame(account.Player.PlayerInGame.GameToken);
+			var game = _gameRepository.GetGame(account.Player.PlayerInGame.First().GameToken);
 
-			if (game.PlayerTurn != account.Player.PlayerInGame.Color) return BadRequest("Not your turn");
+			if (game.PlayerTurn != account.Player.PlayerInGame.First().Color) return BadRequest("Not your turn");
 
 			var gameService = new GameService();
 			try
@@ -157,6 +157,48 @@ namespace Othelloworld.Controllers
 
 				return Ok(result);
 			} catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>Game</returns>
+		[HttpPut("pass")]
+		[Consumes("application/json")]
+		[Produces("application/json")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		public async Task<ActionResult<Game>> Pass()
+		{
+			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+
+			var account = await _userManager.FindByIdAsync(id);
+			account.Player = _playerRepository.GetPlayer(account.UserName);
+
+			if (account.Player.PlayerInGame.First() == null) return BadRequest("Player doesn't have a game");
+
+			var game = _gameRepository.GetGame(account.Player.PlayerInGame.First().GameToken);
+
+			if (game.PlayerTurn != account.Player.PlayerInGame.First().Color) return BadRequest("Not your turn");
+
+			var gameService = new GameService();
+			try
+			{
+				var playerTurn = game.PlayerTurn;
+				var result = gameService.Pass(game);
+
+				if (result.PlayerTurn != playerTurn) { 
+					_gameRepository.UpdateGame(result);
+				} else
+				{
+					throw new Exception("Player can put a stone");
+				}
+				return Ok(result);
+			}
+			catch (Exception ex)
 			{
 				return BadRequest(ex.Message);
 			}

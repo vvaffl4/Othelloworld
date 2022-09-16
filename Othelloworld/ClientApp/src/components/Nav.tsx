@@ -8,7 +8,6 @@ import ProfileAvatar from "./ProfileAvatar";
 import { useAppDispatch, useAppSelector } from "../store/Hooks";
 
 const Nav: FC = () => {
-  const navigate = useNavigate();
   const authenticated = useAppSelector(state => state.auth.authenticated);
 
   return (

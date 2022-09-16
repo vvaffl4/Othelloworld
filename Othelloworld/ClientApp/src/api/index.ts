@@ -3,7 +3,7 @@ import Player from "../model/Player";
 import Token from "../model/Token";
 import { Country } from "../store/World";
 
-export const register = (username: string, email: string, password: string) =>
+export const register = (username: string, email: string, password: string, country: string) =>
 	fetch('/account/register',
 		{
 			method: 'POST',
@@ -11,7 +11,7 @@ export const register = (username: string, email: string, password: string) =>
 				'Content-Type': 'application/json',
 				'Accept': 'application/json'
 			},
-			body: JSON.stringify({ username, email, password })
+			body: JSON.stringify({ username, email, password, country })
 		})
 		.then(result => result.json())
 		.then(json => json as Token);

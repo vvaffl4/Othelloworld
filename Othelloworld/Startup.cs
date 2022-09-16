@@ -161,6 +161,8 @@ namespace Othelloworld
 				var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 				options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 			});
+
+			services.AddRazorPages();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -190,6 +192,8 @@ namespace Othelloworld
 
 			app.UseEndpoints(endpoints =>
 			{
+				endpoints.MapRazorPages();
+
 				endpoints.MapControllerRoute(
 									name: "default",
 									pattern: "{controller}/{action=Index}/{id?}");

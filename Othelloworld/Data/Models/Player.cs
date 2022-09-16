@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Othelloworld.Data.Models
 {
@@ -8,12 +10,13 @@ namespace Othelloworld.Data.Models
 		[Key]
 		[ForeignKey("Account_ID")]
 		public string Username { get; set; }
+		[JsonIgnore]
 		public Account Account { get; set; }
-		public string country { get; set; }
-		public int amountWon { get; set; }
-		public int amountLost { get; set; }
-		public int amountDraw { get; set; }
+		public string Country { get; set; }
+		public int AmountWon { get; set; }
+		public int AmountLost { get; set; }
+		public int AmountDraw { get; set; }
 
-		public PlayerInGame PlayerInGame { get; set; }
+		public IEnumerable<PlayerInGame> PlayerInGame { get; set; }
 	}
 }

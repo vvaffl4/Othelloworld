@@ -89,7 +89,7 @@ const GameList: FC = () => {
 									<Button
 										variant="contained"
 										endIcon={<AddIcon />}
-										onClick={handlePlay}
+										href="/play/new"
 									>
 										Create
 									</Button>

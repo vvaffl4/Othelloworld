@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -28,15 +29,18 @@ namespace Othelloworld.Controllers
 		private readonly IConfiguration _configuration;
 		private readonly UserManager<Account> _userManager;
 		private readonly SignInManager<Account> _signInManager;
+		private readonly IPlayerRepository _playerRepository;
 
 		public AccountController(
 			IConfiguration configuration,
 			UserManager<Account> userManager,
-			SignInManager<Account> signInManager)
+			SignInManager<Account> signInManager,
+			IPlayerRepository playerRepository)
 		{
 			_configuration = configuration;
 			_userManager = userManager;
 			_signInManager = signInManager;
+			_playerRepository = playerRepository;
 		}
 
 		[AllowAnonymous]
@@ -48,14 +52,32 @@ namespace Othelloworld.Controllers
 			var hasher = new PasswordHasher<Account>();
 			var user = new Account
 			{
+				Id = Guid.NewGuid().ToString(),
 				UserName = model.Username,
+				NormalizedUserName = model.Username,
 				Email = model.Email,
-				PasswordHash = hasher.HashPassword(null, model.Password)
+				NormalizedEmail = model.Email,
+				EmailConfirmed = true,
+				PasswordHash = hasher.HashPassword(null, model.Password),
+				SecurityStamp = String.Empty
 			};
 
-			var result = await _userManager.CreateAsync(user, model.Password);
+			var accountResult = await _userManager.CreateAsync(user, model.Password);
 
-			if (!result.Succeeded) return BadRequest("Was unable to register");
+			if (!accountResult.Succeeded) return BadRequest(accountResult.Errors.Select(error => $"{error.Code}: {error.Description}"));
+
+			var roleResult = await _userManager.AddToRoleAsync(user, "user");
+
+			if (!roleResult.Succeeded) return BadRequest(roleResult.Errors.Select(error => $"{error.Code}: {error.Description}"));
+
+			_playerRepository.CreatePlayer(new Player
+			{
+				Username = model.Username,
+				AmountWon = 0,
+				AmountDraw = 0,
+				AmountLost = 0,
+				Country = model.Country
+			});
 
 			await _signInManager.SignInAsync(user, false);
 
@@ -167,6 +189,7 @@ namespace Othelloworld.Controllers
 			public string Username { get; set; }
 			public string Email { get; set; }
 			public string Password { get; set; }
+			public string Country { get; set; }
 		}
 	}
 }

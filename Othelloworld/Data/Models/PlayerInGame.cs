@@ -14,6 +14,8 @@ namespace Othelloworld.Data.Models
 	public class PlayerInGame
 	{
 		[JsonIgnore]
+		[Key]
+		[Column(Order = 1)]
 		[ForeignKey("Player_Username_ID")]
 		public string Username { get; set; }
 
@@ -23,6 +25,8 @@ namespace Othelloworld.Data.Models
 		public Color Color { get; set; }
 
 		[JsonIgnore]
+		[Key]
+		[Column(Order = 2)]
 		[ForeignKey("Game_Token_ID")]
 		public string GameToken { get; set; }
 		public Game Game { get; set; }

@@ -73,7 +73,7 @@ const Play: FC = () => {
 										</Card>
 									</Grid>
 									<Grid item xs={6}>
-										<Card variant="outlined" elevation={12}>
+										<Card variant="outlined">
 											<CardContent>
 												<Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
 													Normal
