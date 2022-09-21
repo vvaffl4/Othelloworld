@@ -98,6 +98,18 @@ export const putStone = (token: Token, position: [number, number]) =>
 		})
 		.then(json => json as Game);
 
+export const giveUp = (token: Token) =>
+	fetch('/game/giveup',
+		{
+			method: 'PUT',
+			headers: {
+				'Accept': 'application/json',
+				'Authorization': `Bearer ${token.token}`
+			}
+		})
+		.then(result => result.json())
+		.then(json => json as Game);
+
 export const getPlayer = (token: Token, username: string) =>
 	fetch(`/player/${username}`,
 		{

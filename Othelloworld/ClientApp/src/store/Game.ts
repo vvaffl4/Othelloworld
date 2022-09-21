@@ -213,6 +213,12 @@ export const putStone = (position: [number, number]): ApiRequest =>
 			.then(game => dispatch(setGame(game)))
 			.catch(console.error);
 
+export const giveUp = (): ApiRequest =>
+	async (dispatch, getState, { giveUp }) =>
+		giveUp(getState().auth)
+			.then(game => dispatch(setGame(game)))
+			.catch(console.error);
+
 export const { startGame, setBoard, setGame, toggleCameraMode } = gameSlice.actions
 
 export default gameSlice.reducer

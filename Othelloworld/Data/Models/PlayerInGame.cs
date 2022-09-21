@@ -11,6 +11,14 @@ namespace Othelloworld.Data.Models
 		black = 2
 	}
 
+	public enum GameResult: uint
+	{
+		undecided = 0,
+		won = 1,
+		lost = 2,
+		draw = 3
+	}
+
 	public class PlayerInGame
 	{
 		[JsonIgnore]
@@ -18,8 +26,10 @@ namespace Othelloworld.Data.Models
 		public string Username { get; set; }
 
 		public Player Player { get; set; }
-		
+
 		public bool IsHost { get; set; }
+
+		public GameResult Result { get; set; }
 		public Color Color { get; set; }
 
 		[JsonIgnore]

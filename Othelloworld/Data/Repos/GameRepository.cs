@@ -9,7 +9,12 @@ namespace Othelloworld.Data.Repos
 {
 	public class GameRepository : Repository<Game>, IGameRepository
 	{
-		public GameRepository(OthelloDbContext context) : base(context) { }
+		public OthelloDbContext Context { get; set; }
+
+		public GameRepository(OthelloDbContext context) : base(context) 
+		{
+			Context = context;
+		}
 
 		public void CreateGame(Game game) => 
 			Create(game);
@@ -21,7 +26,6 @@ namespace Othelloworld.Data.Repos
 			FindByCondition(game => game.Token == token)
 				.Include(game => game.Players)
 				.ThenInclude(playerInGame => playerInGame.Player)
-				.AsNoTracking()
 				.FirstOrDefault();
 
 		public Task<PagedList<Game>> GetGames(int pageNumber, int pageSize) =>

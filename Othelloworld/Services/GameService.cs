@@ -49,14 +49,15 @@ namespace Othelloworld.Services
 				Token = gameToken,
 				Name = gameName,
 				Description = gameDescription,
-				PlayerTurn = Color.white,
+				PlayerTurn = Color.black,
 				Players = new PlayerInGame[]
 				{
 					new PlayerInGame
 					{
 						GameToken = gameToken,
 						Username = userName,
-						IsHost = true
+						IsHost = true,
+						Color = Color.white
 					}
 				},
 				Board = new Color[8][]

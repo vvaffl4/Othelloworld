@@ -19,7 +19,7 @@ namespace Othelloworld.Data
 	{
 		private DbSet<Account> Accounts { get; set; }
 		public DbSet<Player> Players { get; set; }
-		private DbSet<Game> Games { get; set; }
+		public DbSet<Game> Games { get; set; }
 		private DbSet<PlayerInGame> PlayersInGame { get; set; }
 
 		public OthelloDbContext(
@@ -203,26 +203,32 @@ namespace Othelloworld.Data
 					Username = "hello1",
 					Color = Color.white,
 					GameToken = gameTokens[0],
-					IsHost = true
+					IsHost = true,
+					Result = GameResult.undecided
 				},
 				new PlayerInGame
 				{
 					Username = "hello2",
 					Color = Color.black,
 					GameToken = gameTokens[0],
+					IsHost = false,
+					Result = GameResult.undecided
 				},
 				new PlayerInGame
 				{
 					Username = "hello3",
 					Color = Color.white,
 					GameToken = gameTokens[1],
-					IsHost = true
+					IsHost = true,
+					Result = GameResult.undecided
 				},
 				new PlayerInGame
 				{
 					Username = "hello4",
 					Color = Color.black,
 					GameToken = gameTokens[1],
+					IsHost = false,
+					Result = GameResult.undecided
 				},
 				//new PlayerInGame
 				//{

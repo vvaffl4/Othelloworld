@@ -11,7 +11,7 @@ import FormatColorFillIcon from '@mui/icons-material/FormatColorFill';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { FC } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/Hooks';
-import { toggleCameraMode } from '../store/Game';
+import { giveUp, toggleCameraMode } from '../store/Game';
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
   '& .MuiToggleButtonGroup-grouped': {
@@ -35,6 +35,10 @@ const Timeline: FC = () => {
 
   const handleCameraModeToggle = () => {
     dispatch(toggleCameraMode());
+  }
+
+  const handleGiveUpButton = () => {
+    dispatch(giveUp());
 	}
 
 	return (
@@ -80,7 +84,7 @@ const Timeline: FC = () => {
           <ChevronRightIcon />
         </ToggleButton>
         <ToggleButton value="last" aria-label="justified">
-          <LastPageIcon />
+          <LastPageIcon  />
         </ToggleButton>
       </StyledToggleButtonGroup>
       <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
@@ -103,7 +107,11 @@ const Timeline: FC = () => {
         <ToggleButton value="underlined" aria-label="underlined">
           <FormatUnderlinedIcon />
         </ToggleButton>
-        <ToggleButton value="color" aria-label="color" disabled>
+        <ToggleButton
+          value="color"
+          aria-label="color"
+          onClick={handleGiveUpButton}
+        >
           <FormatColorFillIcon />
           <ArrowDropDownIcon />
         </ToggleButton>

@@ -124,6 +124,11 @@ namespace Othelloworld.Controllers
 			return Created("CreateGame", game);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="model"></param>
+		/// <returns></returns>
 		[HttpPost("join")]
 		[Consumes("application/json")]
 		[Produces("application/json")]
@@ -140,35 +145,48 @@ namespace Othelloworld.Controllers
 
 			if (account == null) return BadRequest("Token is invalid");
 
-			Debug.WriteLine($"Account id: {id}");
+			//var game = _gameRepository.GetGame(model.Token);
 
-			var game = _gameRepository.GetGame(model.Token);
+			//if (game == null) return BadRequest("Game Token is invalid");
 
-			if (game == null) return BadRequest("Game Token is invalid");
+			//game.Players.Add(new PlayerInGame
+			//{
+			//	Username = account.UserName,
+			//	GameToken = game.Token,
+			//	IsHost = false,
+			//	Color = Color.white
+			//});
+			//game.Status = GameStatus.Playing;
 
-			var host = game.Players.First();
+			//_gameRepository.Update(game);
 
-			game.Players.Clear();
-			game.Players.Add(host);
+			var game = await _gameRepository.Context.Games
+				.Where(game => game.Token == model.Token)
+				.Include(game => game.Players)
+				.FirstOrDefaultAsync();
+
 			game.Players.Add(new PlayerInGame
 			{
 				Username = account.UserName,
 				GameToken = game.Token,
 				IsHost = false,
-				Color = Color.white
+				Color = Color.black
 			});
 			game.Status = GameStatus.Playing;
 
-			_gameRepository.Update(game);
-			return Ok(game);
+			await _gameRepository.Context.SaveChangesAsync();
+
+			var resultGame = _gameRepository.GetGame(model.Token);
+
+			return Ok(resultGame);
 		}
 
-			/// <summary>
-			/// 
-			/// </summary>
-			/// <param name="position"></param>
-			/// <returns>Game</returns>
-			[HttpPut]
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="position"></param>
+		/// <returns>Game</returns>
+		[HttpPut]
 		[Consumes("application/json")]
 		[Produces("application/json")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
@@ -182,7 +200,7 @@ namespace Othelloworld.Controllers
 			var account = await _userManager.FindByIdAsync(id);
 			account.Player = _playerRepository.GetPlayer(account.UserName);
 
-			if (account.Player.PlayerInGame.First() == null) return BadRequest("Player doesn't have a game");
+			if (account.Player.PlayerInGame.First() == null) return NotFound("Player doesn't have a game");
 							
 			var game = _gameRepository.GetGame(account.Player.PlayerInGame.First().GameToken);
 
@@ -218,7 +236,7 @@ namespace Othelloworld.Controllers
 			var account = await _userManager.FindByIdAsync(id);
 			account.Player = _playerRepository.GetPlayer(account.UserName);
 
-			if (account.Player.PlayerInGame.First() == null) return BadRequest("Player doesn't have a game");
+			if (account.Player.PlayerInGame.First() == null) return NotFound("Player doesn't have a game");
 
 			var game = _gameRepository.GetGame(account.Player.PlayerInGame.First().GameToken);
 
@@ -242,6 +260,39 @@ namespace Othelloworld.Controllers
 			{
 				return BadRequest(ex.Message);
 			}
+		}
+
+		[HttpPut("giveup")]
+		public async Task<ActionResult<Game>> GiveUp()
+		{
+			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+
+			var account = await _userManager.FindByIdAsync(id);
+			var player = _gameRepository.Context.Players
+				.Where(player => player.Username == account.UserName)
+				.Include(player => player.PlayerInGame)
+				.ThenInclude(pig => pig.Game)
+				.AsNoTracking()
+				.FirstOrDefault();
+
+			if (player == null) return NotFound("Player doesn't have a game");
+
+			var game = _gameRepository.Context.Games
+				.Where(game => game.Token == player.PlayerInGame.First().GameToken)
+				.Include(game => game.Players.Where(pig => pig.Username != account.Player.Username))
+				.FirstOrDefault();
+
+			var lostPlayer = player.PlayerInGame.FirstOrDefault(pig => pig.Username == account.UserName);
+			var wonPlayer = player.PlayerInGame.FirstOrDefault(pig => pig.Username != account.UserName);
+
+			lostPlayer.Result = GameResult.lost;
+			wonPlayer.Result = GameResult.won;
+
+			game.Status = GameStatus.Finished;
+
+			await _gameRepository.Context.SaveChangesAsync();
+
+			return Ok(player.PlayerInGame.First().Game);
 		}
 
 		public class CreateGameModel

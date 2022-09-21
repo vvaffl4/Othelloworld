@@ -6,6 +6,7 @@ namespace Othelloworld.Data.Repos
 {
 	public interface IGameRepository : IRepository<Game>
 	{
+		public OthelloDbContext Context { get; }
 		public Game GetGame(string token);
 		public void CreateGame(Game game);
 		public void UpdateGame(Game game);
