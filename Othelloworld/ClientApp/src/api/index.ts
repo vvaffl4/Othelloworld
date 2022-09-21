@@ -44,6 +44,20 @@ export const createGame = (token: Token, game: Pick<Game, 'name' | 'description'
 		.then(result => result.json())
 		.then(json => json as Game);
 
+export const joinGame = (token: Token, gameToken: string) =>
+	fetch('/game/join',
+	{
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Accept': 'application/json',
+			'Authorization': `Bearer ${token.token}`
+		},
+		body: JSON.stringify({ token: gameToken })
+		})
+		.then(result => result.json())
+		.then(json => json as Game)
+
 export const getGames = (token: Token) =>
 	fetch(`/game/pages?pageNumber=1&pageSize=3`,
 		{

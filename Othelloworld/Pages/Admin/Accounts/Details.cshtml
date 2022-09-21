@@ -1,0 +1,80 @@
+﻿@page "/Admin/Accounts/{id}"
+@model IndexModel
+@functions {
+
+}
+
+<h3>@ViewData["Title"]</h3>
+<form id="details">
+	<ul>
+		<li class="row mb-3">
+			<div class="col-md-3 text-end">Id</div>
+			<div class="col-md-7">@Model.Account.Id</div>
+		</li>
+		<li class="row mb-3">
+			<div class="col-md-3 text-end">
+				<label for="username_input">Username</label>
+			</div>
+			<div class="col-md-7">
+				<div class="input-group">
+					<input id="username_input" type="text" class="form-control" placeholder="Username" value="@Model.Account.UserName" disabled />
+					<button type="button" class="btn btn-outline-primary" id="username_edit_button">Edit</button>
+				</div>
+			</div>
+		</li>
+		<li class="row mb-3">
+			<div class="col-md-3 text-end">
+				<label for="email_input">Email</label>
+			</div>
+			<div class="col-md-7">
+				<div class="input-group">
+					<input id="email_input" type="text" class="form-control input-primary" placeholder="Email" value="@Model.Account.Email" disabled />
+					<button type="button" class="btn btn-outline-primary" id="email_edit_button">Edit</button>
+				</div>
+			</div>
+		</li>
+		<li class="row mb-3">
+			<div class="col-md-3 text-end">PasswordHash</div>
+			<div class="col-md-7">
+				<div class="input-group">
+					<input id="passwordhash_input" type="text" class="form-control" placeholder="Email" value="@Model.Account.PasswordHash" disabled />
+					<button id="password_reset_button" type="button" class="btn btn-outline-primary" >Reset</button>
+				</div>
+			</div>
+		</li>
+		<li class="row mb-3">
+			<div class="col-md-10 text-end">
+				<div class="btn-group" role="group" aria-label="Basic mixed styles example">
+					<input id="cancel" type="submit" class="btn btn-danger" value="Cancel" />
+					<input id="confirm" type="submit" class="btn btn-success" value="Confirm" />
+				</div>
+			</div>
+		</div>
+	</ul>
+</form>
+<script>
+	Admin.Form.register('details');
+
+	//$("#username_edit_button").on("click", (event) => {
+	//	event.preventDefault();
+
+	//	console.log("test")
+
+	//	let disabled = $("#username_input").attr("disabled");
+
+	//	$("#username_edit_button").text(disabled ? "Save" : "Edit");
+	//	$("#username_input")
+	//		.attr("disabled", !disabled)
+	//		.focus();
+
+	//	return false;
+	//});
+
+	//$("#username_input").on("blur", () => {
+	//	$("#username_input").attr("disabled", true);
+	//})
+</script>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

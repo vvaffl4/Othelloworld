@@ -1,5 +1,6 @@
 import { Box, Button, Checkbox, Container, Divider, FormControlLabel, Paper, Stack, TextField, Typography, useTheme } from "@mui/material";
 import { FC, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { register } from "../store/Auth";
 import { useAppDispatch, useAppSelector } from "../store/Hooks";
 import { changeWorldSettings } from "../store/World";
@@ -13,10 +14,11 @@ interface FormProps {
 }
 
 const Register: FC = () => {
-  const theme = useTheme();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const country = useAppSelector(state => state.world.selected[0])
+  const auth = useAppSelector(state => state.auth);
   const [form, setForm] = useState<FormProps>({
     username: '',
     email: '',
@@ -45,6 +47,14 @@ const Register: FC = () => {
       }));
     }
   }, [])
+
+  useEffect(() => {
+    console.log("auth.username: ", auth?.username);
+
+    if (auth?.username !== undefined) {
+      navigate(`/profile/${auth.username}`, { replace: true });
+    }
+  }, [auth]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setForm({

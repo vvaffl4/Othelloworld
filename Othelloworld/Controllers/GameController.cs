@@ -11,6 +11,7 @@ using Othelloworld.Services;
 using Othelloworld.Util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -89,7 +90,7 @@ namespace Othelloworld.Controllers
 
 			account.Player = _playerRepository.GetPlayer(account.UserName);
 
-			if (account.Player.PlayerInGame == null) return BadRequest("Player doesn't have a game");
+			if (!account.Player.PlayerInGame.Any()) return BadRequest("Player doesn't have a game");
 
 			var game = _gameRepository.GetGame(account.Player.PlayerInGame.First().GameToken);
 
@@ -123,12 +124,51 @@ namespace Othelloworld.Controllers
 			return Created("CreateGame", game);
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="position"></param>
-		/// <returns>Game</returns>
-		[HttpPut]
+		[HttpPost("join")]
+		[Consumes("application/json")]
+		[Produces("application/json")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		public async Task<ActionResult<Game>> JoinGameAsync([FromBody] JoinGameModel model)
+		{
+			if (model == null) return BadRequest("Game is null");
+			if (model.Token == null) return BadRequest("Invalid model state for game");
+
+			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+
+			var account = await _userManager.FindByIdAsync(id);
+
+			if (account == null) return BadRequest("Token is invalid");
+
+			Debug.WriteLine($"Account id: {id}");
+
+			var game = _gameRepository.GetGame(model.Token);
+
+			if (game == null) return BadRequest("Game Token is invalid");
+
+			var host = game.Players.First();
+
+			game.Players.Clear();
+			game.Players.Add(host);
+			game.Players.Add(new PlayerInGame
+			{
+				Username = account.UserName,
+				GameToken = game.Token,
+				IsHost = false,
+				Color = Color.white
+			});
+			game.Status = GameStatus.Playing;
+
+			_gameRepository.Update(game);
+			return Ok(game);
+		}
+
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="position"></param>
+			/// <returns>Game</returns>
+			[HttpPut]
 		[Consumes("application/json")]
 		[Produces("application/json")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
@@ -208,6 +248,11 @@ namespace Othelloworld.Controllers
 		{
 			public string Name { get; set; }
 			public string Description { get; set; }
+		}
+
+		public class JoinGameModel
+		{
+			public string Token { get; set; }
 		}
 	}
 }

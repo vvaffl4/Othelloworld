@@ -62,6 +62,20 @@ const RGlobe: FC = () => {
       (globeRef.current!.scene() as THREE.Scene).visible = settings.show;
     }
 
+    const onWindowResize = () => {
+      const renderer = (globeRef.current!.renderer() as THREE.Renderer);
+      const camera = (globeRef.current!.camera() as THREE.PerspectiveCamera);
+
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+		}
+
+    window.addEventListener('resize', onWindowResize, false);
+
+    return () => {
+      window.removeEventListener('resize', onWindowResize);
+		}
   }, [settings.orbitControl, settings.show])
 
   const handleCountrySelect = (country: Country, _1: MouseEvent, _2: Coords) => {

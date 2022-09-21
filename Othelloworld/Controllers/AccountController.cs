@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Othelloworld.Data;
 using Othelloworld.Data.Models;
 using Othelloworld.Data.Repos;
+using Othelloworld.Services;
 using Othelloworld.Util;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace Othelloworld.Controllers
@@ -29,17 +31,20 @@ namespace Othelloworld.Controllers
 		private readonly IConfiguration _configuration;
 		private readonly UserManager<Account> _userManager;
 		private readonly SignInManager<Account> _signInManager;
+		private readonly IAccountService _accountService;
 		private readonly IPlayerRepository _playerRepository;
 
 		public AccountController(
 			IConfiguration configuration,
 			UserManager<Account> userManager,
 			SignInManager<Account> signInManager,
+			IAccountService accountService,
 			IPlayerRepository playerRepository)
 		{
 			_configuration = configuration;
 			_userManager = userManager;
 			_signInManager = signInManager;
+			_accountService = accountService;
 			_playerRepository = playerRepository;
 		}
 
@@ -50,9 +55,10 @@ namespace Othelloworld.Controllers
 			if (!ModelState.IsValid) return BadRequest("Supplied bad model");
 
 			var hasher = new PasswordHasher<Account>();
-			var user = new Account
+			var accountId = Guid.NewGuid().ToString();
+			var account = new Account
 			{
-				Id = Guid.NewGuid().ToString(),
+				Id = accountId,
 				UserName = model.Username,
 				NormalizedUserName = model.Username,
 				Email = model.Email,
@@ -62,11 +68,11 @@ namespace Othelloworld.Controllers
 				SecurityStamp = String.Empty
 			};
 
-			var accountResult = await _userManager.CreateAsync(user, model.Password);
+			var accountResult = await _userManager.CreateAsync(account, model.Password);
 
 			if (!accountResult.Succeeded) return BadRequest(accountResult.Errors.Select(error => $"{error.Code}: {error.Description}"));
 
-			var roleResult = await _userManager.AddToRoleAsync(user, "user");
+			var roleResult = await _userManager.AddToRoleAsync(account, "user");
 
 			if (!roleResult.Succeeded) return BadRequest(roleResult.Errors.Select(error => $"{error.Code}: {error.Description}"));
 
@@ -79,9 +85,28 @@ namespace Othelloworld.Controllers
 				Country = model.Country
 			});
 
-			await _signInManager.SignInAsync(user, false);
+			await _signInManager.SignInAsync(account, false);
 
-			return Created("Register", new { UserName = model.Username, Email = model.Email });
+			var roles = await _userManager.GetRolesAsync(account);
+
+			//return Created("Register", new { UserName = model.Username, Email = model.Email });
+
+			var token = _accountService.CreateJwtToken(
+				accountId,
+				model.Username,
+				roles.Select(role => new Claim(ClaimTypes.Role, role)),
+				_configuration.GetValue<string>("SigningKey"),
+				_configuration.GetValue<string>("Issuer"),
+				_configuration.GetValue<string>("Audience"),
+				_configuration.GetValue<int>("TokenTimeoutMinutes")
+			);
+
+			return Created("Register", new
+			{
+				token = new JwtSecurityTokenHandler().WriteToken(token),
+				username = model.Username,
+				expires = token.ValidTo
+			});
 		}
 
 		[AllowAnonymous]
@@ -98,25 +123,36 @@ namespace Othelloworld.Controllers
 
 			var roles = await _userManager.GetRolesAsync(account);
 
-			var claims = new List<Claim>
-			{
-				new Claim("id", account.Id),
-				new Claim("username", account.UserName)
-			};
-
-			// Add roles as multiple claims
-			foreach (var role in roles)
-			{
-				claims.Add(new Claim(ClaimTypes.Role, role));
-			}
-
-			var token = JwtHelper.GetJwtToken(
+			var token = _accountService.CreateJwtToken(
 				account.Id,
+				account.UserName,
+				roles.Select(role => new Claim(ClaimTypes.Role, role)),
 				_configuration.GetValue<string>("SigningKey"),
 				_configuration.GetValue<string>("Issuer"),
 				_configuration.GetValue<string>("Audience"),
-				TimeSpan.FromMinutes(_configuration.GetValue<int>("TokenTimeoutMinutes")),
-				claims);
+				_configuration.GetValue<int>("TokenTimeoutMinutes")
+			);
+
+
+			//var claims = new List<Claim>
+			//{
+			//	new Claim("id", account.Id),
+			//	new Claim("username", account.UserName)
+			//};
+
+			// Add roles as multiple claims
+			//foreach (var role in roles)
+			//{
+			//	claims.Add(new Claim(ClaimTypes.Role, role));
+			//}
+
+			//var token = JwtHelper.GetJwtToken(
+			//	account.Id,
+			//	_configuration.GetValue<string>("SigningKey"),
+			//	_configuration.GetValue<string>("Issuer"),
+			//	_configuration.GetValue<string>("Audience"),
+			//	TimeSpan.FromMinutes(_configuration.GetValue<int>("TokenTimeoutMinutes")),
+			//	claims);
 
 			return Ok(new { 
 				token = new JwtSecurityTokenHandler().WriteToken(token),

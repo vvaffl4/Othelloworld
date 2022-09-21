@@ -17,7 +17,7 @@ namespace Othelloworld.Data.Models
 	public class Game
 	{
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		[JsonIgnore]
+		//[JsonIgnore]
 		[Key]
 		public string Token { get; set; }
 

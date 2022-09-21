@@ -9,8 +9,6 @@ import { setPaletteMode } from "../store/UserInterface";
 import createTheme from "../Theme";
 import { useSnackbar } from "notistack";
 
-
-
 const App = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar(); 
   const dispatch = useDispatch();

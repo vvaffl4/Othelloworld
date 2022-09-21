@@ -1,0 +1,35 @@
+﻿@page "/Admin/Accounts"
+@model AccountsModel
+@{
+}
+
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Username</th>
+      <th scope="col">Email</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (var account in Model.Accounts)
+    {
+      var edit = $"/Admin/Accounts/{account.UserName}/Edit";
+      <tr>
+        <td scope="row">
+          @Html.DisplayFor(_ => account.Id)
+        </td>
+        <td>
+          @Html.DisplayFor(_ => account.UserName)
+        </td>
+        <td>
+          @Html.DisplayFor(_ => account.Email)
+        </td>
+        <td>
+          <a href="/Admin/Accounts/@account.UserName">Details</a>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

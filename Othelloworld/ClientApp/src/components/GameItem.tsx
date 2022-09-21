@@ -6,7 +6,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useAppDispatch, useAppSelector } from '../store/Hooks';
 import { useNavigate } from 'react-router-dom';
-import { setGame } from '../store/Game';
+import { joinGame } from '../store/Game';
 
 const GameItem: FC<{ token: string }> = ({ token }) => {
   const [open, setOpen] = React.useState(false);
@@ -15,7 +15,7 @@ const GameItem: FC<{ token: string }> = ({ token }) => {
   const game = useAppSelector(state => state.games.byId[token])
 
   const handlePlay = () => {
-    dispatch(setGame(game));
+    dispatch(joinGame(token));
     navigate(`../${game.token}`);
 	}
 

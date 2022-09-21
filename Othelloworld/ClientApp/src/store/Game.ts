@@ -197,8 +197,9 @@ export const createGame = (game: Pick<Game, 'name' | 'description'>): ApiRequest
 		createGame(getState().auth, game)
 			.then(game => dispatch(setGame(game)));
 
-//export const joinGame = (token: string): ApiRequest =>
-
+export const joinGame = (token: string): ApiRequest =>
+	async (dispatch, getState, { joinGame }) =>
+		joinGame(getState().auth, token)
 
 export const fetchGame = (): ApiRequest =>
 	async (dispatch, getState, { getGame }) =>

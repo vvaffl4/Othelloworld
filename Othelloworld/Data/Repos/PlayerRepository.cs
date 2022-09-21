@@ -16,7 +16,9 @@ namespace Othelloworld.Data.Repos
 
 		public Player GetPlayer(string username) =>
 			FindByCondition(player => player.Username == username)
-				.Include(player => player.PlayerInGame.Where(pig => pig.Game.Status == GameStatus.Playing).Take(1))
+				.Include(player => player.PlayerInGame.Where(pig => 
+					pig.Game.Status == GameStatus.Playing
+					|| pig.Game.Status == GameStatus.Staging).Take(1))
 				.FirstOrDefault();
 
 		public void UpdatePlayer(Player player)

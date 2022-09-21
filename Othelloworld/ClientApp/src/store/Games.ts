@@ -25,6 +25,9 @@ const gamesSlice = createSlice({
   initialState,
   reducers: {
     addGames: (state, action: PayloadAction<Game[]>) => {
+
+      console.log(action.payload);
+
       state.byId = {
         ...state.byId,
         ...action.payload.reduce((byId, game) => ({ ...byId, [game.token]: game }), {})

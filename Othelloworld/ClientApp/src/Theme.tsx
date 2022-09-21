@@ -68,5 +68,10 @@ export default (mode: PaletteMode) => createTheme({
         LinkComponent: LinkBehavior,
       },
     },
+    MuiListItemButton: {
+      defaultProps: {
+        LinkComponent: LinkBehavior
+			}
+		}
   }
 });
