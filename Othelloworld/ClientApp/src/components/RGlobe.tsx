@@ -57,7 +57,9 @@ const RGlobe: FC = () => {
       
       (globeRef.current!.controls() as any).autoRotate = settings.orbitAutoRotate;
       (globeRef.current!.controls() as any).autoRotateSpeed = 0.5;
-      globeRef.current!.pointOfView({ altitude: 4 }, 2000);
+      globeRef.current!.pointOfView({ altitude: settings.zoom }, 2000);
+
+      console.log("Settings.Zoom: ", settings.zoom);
 
       (globeRef.current!.scene() as THREE.Scene).visible = settings.show;
     }
@@ -76,7 +78,7 @@ const RGlobe: FC = () => {
     return () => {
       window.removeEventListener('resize', onWindowResize);
 		}
-  }, [settings.orbitControl, settings.show])
+  }, [settings.orbitControl, settings.zoom, settings.show])
 
   const handleCountrySelect = (country: Country, _1: MouseEvent, _2: Coords) => {
     dispatch(selectCountry({ isoCode: country.properties.ISO_A2}));

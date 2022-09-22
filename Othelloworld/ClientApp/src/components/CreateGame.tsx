@@ -11,6 +11,7 @@ const CreateGame: FC = () => {
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [isLoading, setLoading] = useState(false);
   const game = useAppSelector(state => state.game);
   //const player = useAppSelector(state => state.)
 
@@ -25,11 +26,12 @@ const CreateGame: FC = () => {
     dispatch(selectAndFocusCountry({ isoCode: 'nl', altitude: 1 }));
   }, []);
 
- // useEffect(() => {
- //   if (game.token) {
- //     navigate(game.token);
-	//	}
-	//}, [game])
+  useEffect(() => {
+    if (game.hasGame) {
+      setLoading(false);
+      navigate('/play');
+		}
+	}, [game])
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
@@ -43,7 +45,9 @@ const CreateGame: FC = () => {
     dispatch(createGame({
       name,
       description
-    }))
+    }));
+
+    setLoading(true);
 	}
 
 	return (

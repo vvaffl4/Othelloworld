@@ -1,17 +1,42 @@
 ﻿import { Box, Container, Grid, Typography, Paper } from '@mui/material';
-import { FC } from 'react';
-import { useAppSelector } from '../store/Hooks';
+import { FC, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { fetchGame } from '../store/Game';
+import { useAppDispatch, useAppSelector } from '../store/Hooks';
+import { changeWorldSettings } from '../store/World';
 import PlayerCard from './PlayerCard';
 
 const Staging: FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const game = useAppSelector(state => state.game);
+
+  useEffect(() => {
+    dispatch(changeWorldSettings({
+      zoom: 3
+    }))
+    
+    const fetchGameInterval = setInterval(() => {
+      dispatch(fetchGame());
+    }, 5000);
+
+    return () => {
+      clearInterval(fetchGameInterval);
+		}
+  }, []);
+
+  useEffect(() => {
+    if (game.players && game.players.length > 1) {
+      navigate('/play');
+		}
+	}, [game])
 
 	return (
     <Container
       component='div'
       sx={{
         position: 'absolute',
-        top: 500,
+        top: 405,
         bottom: 0,
         left: 0,
         right: 0
@@ -20,12 +45,18 @@ const Staging: FC = () => {
       <Paper
         elevation={5}
         sx={{
-          background: 'none'
+          position: 'relative',
+          height: '100%',
+          background: 'none',
 				}}
       >
         <Grid
           container
           sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
             display: 'flex'
           }}
         >
@@ -123,6 +154,19 @@ const Staging: FC = () => {
           <Grid item xs={6}>
           </Grid>
         </Grid>
+        <Box
+          component="div"
+          sx={{
+            position: 'absolute',
+            top: '250px',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: (theme) => theme.palette.background.paper
+          }}
+        >
+
+         </Box>
       </Paper>
 		</Container>
 	);

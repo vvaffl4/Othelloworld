@@ -1,5 +1,5 @@
 ﻿import { Button, Collapse, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 
 import * as React from 'react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -13,11 +13,17 @@ const GameItem: FC<{ token: string }> = ({ token }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const game = useAppSelector(state => state.games.byId[token])
+  const joinedGame = useAppSelector(state => state.game);
 
   const handlePlay = () => {
     dispatch(joinGame(token));
-    navigate(`../${game.token}`);
-	}
+  }
+
+  useEffect(() => {
+    if (joinedGame.hasGame) {
+      navigate('/play');
+		}
+	}, [joinedGame]);
 
   return (
     <React.Fragment>
