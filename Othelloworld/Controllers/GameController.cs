@@ -271,7 +271,6 @@ namespace Othelloworld.Controllers
 			var player = _gameRepository.Context.Players
 				.Where(player => player.Username == account.UserName)
 				.Include(player => player.PlayerInGame)
-				.ThenInclude(pig => pig.Game)
 				.AsNoTracking()
 				.FirstOrDefault();
 
@@ -279,11 +278,11 @@ namespace Othelloworld.Controllers
 
 			var game = _gameRepository.Context.Games
 				.Where(game => game.Token == player.PlayerInGame.First().GameToken)
-				.Include(game => game.Players.Where(pig => pig.Username != account.Player.Username))
+				.Include(game => game.Players)
 				.FirstOrDefault();
 
-			var lostPlayer = player.PlayerInGame.FirstOrDefault(pig => pig.Username == account.UserName);
-			var wonPlayer = player.PlayerInGame.FirstOrDefault(pig => pig.Username != account.UserName);
+			var lostPlayer = game.Players.FirstOrDefault(pig => pig.Username == account.UserName);
+			var wonPlayer = game.Players.FirstOrDefault(pig => pig.Username != account.UserName);
 
 			lostPlayer.Result = GameResult.lost;
 			wonPlayer.Result = GameResult.won;
@@ -292,7 +291,7 @@ namespace Othelloworld.Controllers
 
 			await _gameRepository.Context.SaveChangesAsync();
 
-			return Ok(player.PlayerInGame.First().Game);
+			return Ok(game);
 		}
 
 		public class CreateGameModel
