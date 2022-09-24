@@ -1,7 +1,10 @@
 ﻿import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { ApiRequest } from '.';
+import { ErrorResponse } from '../api';
 import Game from '../model/Game';
+import Message from '../model/Message';
 import PlayerInGame, { Color } from '../model/PlayerInGame';
+import Turn from '../model/Turn';
 
 type PlayerType = 1 | 2;
 type CameraMode = 'perspective' | 'orthographic';
@@ -10,12 +13,19 @@ interface Controls {
 	mode: CameraMode
 }
 
+export interface HistoryItem {
+	type: 'history' | 'chat',
+	item: Turn | Message
+}
+
+
 // Define a type for the slice state
 interface GameState {
 	hasGame: boolean;
 	players?: [PlayerInGame, PlayerInGame];
 	player?: PlayerType,
 	turn?: PlayerType,
+	history: HistoryItem[],
 	board: number[][],
 	placeholders: [number, number][]
 	controls: Controls
@@ -27,6 +37,7 @@ const initialState: GameState = {
 	players: undefined,
 	player: 1,
 	turn: 1,
+	history: [],
 	board: [],
 	placeholders: [],
 	controls: {
@@ -161,8 +172,25 @@ export const gameSlice = createSlice({
 			state.board = action.payload;
 		},
 		setGame: (state, action: PayloadAction<Game>) => {
+			const messages = [
+				{ username: 'hello3', datetime: new Date().toISOString(), text: 'hello' },
+				{ username: 'hello3', datetime: new Date().toISOString(), text: 'hi' },
+				{ username: 'hello3', datetime: new Date().toISOString(), text: 'gl hf' },
+			]
+
 			state.hasGame = true;
 			state.turn = action.payload.playerTurn as PlayerType;
+			state.history = [
+				...messages.map(message => ({
+					type: 'chat',
+					item: message
+				}) as HistoryItem),
+				...action.payload.turns.map(turn => ({
+					type: 'history',
+					item: turn
+				}) as HistoryItem)
+			].sort((a, b) => new Date(a.item.datetime).getTime() - new Date(b.item.datetime).getTime());
+
 			state.board = action.payload.board;
 			state.players = action.payload.players;
 
@@ -192,26 +220,35 @@ export const gameSlice = createSlice({
 	}
 });
 
-export const createGame = (game: Pick<Game, 'name' | 'description'>): ApiRequest =>
+export const createGame = (game: Pick<Game, 'name' | 'description'>, errorCallback: ErrorResponse = console.error): ApiRequest =>
 	async (dispatch, getState, { createGame }) =>
 		createGame(getState().auth, game)
-			.then(game => dispatch(setGame(game)));
+			.then(game => dispatch(setGame(game)))
+			.catch(errorCallback);
 
 export const joinGame = (token: string): ApiRequest =>
 	async (dispatch, getState, { joinGame }) =>
 		joinGame(getState().auth, token)
+			.then(game => dispatch(setGame(game)))
+			.catch(console.error);
 
-export const fetchGame = (): ApiRequest =>
+export const fetchGame = (errorCallback: ErrorResponse = console.error): ApiRequest =>
 	async (dispatch, getState, { getGame }) =>
 		getGame(getState().auth)
 			.then(game => dispatch(setGame(game)))
-			.catch(console.error);
+			.catch(errorCallback);
 
 export const putStone = (position: [number, number]): ApiRequest =>
 	async (dispatch, getState, { putStone }) =>
 		putStone(getState().auth, position)
 			.then(game => dispatch(setGame(game)))
 			.catch(console.error);
+
+export const passTurn = (): ApiRequest =>
+	async (dispatch, getState, { passTurn }) =>
+		passTurn(getState().auth)
+			.then(game => dispatch(setGame(game)))
+			.catch(console.log);
 
 export const giveUp = (): ApiRequest =>
 	async (dispatch, getState, { giveUp }) =>

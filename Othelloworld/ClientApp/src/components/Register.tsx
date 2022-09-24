@@ -26,7 +26,13 @@ const Register: FC = () => {
     validation: '',
     country: ''
   });
-  const [errors, setErrors] = useState<string[]>([]);
+  const [errors, setErrors] = useState<Partial<FormProps>>({
+    username: '',
+    email: '',
+    password: '',
+    validation: '',
+    country: ''
+  });
 
   useEffect(() => {
     dispatch(changeWorldSettings({
@@ -54,7 +60,7 @@ const Register: FC = () => {
     if (auth?.username !== undefined) {
       navigate(`/profile/${auth.username}`, { replace: true });
     }
-  }, [auth]);
+  }, [auth.username]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
@@ -64,21 +70,29 @@ const Register: FC = () => {
   } 
 
   const handleSubmit = () => {
-    const newErrors: string[] = [];
+    //const newErrors: string[] = [];
 
     if (form.password === form.validation) { 
       dispatch(register(
-        form.username,
-        form.email,
-        form.password,
-        form.country
-      ));
+        form,
+        async (result) => {
+          const errors = Object.entries((await result.json()).errors)
+            .reduce((state, [key, value]) => ({
+              ...state,
+              [key.toLowerCase()]: (value as string[]).join('\n')
+            }), {});
+
+          setErrors(errors);
+				})
+      );
     } else {
-      newErrors.push('validation');
+      //newErrors.push('validation');
     }
 
-    setErrors(newErrors);
+    //setErrors(newErrors);
   }
+
+  console.log(errors);
 
   return (
     <Container
@@ -129,6 +143,8 @@ const Register: FC = () => {
                 label="Player name"
                 value={form.username}
                 variant="standard"
+                error={errors.username !== ''}
+                helperText={errors.username}
                 onChange={handleChange}
               />
               <TextField
@@ -140,6 +156,8 @@ const Register: FC = () => {
                 type="email"
                 value={form.email}
                 variant="standard"
+                error={errors.email !== ''}
+                helperText={errors.email}
                 onChange={handleChange}
               />
               <TextField
@@ -151,11 +169,12 @@ const Register: FC = () => {
                 type="password"
                 value={form.password}
                 variant="standard"
+                error={errors.password !== ''}
+                helperText={errors.password}
                 onChange={handleChange}
               />
               <TextField
                 required
-                error={errors.includes('validation')}
                 fullWidth
                 id="validation"
                 name="validation"
@@ -163,6 +182,8 @@ const Register: FC = () => {
                 type="password"
                 value={form.validation}
                 variant="standard"
+                error={errors.password !== ''}
+                helperText={errors.password}
                 onChange={handleChange}
               />
               <FormControlLabel

@@ -22,8 +22,8 @@ const GameItem: FC<{ token: string }> = ({ token }) => {
   useEffect(() => {
     if (joinedGame.hasGame) {
       navigate('/play');
-		}
-	}, [joinedGame]);
+    }
+  }, [joinedGame.hasGame]);
 
   return (
     <React.Fragment>
@@ -59,7 +59,7 @@ const GameItem: FC<{ token: string }> = ({ token }) => {
                     <TableCell>Date</TableCell>
                     <TableCell>Customer</TableCell>
                     <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell>
+                    <TableCell align="right">Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

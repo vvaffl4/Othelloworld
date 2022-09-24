@@ -19,6 +19,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Collections.Generic;
 using Othelloworld.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Othelloworld
 {
@@ -76,24 +78,47 @@ namespace Othelloworld
 				.AddRoles<IdentityRole>()
 				.AddEntityFrameworkStores<OthelloDbContext>();
 
-			services.AddAuthentication(auth =>
-			{
-				auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-				auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-			})
-			.AddJwtBearer(options =>
-			{
-				options.SaveToken = true;
-
-				options.TokenValidationParameters = new TokenValidationParameters
+			services.AddAuthentication()
+				.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 				{
-					ValidateIssuer = true,
-					ValidIssuer = Configuration.GetValue<string>("Issuer"),
-					ValidateAudience = true,
-					ValidAudience = Configuration.GetValue<string>("Audience"),
-					ValidateIssuerSigningKey = true,
-					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("SigningKey")))
-				};
+					options.LoginPath = "/Admin";
+					options.AccessDeniedPath = "/Error";
+
+				})// auth =>
+					//{
+					//	auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+					//	auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+					//})
+				.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+				{
+					options.SaveToken = true;
+
+					options.TokenValidationParameters = new TokenValidationParameters
+					{
+						ValidateIssuer = true,
+						ValidIssuer = Configuration.GetValue<string>("Issuer"),
+						ValidateAudience = true,
+						ValidAudience = Configuration.GetValue<string>("Audience"),
+						ValidateIssuerSigningKey = true,
+						IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("SigningKey")))
+					};
+				});
+
+			services.AddAuthorization(options =>
+			{
+				var defaultAuthorizationPolicy = new AuthorizationPolicyBuilder(
+						CookieAuthenticationDefaults.AuthenticationScheme)
+					.RequireAuthenticatedUser()
+					.Build();
+
+				options.DefaultPolicy = defaultAuthorizationPolicy;
+
+				var onlySecondJwtSchemePolicy = new AuthorizationPolicyBuilder(
+						JwtBearerDefaults.AuthenticationScheme)
+					.RequireAuthenticatedUser()
+					.Build();
+
+				options.AddPolicy(JwtBearerDefaults.AuthenticationScheme, onlySecondJwtSchemePolicy);
 			});
 
 			services

@@ -1,11 +1,11 @@
-﻿@page "/Admin/Accounts/{id}"
+﻿@page "/Admin/Accounts/{username}/Details"
 @model IndexModel
 @functions {
 
 }
 
 <h3>@ViewData["Title"]</h3>
-<form id="details">
+<form id="details" method="post">
 	<ul>
 		<li class="row mb-3">
 			<div class="col-md-3 text-end">Id</div>
@@ -17,7 +17,7 @@
 			</div>
 			<div class="col-md-7">
 				<div class="input-group">
-					<input id="username_input" type="text" class="form-control" placeholder="Username" value="@Model.Account.UserName" disabled />
+					<input id="username_input" class="form-control" type="text" placeholder="Username" asp-for="Account.UserName" />
 					<button type="button" class="btn btn-outline-primary" id="username_edit_button">Edit</button>
 				</div>
 			</div>
@@ -28,7 +28,7 @@
 			</div>
 			<div class="col-md-7">
 				<div class="input-group">
-					<input id="email_input" type="text" class="form-control input-primary" placeholder="Email" value="@Model.Account.Email" disabled />
+					<input id="email_input" class="form-control input-primary" type="text" placeholder="Email" asp-for="Account.Email" />
 					<button type="button" class="btn btn-outline-primary" id="email_edit_button">Edit</button>
 				</div>
 			</div>
@@ -37,7 +37,7 @@
 			<div class="col-md-3 text-end">PasswordHash</div>
 			<div class="col-md-7">
 				<div class="input-group">
-					<input id="passwordhash_input" type="text" class="form-control" placeholder="Email" value="@Model.Account.PasswordHash" disabled />
+					<input id="passwordhash_input" type="text" class="form-control" placeholder="Email" asp-for="Account.PasswordHash" disabled />
 					<button id="password_reset_button" type="button" class="btn btn-outline-primary" >Reset</button>
 				</div>
 			</div>
@@ -45,7 +45,7 @@
 		<li class="row mb-3">
 			<div class="col-md-10 text-end">
 				<div class="btn-group" role="group" aria-label="Basic mixed styles example">
-					<input id="cancel" type="submit" class="btn btn-danger" value="Cancel" />
+					<button id="cancel" class="btn btn-danger" asp-page="/Admin/Accounts">Cancel</button>
 					<input id="confirm" type="submit" class="btn btn-success" value="Confirm" />
 				</div>
 			</div>
@@ -53,7 +53,7 @@
 	</ul>
 </form>
 <script>
-	Admin.Form.register('details');
+	//Admin.Form.register('details');
 
 	//$("#username_edit_button").on("click", (event) => {
 	//	event.preventDefault();

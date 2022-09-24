@@ -1,3 +1,4 @@
+using Duende.IdentityServer.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -21,9 +22,19 @@ namespace Othelloworld.Pages.Admin
 		[BindProperty]
 		public IEnumerable<Account> Accounts { get; set; }
 
-		public async Task OnGetAsync()
+		public async Task<IActionResult> OnGetAsync()
 		{
-			Accounts = await _userManager.GetUsersInRoleAsync("user");
+			if (ModelState.IsValid)
+			{
+				if (User.IsAuthenticated() && User.IsInRole("admin"))
+				{
+					Accounts = await _userManager.GetUsersInRoleAsync("user");
+
+					return Page();
+				}
+			}
+
+			return Redirect("/");
 		}
 	}
 }

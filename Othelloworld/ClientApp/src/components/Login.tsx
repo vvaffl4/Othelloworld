@@ -8,7 +8,7 @@ const Login: FC = () => {
   const dispatch = useAppDispatch();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [identifier, setIdentifier] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
   const handleOpenLoginMenu = (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -19,14 +19,18 @@ const Login: FC = () => {
     setAnchorEl(null);
   }
 
-  const handleIdentifierChange = (event: ChangeEvent<HTMLInputElement>) =>
-    setIdentifier(event.target.value);
+  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) =>
+    setEmail(event.target.value);
 
   const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) =>
     setPassword(event.target.value);
 
   const handleLogin = () => {
-    dispatch(login(identifier, password));
+    dispatch(login(
+      { email, password },
+      async result => {
+        console.log(await result.json());
+			}));
   }
 
   return (
@@ -76,8 +80,8 @@ const Login: FC = () => {
                   }
                 }
               }}
-              value={identifier}
-              onChange={handleIdentifierChange}
+              value={email}
+              onChange={handleEmailChange}
             />
           </ListItem>
           <ListItem

@@ -27,7 +27,7 @@
           @Html.DisplayFor(_ => account.Email)
         </td>
         <td>
-          <a href="/Admin/Accounts/@account.UserName">Details</a>
+          <a asp-page="Accounts/Details" asp-route-username="@account.UserName">Details</a>
         </td>
       </tr>
     }

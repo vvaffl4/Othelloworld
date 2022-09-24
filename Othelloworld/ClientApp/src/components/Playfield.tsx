@@ -12,6 +12,7 @@ import Score from './Score';
 import Timeline from './Timeline';
 import Camera from './threejs/Camera';
 import { changeWorldSettings } from '../store/World';
+import TurnHistory from './TurnHistory';
 
 const Playfield: FC = () => {
   const ContextBridge = useContextBridge(ReactReduxContext);
@@ -49,59 +50,90 @@ const Playfield: FC = () => {
     , [0, 0, 0]);
 
   return (
-    <>
-     <Canvas
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1
-        }}
-        frameloop="demand"
-      >
-        <ContextBridge>
-          <pointLight position={[10, 10, 10]} />
-          <ambientLight color={'hotpink'} />
-          <Board position={[0, 0, 0]} />
-          {/*<PerspectiveCamera*/}
-          {/*  makeDefault*/}
-          {/*  position={[0, 5, 5.5]}*/}
-          {/*  rotation={new THREE.Euler(-45 * (Math.PI / 180), 0, 0)}*/}
-          {/*/>*/}
-          {/*<OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} />*/}
-          <Camera />
-        </ContextBridge>
-      </Canvas>
+    <Box 
+      component="div"
+      sx={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
+      }}
+    >
       <Box
         component="div"
         sx={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          pointerEvents: 'none'
-        }}
+          display: 'flex',
+          flexDirection: 'row',
+          width: '100%',
+          height: '100%'
+				}}
       >
-        {
-          playersInGame && ([Color.white, Color.black])
-            .map(color => ({
-              color,
-              playerInGame: playersInGame
-                .find(playerInGame => playerInGame.color === color)!
-            }))
-            .map(({ color, playerInGame }) => (
-              <Score
-                side={playerInGame.player.username === username ? 'left' : 'right'}
-                playerInGame={playerInGame}
-                score={color === Color.black ? blackCount : whiteCount}
-              />
-            ))
-        }
-        <Timeline />
+        <Box
+          component="div"
+          sx={{
+            position: 'relative',
+            flexGrow: 1,
+            height: '100%',
+            overflow: 'hidden'
+					}}
+        >
+          <Canvas
+            frameloop="demand"
+            style={{
+              zIndex: 1
+			      }}
+          >
+            <ContextBridge>
+              <pointLight position={[10, 10, 10]} />
+              <ambientLight color={'hotpink'} />
+              <Board position={[0, 0, 0]} />
+              <Camera />
+            </ContextBridge>
+          </Canvas>
+          <Box
+            component="div"
+            sx={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              pointerEvents: 'none'
+            }}
+          >
+            {
+              playersInGame && ([Color.white, Color.black])
+                .map(color => ({
+                  color,
+                  playerInGame: playersInGame
+                    .find(playerInGame => playerInGame.color === color)!
+                }))
+                .map(({ color, playerInGame }) => (
+                  <Score
+                    side={playerInGame.player.username === username ? 'left' : 'right'}
+                    playerInGame={playerInGame}
+                    score={color === Color.black ? blackCount : whiteCount}
+                  />
+                ))
+            }
+            <Timeline />
+          </Box>
+        </Box>
+        <Box
+          id="sidebar"
+          component="div"
+          sx={{
+            flexGrow: 0,
+            pt: '56px',
+            height: '100%',
+            backgroundColor: '#121212'
+					}}
+        >
+          <TurnHistory/>
+        </Box>
       </Box>
-    </>
+    </Box>
   );
 }
 

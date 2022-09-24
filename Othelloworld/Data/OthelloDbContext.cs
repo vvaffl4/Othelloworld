@@ -22,6 +22,8 @@ namespace Othelloworld.Data
 		public DbSet<Game> Games { get; set; }
 		private DbSet<PlayerInGame> PlayersInGame { get; set; }
 
+		private DbSet<Turn> Turns { get; set; }
+
 		public OthelloDbContext(
 			DbContextOptions<OthelloDbContext> options) : base(options)
 		{ }
@@ -229,14 +231,7 @@ namespace Othelloworld.Data
 					GameToken = gameTokens[1],
 					IsHost = false,
 					Result = GameResult.undecided
-				},
-				//new PlayerInGame
-				//{
-				//	Username = "admin",
-				//	Color = Color.black,
-				//	GameToken = gameTokens[2],
-				//	IsHost = true
-				//}
+				}
 			};
 
 			var games = new Game[]
@@ -269,38 +264,35 @@ namespace Othelloworld.Data
 					{
 						new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
 						new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
-						new int[8]{0, 0, 0, 1, 1, 1, 0, 0}.Cast<Color>(),
+						new int[8]{0, 0, 1, 2, 0, 0, 0, 0}.Cast<Color>(),
 						new int[8]{0, 0, 0, 1, 2, 0, 0, 0}.Cast<Color>(),
-						new int[8]{0, 0, 0, 1, 2, 0, 0, 0}.Cast<Color>(),
+						new int[8]{0, 0, 0, 2, 1, 0, 0, 0}.Cast<Color>(),
 						new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
 						new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
 						new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>()
 					}
-				},
-				//new Game{
-				//	Token = gameTokens[2],
-				//	Name = "Game2",
-				//	Description = "A description2",
-				//	Status = Status.Playing,
-				//	PlayerTurn = Color.black,
-				//	Board = new int[8][]
-				//	{
-				//		new int[8]{0, 0, 0, 0, 0, 0, 0, 0},
-				//		new int[8]{0, 0, 0, 0, 0, 0, 0, 0},
-				//		new int[8]{0, 0, 0, 0, 0, 0, 0, 0},
-				//		new int[8]{0, 0, 0, 1, 2, 0, 0, 0},
-				//		new int[8]{0, 0, 0, 2, 1, 0, 0, 0},
-				//		new int[8]{0, 0, 0, 0, 0, 0, 0, 0},
-				//		new int[8]{0, 0, 0, 0, 0, 0, 0, 0},
-				//		new int[8]{0, 0, 0, 0, 0, 0, 0, 0}
-				//	}
-				//}
-
+				}
 			};
 
-
-			// Account
-			//builder.Entity<Account>().HasData(accounts);
+			var turns = new Turn[]
+			{
+				new Turn
+				{
+					GameToken = gameTokens[1],
+					Number = 1,
+					X = 3,
+					Y = 2,
+					Color = Color.black
+				},
+				new Turn
+				{
+					GameToken = gameTokens[1],
+					Number = 2,
+					X = 2,
+					Y = 2,
+					Color = Color.white
+				}
+			};
 
 			// Player
 			builder.Entity<Player>(entity =>
@@ -328,8 +320,18 @@ namespace Othelloworld.Data
 
 					//.HasForeignKey<PlayerInGame>(playerInGame => playerInGame.Username)
 					//.HasPrincipalKey<Player>(player => player.Username));
-
 			builder.Entity<PlayerInGame>().HasData(playersInGame);
+
+			// Turn
+			builder.Entity<Turn>()
+				.HasKey(turn => new { turn.Number, turn.GameToken });
+
+			builder.Entity<Turn>(entity =>
+				entity.HasOne(turn => turn.Game)
+					.WithMany(game => game.Turns)
+					.HasForeignKey(playersInGame => playersInGame.GameToken));
+
+			builder.Entity<Turn>().HasData(turns);
 		}
 
 		//public Task<bool> HasAnyAccounts()

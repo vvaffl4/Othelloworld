@@ -3,7 +3,28 @@ import Player from "../model/Player";
 import Token from "../model/Token";
 import { Country } from "../store/World";
 
-export const register = (username: string, email: string, password: string, country: string) =>
+export interface AccountDTO {
+	username: string;
+	email: string;
+	password: string;
+	country: string;
+}
+
+export interface LoginDTO {
+	email: string;
+	password: string;
+}
+
+export type ErrorResponse = (result: Response) => void;
+
+const checkResponseStatus = (result: Response) =>
+	result.status > 199 && result.status < 400
+		? result
+		: (() => { throw result })();
+
+const parseResultToJson = ((result: Response) => result.json());
+
+export const register = (account: AccountDTO) =>
 	fetch('/account/register',
 		{
 			method: 'POST',
@@ -11,12 +32,13 @@ export const register = (username: string, email: string, password: string, coun
 				'Content-Type': 'application/json',
 				'Accept': 'application/json'
 			},
-			body: JSON.stringify({ username, email, password, country })
+			body: JSON.stringify(account)
 		})
-		.then(result => result.json())
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
 		.then(json => json as Token);
 
-export const login = (email: string, password: string) =>
+export const login = (credentials: LoginDTO) =>
 	fetch('/account/login',
 		{
 			method: 'POST',
@@ -24,12 +46,23 @@ export const login = (email: string, password: string) =>
 				'Content-Type': 'application/json',
 				'Accept': 'application/json'
 			},
-			body: JSON.stringify({ email, password })
+			body: JSON.stringify(credentials)
 		})
-		.then(result => result.json())
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
 		.then(json => json as Token);
 
-	// Games
+export const logout = (token: Token) =>
+	fetch('/account/logout',
+		{
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${token.token}`
+			}
+		})
+		.then(checkResponseStatus);
+
+// Games
 export const createGame = (token: Token, game: Pick<Game, 'name' | 'description'>) =>
 	fetch('/game',
 		{
@@ -41,21 +74,23 @@ export const createGame = (token: Token, game: Pick<Game, 'name' | 'description'
 			},
 			body: JSON.stringify(game)
 		})
-		.then(result => result.json())
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
 		.then(json => json as Game);
 
 export const joinGame = (token: Token, gameToken: string) =>
 	fetch('/game/join',
-	{
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Accept': 'application/json',
-			'Authorization': `Bearer ${token.token}`
-		},
-		body: JSON.stringify({ token: gameToken })
+		{
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+				'Authorization': `Bearer ${token.token}`
+			},
+			body: JSON.stringify({ token: gameToken })
 		})
-		.then(result => result.json())
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
 		.then(json => json as Game)
 
 export const getGames = (token: Token) =>
@@ -66,7 +101,8 @@ export const getGames = (token: Token) =>
 				'Authorization': `Bearer ${token.token}`
 			}
 		})
-		.then(result => result.json())
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
 		.then(json => json as Game[]);
 
 export const getGame = (token: Token) =>
@@ -78,7 +114,8 @@ export const getGame = (token: Token) =>
 				'Authorization': `Bearer ${token.token}`
 			}
 		})
-		.then(result => result.json())
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
 		.then(json => json as Game);
 
 export const putStone = (token: Token, position: [number, number]) =>
@@ -92,10 +129,21 @@ export const putStone = (token: Token, position: [number, number]) =>
 			},
 			body: JSON.stringify(position)
 		})
-		.then(result => {
-			if (result.status !== 200) throw new Error(result.statusText)
-			return result.json();
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
+		.then(json => json as Game);
+
+export const passTurn = (token: Token) =>
+	fetch('/game/pass',
+		{
+			method: 'PUT',
+			headers: {
+				'Accept': 'application/json',
+				'Authorization': `Bearer ${token.token}`
+			}
 		})
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
 		.then(json => json as Game);
 
 export const giveUp = (token: Token) =>
@@ -107,7 +155,8 @@ export const giveUp = (token: Token) =>
 				'Authorization': `Bearer ${token.token}`
 			}
 		})
-		.then(result => result.json())
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
 		.then(json => json as Game);
 
 export const getPlayer = (token: Token, username: string) =>
@@ -119,13 +168,12 @@ export const getPlayer = (token: Token, username: string) =>
 				'Authorization': `Bearer ${token.token}`
 			}
 		})
-		.then(result => {
-			if (result.status !== 200) throw new Error(result.statusText)
-			return result.json();
-		})
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
 		.then(json => json as Player);
 
 export const fetchCountries = () =>
 	fetch('./countries.geojson')
-		.then(result => result.json())
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
 		.then(json => json as Country[]);

@@ -5,12 +5,25 @@ import { createGame } from '../store/Game';
 import { useAppDispatch, useAppSelector } from '../store/Hooks';
 import { changeWorldSettings, selectAndFocusCountry } from '../store/World';
 
+interface FormProps {
+  name: string;
+  description: string;
+}
+
 const CreateGame: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [form, setForm] = useState<FormProps>({
+    name: '',
+    description: ''
+  });
+  const [errors, setErrors] = useState<Partial<FormProps>>({
+    name: '',
+    description: ''
+  });
   const [isLoading, setLoading] = useState(false);
   const game = useAppSelector(state => state.game);
   //const player = useAppSelector(state => state.)
@@ -33,19 +46,25 @@ const CreateGame: FC = () => {
 		}
 	}, [game])
 
-  const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-  }
-
-  const handleDescriptionChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setDescription(event.target.value);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value
+    });
   }
 
   const handleCreateGame = () => {
-    dispatch(createGame({
-      name,
-      description
-    }));
+    dispatch(createGame(
+      form,
+      async (result) => {
+        const errors = Object.entries((await result.json()).errors)
+          .reduce((state, [key, value]) => ({
+            ...state,
+            [key.toLowerCase()]: (value as string[]).join('\n')
+          }), {});
+
+        setErrors(errors);
+      }));
 
     setLoading(true);
 	}
@@ -88,8 +107,10 @@ const CreateGame: FC = () => {
                 name="name"
                 label="Game name"
                 variant="standard"
-                value={name}
-                onChange={handleNameChange}
+                error={errors.name !== undefined
+                  && errors.name != ''}
+                helperText={errors.name}
+                onChange={handleChange}
               />
               <TextField
                 required
@@ -100,14 +121,11 @@ const CreateGame: FC = () => {
                 variant="standard"
                 multiline
                 rows={5}
-                value={description}
-                onChange={handleDescriptionChange}
+                error={errors.description !== undefined
+                  && errors.description != ''}
+                helperText={errors.description}
+                onChange={handleChange}
               />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    name="tos" />}
-                label="Terms of Service, bladibladibla" />
               <Button
                 variant='contained'
                 onClick={handleCreateGame}

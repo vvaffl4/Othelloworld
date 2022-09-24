@@ -24,6 +24,7 @@ namespace Othelloworld.Data.Repos
 			Delete(game);
 		public Game GetGame(string token) => 
 			FindByCondition(game => game.Token == token)
+				.Include(game => game.Turns)
 				.Include(game => game.Players)
 				.ThenInclude(playerInGame => playerInGame.Player)
 				.FirstOrDefault();

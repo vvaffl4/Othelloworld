@@ -26,6 +26,9 @@ namespace Othelloworld.Data.Models
 
 		public GameStatus Status { get; set; }
 		public virtual ICollection<PlayerInGame> Players { get; set; }
+
+		public ICollection<Turn> Turns { get; set; }
+
 		public Color PlayerTurn { get; set; }
 		public string Description { get; set; }
 

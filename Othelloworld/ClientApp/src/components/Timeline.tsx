@@ -11,7 +11,7 @@ import FormatColorFillIcon from '@mui/icons-material/FormatColorFill';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { FC } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/Hooks';
-import { giveUp, toggleCameraMode } from '../store/Game';
+import { giveUp, passTurn, toggleCameraMode } from '../store/Game';
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
   '& .MuiToggleButtonGroup-grouped': {
@@ -39,6 +39,10 @@ const Timeline: FC = () => {
 
   const handleGiveUpButton = () => {
     dispatch(giveUp());
+  }
+
+  const handlePass = () => {
+    dispatch(passTurn());
 	}
 
 	return (
@@ -104,7 +108,11 @@ const Timeline: FC = () => {
         <ToggleButton value="italic" aria-label="italic">
           <FormatItalicIcon />
         </ToggleButton>
-        <ToggleButton value="underlined" aria-label="underlined">
+        <ToggleButton
+          value="underlined"
+          aria-label="underlined"
+          onClick={handlePass}
+        >
           <FormatUnderlinedIcon />
         </ToggleButton>
         <ToggleButton

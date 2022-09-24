@@ -19,6 +19,7 @@ namespace Othelloworld.Data.Repos
 				.Include(player => player.PlayerInGame.Where(pig => 
 					pig.Game.Status == GameStatus.Playing
 					|| pig.Game.Status == GameStatus.Staging).Take(1))
+				.AsNoTracking()
 				.FirstOrDefault();
 
 		public void UpdatePlayer(Player player)

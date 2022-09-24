@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Duende.IdentityServer.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,13 +14,14 @@ using Othelloworld.Services;
 using Othelloworld.Util;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Othelloworld.Controllers
 {
-	[Authorize(Roles = "user, admin")]
+	[Authorize(Policy = JwtBearerDefaults.AuthenticationScheme, Roles = "user, admin")]
 	[ApiController]
 	[Route("[controller]")]
 	public class GameController : Controller
@@ -296,7 +300,16 @@ namespace Othelloworld.Controllers
 
 		public class CreateGameModel
 		{
+			[Required(ErrorMessage = "This field is required")]
+			[MinLength(3, ErrorMessage = "Your password must be longer than 2 characters.")]
+			[MaxLength(16, ErrorMessage = "Your password can't be longer than 16 characters.")]
+			[RegularExpression("^(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
+				ErrorMessage = "This game name is invalid.")]
 			public string Name { get; set; }
+
+			[MaxLength(400, ErrorMessage = "Your password can't be longer than 400 characters.")]
+			[RegularExpression("^(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
+				ErrorMessage = "This game name is invalid.")]
 			public string Description { get; set; }
 		}
 

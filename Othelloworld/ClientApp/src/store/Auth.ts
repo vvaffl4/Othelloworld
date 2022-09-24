@@ -1,6 +1,7 @@
 ﻿import Token from "../model/Token";
 import { createSlice, Dispatch, PayloadAction } from "@reduxjs/toolkit";
 import { ApiRequest } from ".";
+import { AccountDTO, ErrorResponse, LoginDTO } from "../api";
 
 interface AuthState extends Token {
 	authenticated: boolean
@@ -31,13 +32,19 @@ const authSlice = createSlice({
 	}
 });
 
-export const register = (username: string, email: string, password: string, country: string): ApiRequest => async (dispatch, _, { register }) =>
-	register(username, email, password, country)
-		.then(token => dispatch(authSlice.actions.setToken(token)));
-export const login = (email: string, password: string): ApiRequest => async (dispatch, _, { login }) =>
-	login(email, password)
-		.then(token => dispatch(authSlice.actions.setToken(token)));
-export const logout = () => (dispatch: Dispatch) =>
-	dispatch(authSlice.actions.unsetToken())
+export const register = (account: AccountDTO, errorCallback: ErrorResponse): ApiRequest =>
+	async (dispatch, _, { register }) =>
+		register(account)
+			.then(token => dispatch(authSlice.actions.setToken(token)))
+			.catch(errorCallback);
+export const login = (credentials: LoginDTO, errorCallback: ErrorResponse): ApiRequest =>
+	async (dispatch, _, { login }) =>
+		login(credentials)
+			.then(token => dispatch(authSlice.actions.setToken(token)))
+			.catch(errorCallback);
+export const logout = (): ApiRequest =>
+	async (dispatch, getState, { logout }) =>
+		logout(getState().auth)
+			.then(_ => dispatch(authSlice.actions.unsetToken()))
 
 export default authSlice.reducer;

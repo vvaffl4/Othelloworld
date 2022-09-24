@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Othelloworld.Data.Models;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Othelloworld.Pages.Admin.Accounts
@@ -21,11 +22,23 @@ namespace Othelloworld.Pages.Admin.Accounts
 
 		[BindProperty]
 		public Account Account { get; set; }
-		public async Task OnGetAsync(string id)
+		public async Task OnGetAsync(string username)
 		{
-			string username = id; //(string)Request.RouteValues["id"];
-
 			Account = await _userManager.FindByNameAsync(username);
+		}
+
+		public async Task<IActionResult> OnPostAsync()
+		{
+			var result = await _userManager.UpdateAsync(Account);
+
+			if(result.Succeeded)
+			{
+				return Page();
+			} else
+			{
+				Debug.WriteLine(result.Errors.ToString());
+			}
+			return Page();
 		}
 	}
 }

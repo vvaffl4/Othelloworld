@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Othelloworld.Data;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Othelloworld
 {
@@ -22,6 +23,18 @@ namespace Othelloworld
 				.ConfigureWebHostDefaults(webBuilder =>
 				{
 					webBuilder.UseStartup<Startup>();
+					
+					if( RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+					{
+						webBuilder.UseKestrel(options =>
+						{
+							options.AddServerHeader = false;
+						});
+					} else
+					{
+						webBuilder.UseIIS();
+					}
+
 				});
 	}
 }

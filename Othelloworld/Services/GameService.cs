@@ -155,6 +155,13 @@ namespace Othelloworld.Services
 					);
 
 				game.Board = board;
+				game.Turns.Add(new Turn
+				{
+					Number = game.Turns.Count + 1,
+					X = position.x,
+					Y = position.y,
+					Color = game.PlayerTurn
+				});
 
 				var isFinished = Finished(game);
 
