@@ -60,6 +60,10 @@ const Timeline: FC = () => {
     }
   }, [isPlaying, turn]);
 
+  useEffect(() => {
+    setTurn(step);
+	}, [step])
+
   const handleCameraModeToggle = () => {
     dispatch(toggleCameraMode());
   }

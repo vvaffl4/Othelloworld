@@ -1,7 +1,7 @@
 ﻿import { Box, ListItem, ListItemButton, ListItemIcon, ListItemText, Tab, Tabs } from '@mui/material';
 import { FC, useEffect, useRef, useState } from 'react';
 import { FixedSizeList, ListChildComponentProps, VariableSizeList } from 'react-window';
-import { useAppSelector } from '../store/Hooks';
+import { useAppDispatch, useAppSelector } from '../store/Hooks';
 import HorizontalSplitIcon from '@mui/icons-material/HorizontalSplit';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import HistoryIcon from '@mui/icons-material/History';
@@ -9,15 +9,21 @@ import CircleIcon from '@mui/icons-material/Circle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import Turn from '../model/Turn';
 import Message from '../model/Message';
+import { setStep } from '../store/Game';
 
 const TurnHistoryRow = (tab: string) => {
 
 	return (props: ListChildComponentProps) => {
 		const { index, style } = props;
+		const dispatch = useAppDispatch();
 		const historyItem = useAppSelector(state => state.game.history[index]);
 		const type = historyItem.type
 		if (type === 'history' && tab !== 'chat') {
 			const item = historyItem.item as Turn;
+
+			const handleTurnClick = () => {
+				dispatch(setStep(item.number));
+			}
 
 			return (
 				<ListItem
@@ -26,7 +32,9 @@ const TurnHistoryRow = (tab: string) => {
 					component="div"
 					disablePadding
 				>
-					<ListItemButton>
+					<ListItemButton
+						onClick={handleTurnClick}
+					>
 						<ListItemIcon>
 							{item.color === 1
 								? (<CircleIcon />)
@@ -127,6 +135,7 @@ const TurnHistory = () => {
 				component="div"
 				sx={{
 					flexGrow: 1,
+					flexShrink: 1,
 					width: '100%'
 				}}
 			>
@@ -141,7 +150,9 @@ const TurnHistory = () => {
 
 						return history[index].type === tab || tab === 'all' ? 80 : 0;
 					}}
-					itemCount={history.length}
+					itemCount={
+						history.filter(item => item.type === tab || tab === 'all').length
+					}
 					overscanCount={5}
 				>
 					{TurnHistoryRow(tab)}
