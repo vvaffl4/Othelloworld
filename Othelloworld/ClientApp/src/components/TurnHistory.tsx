@@ -118,6 +118,7 @@ const TurnHistory = () => {
 			sx={{
 				display: 'flex',
 				flexDirection: 'column',
+				justifyContent: 'flex-end',
 				height: '100%'
 			}}
 		>

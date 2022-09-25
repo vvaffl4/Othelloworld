@@ -40,7 +40,7 @@ const Playfield: FC = () => {
     dispatch(changeWorldSettings({ show: false }));
   }, []);
 
-  const [emptyCount, whiteCount, blackCount] = game.board.reduce((state, value) =>
+  const [emptyCount, whiteCount, blackCount] = game.boards[game.step].reduce((state, value) =>
     value.reduce((state, value) => [
       state[Color.none] + Number(value == Color.none),
       state[Color.white] + Number(value == Color.white),

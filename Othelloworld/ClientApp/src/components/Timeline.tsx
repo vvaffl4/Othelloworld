@@ -2,6 +2,7 @@
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import ThreeDRotationIcon from '@mui/icons-material/ThreeDRotation';
@@ -9,9 +10,9 @@ import FormatItalicIcon from '@mui/icons-material/FormatItalic';
 import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
 import FormatColorFillIcon from '@mui/icons-material/FormatColorFill';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/Hooks';
-import { giveUp, passTurn, toggleCameraMode } from '../store/Game';
+import { giveUp, passTurn, setStep, toggleCameraMode } from '../store/Game';
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
   '& .MuiToggleButtonGroup-grouped': {
@@ -32,6 +33,32 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
 const Timeline: FC = () => {
   const dispatch = useAppDispatch();
   const cameraMode = useAppSelector(state => state.game.controls.mode);
+  const turns = useAppSelector(state => state.game.turns);
+  const step = useAppSelector(state => state.game.step);
+
+  const [turn, setTurn] = useState(turns.length);
+  const [isPlaying, setPlaying] = useState(false);
+
+  useEffect(() => {
+    if (isPlaying) {
+      const increaseStep = () => {
+        const nextTurn = Math.min(turn + 1, turns.length);
+
+        if (nextTurn >= turns.length) {
+          setPlaying(false);
+				}
+
+        dispatch(setStep(nextTurn));
+        setTurn(nextTurn);
+			}
+
+      const playInterval = setInterval(increaseStep, 2000)
+
+      return () => {
+        clearInterval(playInterval);
+      }
+    }
+  }, [isPlaying, turn]);
 
   const handleCameraModeToggle = () => {
     dispatch(toggleCameraMode());
@@ -43,6 +70,50 @@ const Timeline: FC = () => {
 
   const handlePass = () => {
     dispatch(passTurn());
+  }
+
+  const handleTurnChange = (_, value: number | number[], activeThumb: number) => {
+    var currentValue = value as number;
+
+    setTurn(currentValue);
+  }
+
+  const handleTurnBegin = () => {
+    setTurn(0);
+
+    dispatch(setStep(0));
+  }
+
+  const handleTurnEnd = () => {
+    setTurn(turns.length);
+
+    dispatch(setStep(turns.length));
+	}
+
+  const handleTurnStepBackwards = () => {
+    const currentStep = Math.max(turn - 1, 0);
+
+    setTurn(currentStep);
+
+    dispatch(setStep(currentStep));
+  }
+
+  const handleTurnStepForwards = () => {
+    const currentStep = Math.min(turn + 1, turns.length);
+
+    setTurn(currentStep);
+
+    dispatch(setStep(currentStep));
+  }
+
+  const handleTimelineChange = (_, value: number | number[]) => {
+    var currentValue = value as number;
+
+    dispatch(setStep(currentValue));
+  }
+
+  const handlePlaychange = () => {
+    setPlaying(!isPlaying);
 	}
 
 	return (
@@ -65,10 +136,18 @@ const Timeline: FC = () => {
         exclusive
         aria-label="text alignment"
       >
-        <ToggleButton value="first" aria-label="left aligned">
+        <ToggleButton
+          value="first"
+          aria-label="left aligned"
+          onClick={handleTurnBegin}
+        >
           <FirstPageIcon />
         </ToggleButton>
-        <ToggleButton value="prev" aria-label="centered">
+        <ToggleButton
+          value="prev"
+          aria-label="centered"
+          onClick={handleTurnStepBackwards}
+        >
           <ChevronLeftIcon />
         </ToggleButton>
         <ToggleButton
@@ -81,13 +160,22 @@ const Timeline: FC = () => {
           color="primary"
           value="play"
           aria-label="right aligned"
+          onClick={handlePlaychange}
         >
-          <PlayArrowIcon />
+          {isPlaying ? (<PauseIcon />) : (<PlayArrowIcon />)}
         </ToggleButton>
-        <ToggleButton value="next" aria-label="justified">
+        <ToggleButton
+          value="next"
+          aria-label="justified"
+          onClick={handleTurnStepForwards}
+        >
           <ChevronRightIcon />
         </ToggleButton>
-        <ToggleButton value="last" aria-label="justified">
+        <ToggleButton
+          value="last"
+          aria-label="justified"
+          onClick={handleTurnEnd}
+        >
           <LastPageIcon  />
         </ToggleButton>
       </StyledToggleButtonGroup>
@@ -129,16 +217,18 @@ const Timeline: FC = () => {
           pt: 1,
           pb: 0,
           '.MuiSlider-rail, .MuiSlider-track': {
-            height: '8px' 
-					},
+            height: '8px'
+          },
         }}
         aria-label="Sets"
-        defaultValue={10}
+        value={turn}
         valueLabelDisplay="auto"
         step={1}
         marks
         min={0}
-        max={10}
+        max={turns.length}
+        onChange={handleTurnChange}
+        onChangeCommitted={handleTimelineChange}
       />
     </Paper>
 	);

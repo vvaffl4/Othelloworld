@@ -1,4 +1,5 @@
 ﻿import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Log } from 'oidc-react';
 import type { ApiRequest } from '.';
 import { ErrorResponse } from '../api';
 import Game from '../model/Game';
@@ -25,8 +26,10 @@ interface GameState {
 	players?: [PlayerInGame, PlayerInGame];
 	player?: PlayerType,
 	turn?: PlayerType,
+	turns: Turn[],
 	history: HistoryItem[],
-	board: number[][],
+	step: number,
+	boards: number[][][],
 	placeholders: [number, number][]
 	controls: Controls
 }
@@ -37,8 +40,10 @@ const initialState: GameState = {
 	players: undefined,
 	player: 1,
 	turn: 1,
+	turns: [],
 	history: [],
-	board: [],
+	step: 0,
+	boards: [],
 	placeholders: [],
 	controls: {
 		mode: 'perspective'
@@ -52,12 +57,6 @@ const allDirections: [number, number][] = [
 ];
 
 const checkIfValid = (board: number[][], position: [number, number], directions: [number, number][], turn: number) => {
-	//const directions = [
-	//	[-1, -1], [0, -1], [1, -1],
-	//	[-1,  0],					 [1,  0],
-	//	[-1,  1], [0,  1], [1,  1]
-	//];
-
 	if (board[position[1]][position[0]] !== 0) return { valid: false, paths: [] };
 
 	return directions.reduce((result, direction) => {
@@ -128,8 +127,6 @@ const createPlaceholderMap = (board: number[][], color: Color) => {
 					|| placeHolderMap[locY][locX] !== 0
 					|| board[locY][locX] !== 0) return state;
 
-					console.log(locX, locY);
-
 					const result = checkIfValid(
 						board,
 						[locX, locY],
@@ -150,6 +147,41 @@ const createPlaceholderMap = (board: number[][], color: Color) => {
 	, []);
 }
 
+const createTurnBoards = (turns: Turn[]) => {
+	const defaultBoard = [
+		[0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 1, 2, 0, 0, 0],
+		[0, 0, 0, 2, 1, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0],
+	];
+
+	return turns.reduce((state, turn, index) => {
+		const result = checkIfValid(state[index], [turn.x, turn.y], allDirections, turn.color - 1);
+
+		console.log(turn);
+
+		if (!result.valid) return state;
+
+
+		const newBoard = state[index].map(row => [...row]);
+
+		result.paths.forEach(path => {
+			path.forEach(position => {
+				newBoard[position[1]][position[0]] = turn.color;
+			});
+		});
+
+		return [
+			...state,
+			newBoard
+		];
+	}, [defaultBoard])
+}
+
 export const gameSlice = createSlice({
 	name: 'game',
 	initialState,
@@ -157,7 +189,7 @@ export const gameSlice = createSlice({
 		startGame: (state, action: PayloadAction<1 | 2>) => {
 			state.player = action.payload;
 			state.turn = action.payload;
-			state.board = [
+			state.boards = [[
 				[0, 0, 0, 0, 0, 0, 0, 0],
 				[0, 0, 0, 0, 0, 0, 0, 0],
 				[0, 0, 0, 0, 0, 0, 0, 0],
@@ -166,10 +198,15 @@ export const gameSlice = createSlice({
 				[0, 0, 0, 0, 0, 0, 0, 0],
 				[0, 0, 0, 0, 0, 0, 0, 0],
 				[0, 0, 0, 0, 0, 0, 0, 0],
-			];
+			]];
 		},
 		setBoard: (state, action: PayloadAction<number[][]>) => {
-			state.board = action.payload;
+			state.boards = [action.payload];
+		},
+		setStep: (state, action: PayloadAction<number>) => {
+			state.step = action.payload;
+			state.placeholders = createPlaceholderMap(state.boards[state.step], state.turns[state.step].color);
+			state.turn = state.turns[state.step].color as PlayerType;
 		},
 		setGame: (state, action: PayloadAction<Game>) => {
 			const messages = [
@@ -180,6 +217,7 @@ export const gameSlice = createSlice({
 
 			state.hasGame = true;
 			state.turn = action.payload.playerTurn as PlayerType;
+			state.turns = action.payload.turns;
 			state.history = [
 				...messages.map(message => ({
 					type: 'chat',
@@ -191,10 +229,13 @@ export const gameSlice = createSlice({
 				}) as HistoryItem)
 			].sort((a, b) => new Date(a.item.datetime).getTime() - new Date(b.item.datetime).getTime());
 
-			state.board = action.payload.board;
+			state.step = action.payload.turns.length;
+			state.boards = createTurnBoards(action.payload.turns);
 			state.players = action.payload.players;
 
-			state.placeholders = createPlaceholderMap(state.board, action.payload.playerTurn);
+			state.placeholders = createPlaceholderMap(state.boards[state.step], action.payload.playerTurn);
+
+			//console.log(createTurnBoards(action.payload.turns));
 		},
 		putStone: (state, { payload: [locX, locY] }: PayloadAction<[number, number]>) => {
 			if (locX < 0
@@ -202,13 +243,13 @@ export const gameSlice = createSlice({
 				|| locX > 7
 				|| locY > 7) return state;
 
-			const checkResult = checkIfValid(state.board, [locX, locY], allDirections, state.player! - 1);
+			const checkResult = checkIfValid(state.boards[state.step], [locX, locY], allDirections, state.player! - 1);
 
 			if (!checkResult.valid) return state;
 
 			checkResult.paths.forEach(path => {
 				path.forEach(position => {
-					state.board[position[1]][position[0]] = state.player!;
+					state.boards[state.step][position[1]][position[0]] = state.player!;
 				});
 			});
 		},
@@ -256,6 +297,6 @@ export const giveUp = (): ApiRequest =>
 			.then(game => dispatch(setGame(game)))
 			.catch(console.error);
 
-export const { startGame, setBoard, setGame, toggleCameraMode } = gameSlice.actions
+export const { startGame, setBoard, setStep, setGame, toggleCameraMode } = gameSlice.actions
 
 export default gameSlice.reducer

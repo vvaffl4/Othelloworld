@@ -35,7 +35,7 @@ const Board: FC<{position: Vector3 }> = (props) => {
 
       dispatch(putStone([xIndex, yIndex])); 
     }
-  }, [game.board]);
+  }, [game.boards[game.step]]);
 
   return (
     <>
@@ -53,7 +53,7 @@ const Board: FC<{position: Vector3 }> = (props) => {
           args={[5, 5, 8, 8]}
         />
       </mesh>
-      {game.board
+      {game.boards[game.step]
         .map((row, yIndex) =>
           row.map((cell, xIndex) => {
             const index = yIndex * 8 + xIndex;
