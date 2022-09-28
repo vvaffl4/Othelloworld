@@ -72,7 +72,7 @@ namespace Othelloworld.Controllers
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
-		public async Task<ActionResult<PagedList<Game>>> GetGames([FromQuery] int pageNumber, int pageSize)
+		public async Task<ActionResult<PagedList<Game>>> GetGamesAsync([FromQuery] int pageNumber, int pageSize)
 		{
 			return await _gameRepository.GetGames(pageNumber, pageSize);
 		}

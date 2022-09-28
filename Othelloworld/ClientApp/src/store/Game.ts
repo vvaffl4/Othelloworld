@@ -215,7 +215,6 @@ export const gameSlice = createSlice({
 				{ username: 'hello3', datetime: new Date().toISOString(), text: 'gl hf' },
 			]
 
-			state.hasGame = true;
 			state.turn = action.payload.playerTurn as PlayerType;
 			state.turns = action.payload.turns;
 			state.history = [
@@ -234,6 +233,7 @@ export const gameSlice = createSlice({
 			state.players = action.payload.players;
 
 			state.placeholders = createPlaceholderMap(state.boards[state.step], action.payload.playerTurn);
+			state.hasGame = true;
 
 			//console.log(createTurnBoards(action.payload.turns));
 		},
