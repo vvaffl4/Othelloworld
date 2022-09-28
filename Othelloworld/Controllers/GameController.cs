@@ -114,7 +114,7 @@ namespace Othelloworld.Controllers
 		public async Task<ActionResult<Game>> CreateGameAsync([FromBody] CreateGameModel model)
 		{
 			if (model == null) return BadRequest("Game is null");
-			if (model.Name == null) return BadRequest("Invalid model state for game");
+			if (!ModelState.IsValid) return BadRequest("Invalid model state for game");
 
 			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
 
