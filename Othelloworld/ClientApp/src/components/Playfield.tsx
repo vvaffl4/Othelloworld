@@ -13,6 +13,7 @@ import Timeline from './Timeline';
 import Camera from './threejs/Camera';
 import { changeWorldSettings } from '../store/World';
 import TurnHistory from './TurnHistory';
+import GameResult from './GameResult';
 
 const Playfield: FC = () => {
   const ContextBridge = useContextBridge(ReactReduxContext);
@@ -23,7 +24,7 @@ const Playfield: FC = () => {
   const game = useAppSelector(state => state.game, shallowEqual);
 
   useEffect(() => {
-    const player = playersInGame?.find(playerInGame => playerInGame.player.username === username);
+    const player = playersInGame?.find(playerInGame => playerInGame!.player.username === username);
 
     const intervalId = player && player.color === game.turn
       ? undefined
@@ -35,6 +36,7 @@ const Playfield: FC = () => {
       clearInterval(intervalId);
 		}
   }, [game.turn]);
+
 
   useEffect(() => {
     dispatch(changeWorldSettings({ show: false }));
@@ -107,7 +109,7 @@ const Playfield: FC = () => {
                 .map(color => ({
                   color,
                   playerInGame: playersInGame
-                    .find(playerInGame => playerInGame.color === color)!
+                    .find(playerInGame => playerInGame!.color === color)!
                 }))
                 .map(({ color, playerInGame }) => (
                   <Score
@@ -119,6 +121,7 @@ const Playfield: FC = () => {
             }
             <Timeline />
           </Box>
+          <GameResult />
         </Box>
         <Box
           id="sidebar"

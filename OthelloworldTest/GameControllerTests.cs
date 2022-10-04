@@ -12,13 +12,14 @@ using Othelloworld.Util;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
 using Assert = NUnit.Framework.Assert;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http;
 
 namespace OthelloworldTest
 {
-
+#pragma warning disable CS8618
 	[TestFixture]
 	public class GameControllerTest
 	{
@@ -27,67 +28,42 @@ namespace OthelloworldTest
 		private Mock<IPlayerRepository> _playerRepositoryMock;
 		private Mock<IAccountService> _accountServiceMock;
 		private Mock<UserManager<Account>> _userManagerMock;
+		private Mock<HttpRequest> _requestMock;
 		private Mock<ILogger<GameController>> _loggerMock;
 
 		private IEnumerable<Account> _mockAccounts = Enumerable.Range(0, 10)
 			.Select(i => new Account { Id = Guid.NewGuid().ToString(), UserName = $"UserName{i}" })
 			.ToList();
 
-		private IEnumerable<Game> _mockGames = Enumerable.Range(0, 10)
-			.Select(i => new Game { Token = Guid.NewGuid().ToString(), Name = $"Game{i}", Description = $"Description{i}" })
-			.ToList();
-
 		[OneTimeSetUp]
 		public void StartTest()
 		{
-			_gameRepositoryMock = new Mock<IGameRepository>();
+			_gameRepositoryMock = Mocks.GameRepository.New();
+			_gameServiceMock = Mocks.GameService.New();
 
-			_gameRepositoryMock.Setup(x =>
-				x.FindByCondition(
-					It.IsAny<Expression<Func<Game, bool>>>()
-			))
-				.Returns<Expression<Func<Game, bool>>>(x => 
-					_mockGames.AsQueryable().Where(x).AsNoTracking()
-				);
+			_playerRepositoryMock = Mocks.PlayerRepository.New();
+			_accountServiceMock = Mocks.AccountService.New();
 
-			_gameRepositoryMock.Setup(x => 
-				x.GetGames(
-					It.IsAny<int>(), 
-					It.IsAny<int>()
-			))
-				.ReturnsAsync(new PagedList<Game>(
-					_mockGames.ToList(),
-					It.IsAny<int>(),
-					It.IsAny<int>(),
-					It.IsAny<int>()
-				));
-
-			_gameServiceMock = new Mock<IGameService>();
-			_playerRepositoryMock = new Mock<IPlayerRepository>();
-			_accountServiceMock = new Mock<IAccountService>();
 			_loggerMock = new Mock<ILogger<GameController>>();
 
-			_userManagerMock = MockUserManager(
+			_userManagerMock = Mocks.UserManager.New(
 				_mockAccounts.ToList()
 			);
 
+			//only do this if you want to use request object in your tests
+			//var returnUrl = new Uri("http://www.example.com");
+			//var httpContext = new Mock<HttpContext>();
+			_requestMock = new Mock<HttpRequest>();
+
+			//httpContext.Setup(x => x.Request).Returns(request.Object);
+			_requestMock.Setup(x => x.Headers).Returns(() =>
+			{
+				var headerDictionary = new HeaderDictionary();
+				headerDictionary.Append("Authorization", "Bearer abc");
+				return headerDictionary;
+			});
+
 			Trace.Listeners.Add(new ConsoleTraceListener());
-		}
-
-		public static Mock<UserManager<TUser>> MockUserManager<TUser>(List<TUser> ls) where TUser : class
-		{
-			var store = new Mock<IUserStore<TUser>>();
-			var mgr = new Mock<UserManager<TUser>>(store.Object, null, null, null, null, null, null, null, null);
-			mgr.Object.UserValidators.Add(new UserValidator<TUser>());
-			mgr.Object.PasswordValidators.Add(new PasswordValidator<TUser>());
-
-			mgr.Setup(x => x.DeleteAsync(It.IsAny<TUser>())).ReturnsAsync(IdentityResult.Success);
-			mgr.Setup(x => x.CreateAsync(It.IsAny<TUser>(), It.IsAny<string>()))
-				.ReturnsAsync(IdentityResult.Success)
-				.Callback<TUser, string>((x, y) => ls.Add(x));
-			mgr.Setup(x => x.UpdateAsync(It.IsAny<TUser>())).ReturnsAsync(IdentityResult.Success);
-
-			return mgr;
 		}
 
 		[OneTimeTearDown]
@@ -96,16 +72,27 @@ namespace OthelloworldTest
 			Trace.Flush();
 		}
 
-		public GameController CreateMockedGameController() =>
-			new GameController(
+		public GameController CreateMockedGameController()
+		{
+			var httpContext = new DefaultHttpContext();
+			httpContext.Request.Headers["Authorization"] = "Bearer token";
+			
+			return new GameController(
 				_gameRepositoryMock.Object,
 				_gameServiceMock.Object,
 				_playerRepositoryMock.Object,
 				_accountServiceMock.Object,
 				_userManagerMock.Object,
-				_loggerMock.Object);
+				_loggerMock.Object)
+			{
+				 ControllerContext = new ControllerContext
+				 {
+					 HttpContext = httpContext
+				 }
+			};
+		}
 
-		public bool CheckIfValidModelState<Model>(Model model)
+		public IEnumerable<ValidationResult> ValidateModelState<Model>(Model model)
 		{
 			// Set some properties here
 			var context = new ValidationContext(model, null, null);
@@ -118,7 +105,9 @@ namespace OthelloworldTest
 				typeof(Model)
 			);
 
-			return Validator.TryValidateObject(model, context, results, true);
+			Validator.TryValidateObject(model, context, results, true);
+
+			return results;
 		}
 
 
@@ -131,24 +120,70 @@ namespace OthelloworldTest
 
 			// Assert
 			Assert.AreEqual(
-				_mockGames.First(game => game.Name == gameName)
+				Mocks.GameRepository.Games.First(game => game.Name == gameName)
 					.Token,
 				games.Value.First().Token
 			);
 		}
 
 		[Test]
-		public async Task GetGamesFromGameControllerReturns10Games()
+		public async Task GetGamesFromGameControllerReturnsFirstPageWith3Games()
 		{
 			var controller = CreateMockedGameController();
 			var result = await controller.GetGamesAsync(1, 3);
 
 			// Assert
-			_mockGames.Select((game, index) => new {game, index})
+			Mocks.GameRepository.Games.GetRange(0, 3)
+				.Select((game, index) => new {game, index})
 				.ToList()
 				.ForEach(indexedGame =>
-				Assert.AreEqual(indexedGame.game.Name, result.Value[indexedGame.index].Name)
-			);
+					Assert.AreEqual(indexedGame.game.Name, result.Value[indexedGame.index].Name)
+				);
+		}
+
+		[Test]
+		public async Task GetGamesFromGameControllerReturnsSecondPageWith4Games()
+		{
+			var controller = CreateMockedGameController();
+			var result = await controller.GetGamesAsync(2, 4);
+
+			// Assert
+			Mocks.GameRepository.Games.GetRange(4, 4)
+				.Select((game, index) => new { game, index })
+				.ToList()
+				.ForEach(indexedGame =>
+					Assert.AreEqual(indexedGame.game.Name, result.Value[indexedGame.index].Name)
+				);
+		}
+
+		[Test]
+		public async Task GetGamesFromGameControllerReturnsThirdPageWith2Games()
+		{
+			var controller = CreateMockedGameController();
+			var result = await controller.GetGamesAsync(3, 2);
+
+			// Assert
+			Mocks.GameRepository.Games.GetRange(4, 2)
+				.Select((game, index) => new { game, index })
+				.ToList()
+				.ForEach(indexedGame =>
+					Assert.AreEqual(indexedGame.game.Name, result.Value[indexedGame.index].Name)
+				);
+		}
+
+		[Test]
+		public async Task GetGamesFromGameControllerReturnsSecondPageWith5Games()
+		{
+			var controller = CreateMockedGameController();
+			var result = await controller.GetGamesAsync(2, 5);
+
+			// Assert
+			Mocks.GameRepository.Games.GetRange(5, 5)
+				.Select((game, index) => new { game, index })
+				.ToList()
+				.ForEach(indexedGame =>
+					Assert.AreEqual(indexedGame.game.Name, result.Value[indexedGame.index].Name)
+				);
 		}
 
 		[Test]
@@ -168,8 +203,9 @@ namespace OthelloworldTest
 			var createGameModelMock = new GameController.CreateGameModel { Name = "" };
 
 			var controller = CreateMockedGameController();
+			var validationResults = ValidateModelState(createGameModelMock);
 
-			if (CheckIfValidModelState(createGameModelMock)) { 
+			if (validationResults.Any()) { 
 				controller.ModelState.AddModelError("Required", "Invalid model state for game");
 			}
 
@@ -178,6 +214,36 @@ namespace OthelloworldTest
 
 			Assert.AreEqual(400, actual.StatusCode);
 			Assert.AreEqual("Invalid model state for game", actual.Value);
+		}
+
+		[Test]
+		public async Task CreateNewGameWithIdFromGameControllerReturnsBadRequest()
+		{
+			var createGameModelMock = new GameController.CreateGameModel { Name = "Game11", Description = "Description11" };
+
+			var controller = CreateMockedGameController();
+
+			var result = await controller.CreateGameAsync(createGameModelMock);
+			var actual = result.Result as CreatedResult;
+			var game = actual.Value as Game;
+
+			Assert.AreEqual(201, actual.StatusCode);
+			Assert.AreEqual(createGameModelMock.Name, game.Name);
+			Assert.AreEqual(createGameModelMock.Description, game.Description);
+			Assert.AreEqual(Mocks.UserManager.Account.UserName, game.Players.First().Username);
+		}
+
+		[Test]
+		public async Task GetGameWithId()
+		{
+			var controller = CreateMockedGameController();
+
+			var result = await controller.GetGameAsync();
+			var actual = result.Result as OkObjectResult;
+			var game = actual.Value as Game;
+
+			Assert.AreEqual(Mocks.GameRepository.UserManagerGame.Token, game.Token);
+			Assert.AreEqual(Mocks.GameRepository.UserManagerGame.Name, game.Name);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 ﻿import PlayerInGame from "./PlayerInGame";
 import Turn from "./Turn";
 
-enum GameStatus {
+export enum GameStatus {
 	Staging = 0,
 	Playing = 1,
 	Finished = 2
@@ -12,7 +12,7 @@ export default interface Game {
 	name: string;
 	status: GameStatus;
 	description: string;
-	players: [PlayerInGame, PlayerInGame];
+	players: [PlayerInGame, PlayerInGame?];
 	board: number[][];
 	playerTurn: number;
 	turns: Turn[]

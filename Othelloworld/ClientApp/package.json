@@ -6,14 +6,14 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "cross-env CI=true react-scripts test --env=jsdom",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint ./src/**/*.ts ./src/**/*.tsx"
   },
   "author": "P.G. Wobben",
   "license": "ISC",
   "devDependencies": {
-    "@testing-library/react": "^13.3.0",
+    "@testing-library/react": "^13.4.0",
     "@types/jasmine": "^4.0.3",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
@@ -42,6 +42,8 @@
     "@react-three/drei": "^9.21.0",
     "@react-three/fiber": "^8.3.1",
     "@reduxjs/toolkit": "^1.8.4",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/user-event": "^14.4.3",
     "@types/react-window": "^1.8.5",
     "camera-controls": "^1.36.2",
     "flag-icons": "^6.6.6",

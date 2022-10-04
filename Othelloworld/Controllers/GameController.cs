@@ -215,6 +215,28 @@ namespace Othelloworld.Controllers
 			{
 				var result = gameService.PutStone(game, pos);
 
+				if (gameService.Finished(result))
+				{
+					result.Status = GameStatus.Finished;
+					var (none, white, black) = gameService.CountColors(game);
+
+					if (white > black)
+					{
+						result.Players.First(pig => pig.Color == Color.white).Result = GameResult.won;
+						result.Players.First(pig => pig.Color == Color.black).Result = GameResult.lost;
+					}
+					else if (black > white)
+					{
+						result.Players.First(pig => pig.Color == Color.black).Result = GameResult.won;
+						result.Players.First(pig => pig.Color == Color.white).Result = GameResult.lost;
+					}
+					else
+					{
+						result.Players.First(pig => pig.Color == Color.black).Result = GameResult.draw;
+						result.Players.First(pig => pig.Color == Color.white).Result = GameResult.draw;
+					}
+				}
+
 				_gameRepository.UpdateGame(result);
 
 				return Ok(result);

@@ -13,7 +13,7 @@ export type Table<T extends number | string, U> = {
   allIds: T[]
 }
 
-interface GamesState extends Table<string, Game> { }
+export interface GamesState extends Table<string, Game> { }
 
 const initialState: GamesState = {
   byId: {},
@@ -25,9 +25,6 @@ const gamesSlice = createSlice({
   initialState,
   reducers: {
     addGames: (state, action: PayloadAction<Game[]>) => {
-
-      console.log(action.payload);
-
       state.byId = {
         ...state.byId,
         ...action.payload.reduce((byId, game) => ({ ...byId, [game.token]: game }), {})
@@ -40,7 +37,7 @@ const gamesSlice = createSlice({
   },
 })
 
-
+// Thunks
 export const fetchGames = (): ApiRequest =>
   async (dispatch, getState, { getGames }) =>
     getGames(getState().auth)

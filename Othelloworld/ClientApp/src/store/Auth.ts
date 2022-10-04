@@ -3,7 +3,7 @@ import { createSlice, Dispatch, PayloadAction } from "@reduxjs/toolkit";
 import { ApiRequest } from ".";
 import { AccountDTO, ErrorResponse, LoginDTO } from "../api";
 
-interface AuthState extends Token {
+export interface AuthState extends Token {
 	authenticated: boolean
 }
 
@@ -46,5 +46,7 @@ export const logout = (): ApiRequest =>
 	async (dispatch, getState, { logout }) =>
 		logout(getState().auth)
 			.then(_ => dispatch(authSlice.actions.unsetToken()))
+
+export const { setToken, unsetToken } = authSlice.actions;
 
 export default authSlice.reducer;

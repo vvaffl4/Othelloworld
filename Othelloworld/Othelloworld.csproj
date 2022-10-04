@@ -41,8 +41,11 @@
   <ItemGroup>
     <None Remove="ClientApp\src\components\BadgeAvatar.tsx" />
     <None Remove="ClientApp\src\components\Challenge.tsx" />
+    <None Remove="ClientApp\src\components\ErrorMessage.test.tsx" />
     <None Remove="ClientApp\src\components\ErrorMessage.tsx" />
+    <None Remove="ClientApp\src\components\GameResult.tsx" />
     <None Remove="ClientApp\src\components\PlayerCard.tsx" />
+    <None Remove="ClientApp\src\components\Profile.test.tsx" />
     <None Remove="ClientApp\src\components\Profile.tsx" />
     <None Remove="ClientApp\src\components\react-router\ProtectedRoute.tsx" />
     <None Remove="ClientApp\src\components\Score.tsx" />
@@ -67,8 +70,10 @@
     <None Remove="ClientApp\src\ProfileAvatar.tsx" />
     <None Remove="ClientApp\src\RGlobe.tsx" />
     <None Remove="ClientApp\src\Store.ts" />
+    <None Remove="ClientApp\src\store\Auth.test.ts" />
     <None Remove="ClientApp\src\store\Auth.ts" />
     <None Remove="ClientApp\src\store\Game.ts" />
+    <None Remove="ClientApp\src\store\Games.test.ts" />
     <None Remove="ClientApp\src\store\Games.ts" />
     <None Remove="ClientApp\src\store\Hooks.ts" />
     <None Remove="ClientApp\src\store\Nav.ts" />
@@ -77,6 +82,8 @@
     <None Remove="ClientApp\src\TGlobe.tsx" />
     <None Remove="ClientApp\src\types\globe.d.ts" />
     <None Remove="ClientApp\src\util.ts" />
+    <None Remove="ClientApp\src\__tests__\game.test.ts" />
+    <None Remove="ClientApp\src\__tests__\simple.test.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -84,7 +91,10 @@
     <TypeScriptCompile Include="ClientApp\src\components\Challenge.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\components\ErrorMessage.test.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\ErrorMessage.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\GameResult.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\Profile.test.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\TurnHistory.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\PlayerCard.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\Profile.tsx" />
@@ -109,8 +119,10 @@
     <TypeScriptCompile Include="ClientApp\src\components\ProfileAvatar.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\RGlobe.tsx" />
     <TypeScriptCompile Include="ClientApp\src\model\Turn.ts" />
+    <TypeScriptCompile Include="ClientApp\src\store\Auth.test.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\Auth.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\Game.ts" />
+    <TypeScriptCompile Include="ClientApp\src\store\Games.test.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\Games.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\Hooks.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\index.ts" />
@@ -119,6 +131,8 @@
     <TypeScriptCompile Include="ClientApp\src\store\World.ts" />
     <TypeScriptCompile Include="ClientApp\src\types\globe.d.ts" />
     <TypeScriptCompile Include="ClientApp\src\util.ts" />
+    <TypeScriptCompile Include="ClientApp\src\store\Game.test.ts" />
+    <TypeScriptCompile Include="ClientApp\src\__tests__\simple.test.ts" />
   </ItemGroup>
 
   <ItemGroup>

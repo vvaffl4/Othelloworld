@@ -47,6 +47,7 @@ namespace OthelloworldTest
 				new Color[8]{0, 0, 0, 0, 0, 0, 0, 0}
 			};
 			game.PlayerTurn = playerTurn;
+			game.Turns = new List<Turn>();
 
 			return game;
 		}

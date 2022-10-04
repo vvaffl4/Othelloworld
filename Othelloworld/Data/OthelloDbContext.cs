@@ -35,6 +35,7 @@ namespace Othelloworld.Data
 			var gameTokens = new string[]{
 				Guid.NewGuid().ToString(),
 				Guid.NewGuid().ToString(),
+				Guid.NewGuid().ToString(),
 				Guid.NewGuid().ToString()
 			};
 
@@ -200,11 +201,27 @@ namespace Othelloworld.Data
 
 			var playersInGame = new PlayerInGame[]
 			{
+				//new PlayerInGame
+				//{
+				//	Username = "hello1",
+				//	Color = Color.white,
+				//	GameToken = gameTokens[0],
+				//	IsHost = true,
+				//	Result = GameResult.undecided
+				//},
+				//new PlayerInGame
+				//{
+				//	Username = "hello2",
+				//	Color = Color.black,
+				//	GameToken = gameTokens[0],
+				//	IsHost = false,
+				//	Result = GameResult.undecided
+				//},
 				new PlayerInGame
 				{
 					Username = "hello1",
 					Color = Color.white,
-					GameToken = gameTokens[0],
+					GameToken = gameTokens[2],
 					IsHost = true,
 					Result = GameResult.undecided
 				},
@@ -212,7 +229,7 @@ namespace Othelloworld.Data
 				{
 					Username = "hello2",
 					Color = Color.black,
-					GameToken = gameTokens[0],
+					GameToken = gameTokens[2],
 					IsHost = false,
 					Result = GameResult.undecided
 				},
@@ -236,22 +253,40 @@ namespace Othelloworld.Data
 
 			var games = new Game[]
 			{
+				//new Game{
+				//	Token = gameTokens[0],
+				//	Name = "Game",
+				//	Description = "A description",
+				//	Status = GameStatus.Playing,
+				//	PlayerTurn = Color.white,
+				//	Board = new IEnumerable<Color>[]
+				//	{
+				//		new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
+				//		new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
+				//		new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
+				//		new int[8]{0, 0, 0, 1, 2, 0, 0, 0}.Cast<Color>(),
+				//		new int[8]{0, 0, 0, 2, 1, 0, 0, 0}.Cast<Color>(),
+				//		new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
+				//		new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
+				//		new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>()
+				//	}
+				//},
 				new Game{
-					Token = gameTokens[0],
+					Token = gameTokens[2],
 					Name = "Game",
 					Description = "A description",
 					Status = GameStatus.Playing,
 					PlayerTurn = Color.white,
 					Board = new IEnumerable<Color>[]
 					{
-						new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
-						new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
-						new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
-						new int[8]{0, 0, 0, 1, 2, 0, 0, 0}.Cast<Color>(),
-						new int[8]{0, 0, 0, 2, 1, 0, 0, 0}.Cast<Color>(),
-						new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
-						new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>(),
-						new int[8]{0, 0, 0, 0, 0, 0, 0, 0}.Cast<Color>()
+						new int[8]{1, 1, 1, 1, 1, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 1, 1, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 1, 0, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 1, 2, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 2, 1, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 1, 1, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 1, 1, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 1, 1, 1, 1, 1}.Cast<Color>()
 					}
 				},
 				new Game{
@@ -291,6 +326,14 @@ namespace Othelloworld.Data
 					X = 2,
 					Y = 2,
 					Color = Color.white
+				},
+				new Turn
+				{
+					GameToken = gameTokens[2],
+					Number = 1,
+					X = 0,
+					Y = 0,
+					Color = Color.black
 				}
 			};
 
