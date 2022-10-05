@@ -9,7 +9,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import Turn from '../model/Turn';
 import Message from '../model/Message';
-import { setStep } from '../store/Game';
+import { Result, setStep } from '../store/Game';
 
 const TurnHistoryRow = (tab: string) => {
 
@@ -18,7 +18,36 @@ const TurnHistoryRow = (tab: string) => {
 		const dispatch = useAppDispatch();
 		const historyItem = useAppSelector(state => state.game.history[index]);
 		const type = historyItem.type
-		if (type === 'history' && tab !== 'chat') {
+
+		if (historyItem.type === 'result') {
+			const item = historyItem.item as Result;
+
+			console.log(item);
+
+			return (
+				<ListItem
+					style={style}
+					key={index}
+					component="div"
+					disablePadding
+				>
+					<ListItemButton>
+						<ListItemText
+							color="primary"
+							primary={item.winner}
+							secondary="Winner"
+						/>
+					</ListItemButton>
+					<ListItemButton>
+						<ListItemText
+							color="primary"
+							primary={item.loser}
+							secondary="Loser"
+						/>
+					</ListItemButton>
+				</ListItem>
+			);
+		} else if (type === 'history' && tab !== 'chat') {
 			const item = historyItem.item as Turn;
 
 			const handleTurnClick = () => {
@@ -49,7 +78,7 @@ const TurnHistoryRow = (tab: string) => {
 					</ListItemButton>
 				</ListItem>
 			)
-		} else if (tab !== 'history') {
+		} else if (tab === 'message' || tab == 'all') {
 			const item = historyItem.item as Message;
 
 			return (
@@ -72,6 +101,7 @@ const TurnHistoryRow = (tab: string) => {
 				</ListItem>
 			);
 		}
+
 		return (
 			<ListItem sx={{ display: 'none' }} key={index} component="div" disablePadding />
 		);

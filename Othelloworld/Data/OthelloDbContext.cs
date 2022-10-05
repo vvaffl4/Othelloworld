@@ -32,6 +32,7 @@ namespace Othelloworld.Data
 		{
 			base.OnModelCreating(builder);
 
+
 			var gameTokens = new string[]{
 				Guid.NewGuid().ToString(),
 				Guid.NewGuid().ToString(),
@@ -88,7 +89,7 @@ namespace Othelloworld.Data
 					Email = "hello1@gmail.com",
 					NormalizedEmail = "hello1@gmail.com",
 					EmailConfirmed = true,
-					PasswordHash = hasher.HashPassword(null, "hello1!"),
+					PasswordHash = hasher.HashPassword(null, "HelloWorld1!"),
 					SecurityStamp = String.Empty
 				},
 				new Account
@@ -99,7 +100,7 @@ namespace Othelloworld.Data
 					Email = "hello2@gmail.com",
 					NormalizedEmail = "hello2@gmail.com",
 					EmailConfirmed = true,
-					PasswordHash = hasher.HashPassword(null, "hello2!"),
+					PasswordHash = hasher.HashPassword(null, "HelloWorld2!"),
 					SecurityStamp = String.Empty
 				},
 				new Account
@@ -110,7 +111,7 @@ namespace Othelloworld.Data
 					Email = "hello3@gmail.com",
 					NormalizedEmail = "hello3@gmail.com",
 					EmailConfirmed = true,
-					PasswordHash = hasher.HashPassword(null, "hello3!"),
+					PasswordHash = hasher.HashPassword(null, "HelloWorld3!"),
 					SecurityStamp = String.Empty
 				},
 				new Account
@@ -121,7 +122,7 @@ namespace Othelloworld.Data
 					Email = "hello4@gmail.com",
 					NormalizedEmail = "hello4@gmail.com",
 					EmailConfirmed = true,
-					PasswordHash = hasher.HashPassword(null, "hello4!"),
+					PasswordHash = hasher.HashPassword(null, "HelloWorld4!"),
 					SecurityStamp = String.Empty
 				}
 			});
@@ -376,81 +377,5 @@ namespace Othelloworld.Data
 
 			builder.Entity<Turn>().HasData(turns);
 		}
-
-		//public Task<bool> HasAnyAccounts()
-		//{
-		//	return Accounts.AnyAsync();
-		//}
-
-		//private Account SanitizeAccount(Account account)
-		//{
-		//	account.Username = account.Username.ToLower();
-		//	account.Password = account.Password.ToLower();
-		//	account.Email = account.Email.ToLower();
-		//	return account;
-		//}
-
-		//public async Task<Account> CreateAccount(Account account)
-		//{
-		//	SanitizeAccount(account);
-
-		//	await Accounts.AddAsync(account);
-
-		//	await SaveChangesAsync();
-
-		//	return account;
-		//}
-
-		//public Task<Account> FindAccount(string identifier)
-		//{
-		//	return Accounts
-		//			.Where(account => account.Username == identifier || account.Email == identifier)
-		//			.SingleOrDefaultAsync();
-		//}
-
-		//public Task<Account> LoginAccount(string identifier, string passwordEncrypt)
-		//{
-		//	return Accounts
-		//			.Where(account =>
-		//					(account.Username == identifier
-		//					|| account.Email == identifier)
-		//					&& account.Password == passwordEncrypt)
-		//			.SingleOrDefaultAsync();
-		//}
-
-
-		//// Games
-
-		//public Task<bool> HasAnyGames()
-		//{
-		//	return Games.AnyAsync();
-		//}
-
-		//internal async Task<Game[]> GetGames()
-		//{
-		//	return await Games.Include(game => game.Players).ToArrayAsync();
-		//}
-
-		//public Task<Game> GetGame(string token)
-		//{
-		//	return Games.SingleAsync(game => game.Token == token);
-		//}
-
-		//public async Task<Game> PutStone(string gameToken, string accountToken, int position)
-		//{
-		//	var game = Games
-		//			.SingleOrDefault(game =>
-		//					game.Token == gameToken);
-
-		//	if (game == null)
-		//	{
-		//		game.Board[position] = 1;
-		//		await SaveChangesAsync();
-
-		//		return game;
-		//	}
-
-		//	throw new System.Exception("Game does not exist.");
-		//}
 	}
 }

@@ -43,37 +43,6 @@ namespace Othelloworld
 			services.AddDbContext<OthelloDbContext>(options =>
 				options.UseSqlServer(Configuration.GetConnectionString("OThelloWorldDatabase")));
 
-			//services.AddAuthentication(options =>
-			//{
-			//	options.DefaultScheme = IdentityConstants.ApplicationScheme;
-			//	options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-			//})
-			//	//.AddIdentityCookies();
-			//	.AddCookie(options => 
-			//		options.ExpireTimeSpan = TimeSpan.FromMinutes(sessionCookieLifetime))
-			//	.AddOpenIdConnect(options =>
-			//	{
-			//		options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-			//		options.Authority = identityUrl.ToString();
-			//		options.SignedOutRedirectUri = callBackUrl.ToString();
-			//		options.ClientId = "othelloworld";
-			//		options.ClientSecret = "secret";
-			//		options.ResponseType = "code id_token";
-			//		options.SaveTokens = true;
-			//		options.GetClaimsFromUserInfoEndpoint = true;
-			//		options.RequireHttpsMetadata = false;
-			//		options.UsePkce = true;
-			//	});
-
-			//var builder = services.AddIdentityCore<Account>(options => { 
-			//	options.Stores.MaxLengthForKeys = 128;
-			//	options.User.RequireUniqueEmail = true;
-			//});
-
-			//new IdentityBuilder(builder.UserType, typeof(IdentityRole), services)
-			//	.AddEntityFrameworkStores<OthelloDbContext>()
-			//	.AddDefaultTokenProviders();
-
 			services.AddDefaultIdentity<Account>(options => options.SignIn.RequireConfirmedAccount = false)
 				.AddRoles<IdentityRole>()
 				.AddEntityFrameworkStores<OthelloDbContext>();
@@ -121,6 +90,7 @@ namespace Othelloworld
 				options.AddPolicy(JwtBearerDefaults.AuthenticationScheme, onlySecondJwtSchemePolicy);
 			});
 
+			// Dependency injection
 			services
 				.AddScoped<IGameRepository, GameRepository>()
 				.AddScoped<IGameService, GameService>()

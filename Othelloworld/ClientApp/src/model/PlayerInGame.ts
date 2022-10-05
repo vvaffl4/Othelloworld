@@ -14,7 +14,6 @@ export enum GameResult {
 }
 
 export default interface PlayerInGame {
-	username: string;
 	player: Player;
 	color: Color;
 	isHost: boolean;

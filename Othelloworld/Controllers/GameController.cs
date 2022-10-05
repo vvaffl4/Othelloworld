@@ -222,8 +222,13 @@ namespace Othelloworld.Controllers
 
 					if (white > black)
 					{
-						result.Players.First(pig => pig.Color == Color.white).Result = GameResult.won;
-						result.Players.First(pig => pig.Color == Color.black).Result = GameResult.lost;
+						var winner = result.Players.First(pig => pig.Color == Color.white);
+						winner.Result = GameResult.won;
+						winner.Player.AmountWon = winner.Player.AmountWon + 1;
+
+						var loser = result.Players.First(pig => pig.Color == Color.black);
+						loser.Result = GameResult.lost;
+						winner.Player.AmountLost = winner.Player.AmountLost + 1;
 					}
 					else if (black > white)
 					{

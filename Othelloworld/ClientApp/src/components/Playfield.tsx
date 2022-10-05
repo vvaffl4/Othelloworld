@@ -121,7 +121,6 @@ const Playfield: FC = () => {
             }
             <Timeline />
           </Box>
-          <GameResult />
         </Box>
         <Box
           id="sidebar"

@@ -4,7 +4,7 @@ import type { ApiRequest } from '.';
 import { ErrorResponse } from '../api';
 import Game, { GameStatus } from '../model/Game';
 import Message from '../model/Message';
-import PlayerInGame, { Color } from '../model/PlayerInGame';
+import PlayerInGame, { Color, GameResult } from '../model/PlayerInGame';
 import Turn from '../model/Turn';
 
 export type CameraMode = 'perspective' | 'orthographic';
@@ -13,9 +13,15 @@ export interface Controls {
 	mode: CameraMode
 }
 
+export interface Result {
+	winner: string;
+	loser: string;
+	datetime: string;
+}
+
 export interface HistoryItem {
-	type: 'history' | 'chat',
-	item: Turn | Message
+	type: 'history' | 'chat' | 'result',
+	item: Turn | Message | Result
 }
 
 
@@ -231,6 +237,15 @@ export const gameSlice = createSlice({
 			state.turns = action.payload.turns;
 			state.status = action.payload.status;
 
+			var results: Result[] = [];
+			if (action.payload.status === GameStatus.Finished) {
+				results.push({
+					winner: action.payload.players.find(pig => pig!.result === GameResult.won)!.player.username,
+					loser: action.payload.players.find(pig => pig!.result === GameResult.lost)!.player.username,
+					datetime: new Date().toISOString()
+				});
+			}
+
 			state.history = [
 				...messages.map(message => ({
 					type: 'chat',
@@ -239,6 +254,10 @@ export const gameSlice = createSlice({
 				...action.payload.turns.map(turn => ({
 					type: 'history',
 					item: turn
+				}) as HistoryItem),
+				...results.map(result => ({
+					type: 'result',
+					item: result
 				}) as HistoryItem)
 			].sort((a, b) => new Date(a.item.datetime).getTime() - new Date(b.item.datetime).getTime());
 
