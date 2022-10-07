@@ -23,17 +23,17 @@ namespace Othelloworld
 				.ConfigureWebHostDefaults(webBuilder =>
 				{
 					webBuilder.UseStartup<Startup>();
-					
-					if( RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+					webBuilder.UseKestrel(options =>
 					{
-						webBuilder.UseKestrel(options =>
-						{
-							options.AddServerHeader = false;
-						});
-					} else
-					{
-						webBuilder.UseIIS();
-					}
+						options.AddServerHeader = false;
+					});
+
+					//if ( RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+					//{
+					//} else
+					//{
+					//	webBuilder.UseIIS();
+					//}
 
 				});
 	}

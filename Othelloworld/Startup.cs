@@ -45,7 +45,8 @@ namespace Othelloworld
 
 			services.AddDefaultIdentity<Account>(options => options.SignIn.RequireConfirmedAccount = false)
 				.AddRoles<IdentityRole>()
-				.AddEntityFrameworkStores<OthelloDbContext>();
+				.AddEntityFrameworkStores<OthelloDbContext>()
+				.AddDefaultTokenProviders();
 
 			services.AddAuthentication()
 				.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -62,6 +63,8 @@ namespace Othelloworld
 				{
 					options.SaveToken = true;
 
+					//options.Authority = Configuration.GetValue<string>("Authority");
+					options.Audience = Configuration.GetValue<string>("Audience");
 					options.TokenValidationParameters = new TokenValidationParameters
 					{
 						ValidateIssuer = true,
@@ -69,6 +72,7 @@ namespace Othelloworld
 						ValidateAudience = true,
 						ValidAudience = Configuration.GetValue<string>("Audience"),
 						ValidateIssuerSigningKey = true,
+						TokenDecryptionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("DecryptionKey"))),
 						IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("SigningKey")))
 					};
 				});
