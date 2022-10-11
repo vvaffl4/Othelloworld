@@ -10,7 +10,7 @@ namespace Othelloworld.Services
 	{
 		string GetAccountId(string authorization);
 
-		string CreateJwtToken(
+		JwtSecurityToken CreateJwtToken(
 			string id, 
 			string username,
 			IEnumerable<Claim> claims);

@@ -23,6 +23,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using static System.Net.Mime.MediaTypeNames;
+using Othelloworld.Util;
+using System.Security.Cryptography;
 
 namespace Othelloworld
 {
@@ -50,6 +52,14 @@ namespace Othelloworld
 				.AddEntityFrameworkStores<OthelloDbContext>()
 				.AddDefaultTokenProviders();
 
+			var credentials = new Credentials(
+				Configuration.GetValue<string>("Issuer"), 
+				Configuration.GetValue<string>("Audience"),
+				Configuration.GetValue<string>("EncryptionKey"),
+				Configuration.GetValue<string>("SigningKey"),
+				TimeSpan.FromMinutes(Configuration.GetValue<int>("TokenTimeoutMinutes"))
+			);
+
 			services.AddAuthentication()
 				.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 				{
@@ -66,16 +76,16 @@ namespace Othelloworld
 					options.SaveToken = true;
 
 					//options.Authority = Configuration.GetValue<string>("Authority");
-					options.Audience = Configuration.GetValue<string>("Audience");
+					options.Audience = credentials.Audience;
 					options.TokenValidationParameters = new TokenValidationParameters
 					{
 						ValidateIssuer = true,
-						ValidIssuer = Configuration.GetValue<string>("Issuer"),
+						ValidIssuer = credentials.Issuer,
 						ValidateAudience = true,
-						ValidAudience = Configuration.GetValue<string>("Audience"),
+						ValidAudience = credentials.Audience,
 						ValidateIssuerSigningKey = true,
-						TokenDecryptionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("EncryptionKey"))),
-						IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("SigningKey")))
+						TokenDecryptionKey = credentials.PrivateEncryptionKey, // new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("EncryptionKey"))),
+						IssuerSigningKey = credentials.SigningKey
 					};
 				});
 
@@ -98,6 +108,7 @@ namespace Othelloworld
 
 			// Dependency injection
 			services
+				.AddSingleton(credentials)
 				.AddSingleton<JwtHelper, JwtHelper>()
 				.AddScoped<IGameRepository, GameRepository>()
 				.AddScoped<IGameService, GameService>()
@@ -175,7 +186,9 @@ namespace Othelloworld
 				app.UseDeveloperExceptionPage();
 				app.UseSwagger();
 				app.UseSwaggerUI();
-
+			}
+			else
+			{
 				app.UseExceptionHandler(exceptionHandlerApp =>
 				{
 					exceptionHandlerApp.Run(async context =>
@@ -186,9 +199,6 @@ namespace Othelloworld
 						await context.Response.WriteAsync("{}");
 					});
 				});
-			}
-			else
-			{
 				//app.UseExceptionHandler("/Error");
 				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 

@@ -10,7 +10,6 @@ using Othelloworld.Data.Models;
 using Othelloworld.Data.Repos;
 using Othelloworld.Services;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -23,20 +22,17 @@ namespace Othelloworld.Controllers
 	[Route("[controller]")]
 	public class AccountController : ControllerBase
 	{
-		private readonly IConfiguration _configuration;
 		private readonly UserManager<Account> _userManager;
 		private readonly SignInManager<Account> _signInManager;
 		private readonly IAccountService _accountService;
 		private readonly IPlayerRepository _playerRepository;
 
 		public AccountController(
-			IConfiguration configuration,
 			UserManager<Account> userManager,
 			SignInManager<Account> signInManager,
 			IAccountService accountService,
 			IPlayerRepository playerRepository)
 		{
-			_configuration = configuration;
 			_userManager = userManager;
 			_signInManager = signInManager;
 			_accountService = accountService;
@@ -89,17 +85,13 @@ namespace Othelloworld.Controllers
 				accountId,
 				model.Username,
 				roles.Select(role => new Claim(ClaimTypes.Role, role))
-				//_configuration.GetValue<string>("SigningKey"),
-				//_configuration.GetValue<string>("Issuer"),
-				//_configuration.GetValue<string>("Audience"),
-				//_configuration.GetValue<int>("TokenTimeoutMinutes")
 			);
 
 			return Created("Register", new
 			{
-				token = token, //new JwtSecurityTokenHandler().WriteToken(token),
+				token = new JwtSecurityTokenHandler().WriteToken(token),
 				username = model.Username,
-				expires = TimeSpan.FromMinutes(_configuration.GetValue<int>("TokenTimeoutMinutes")).ToString()
+				expires = token.ValidTo
 			});
 		}
 
@@ -123,16 +115,12 @@ namespace Othelloworld.Controllers
 				account.Id,
 				account.UserName,
 				roles.Select(role => new Claim(ClaimTypes.Role, role))
-				//_configuration.GetValue<string>("SigningKey"),
-				//_configuration.GetValue<string>("Issuer"),
-				//_configuration.GetValue<string>("Audience"),
-				//_configuration.GetValue<int>("TokenTimeoutMinutes")
 			);
 
 			return Ok(new { 
-				token = token, // new JwtSecurityTokenHandler().WriteToken(token),
+				token = new JwtSecurityTokenHandler().WriteToken(token),
 				username = account.UserName,
-				expires = TimeSpan.FromMinutes(_configuration.GetValue<int>("TokenTimeoutMinutes")).ToString()
+				expires = token.ValidTo
 			});
 		}
 
