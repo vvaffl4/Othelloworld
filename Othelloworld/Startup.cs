@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using Othelloworld.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Othelloworld
 {
@@ -172,11 +174,23 @@ namespace Othelloworld
 				app.UseDeveloperExceptionPage();
 				app.UseSwagger();
 				app.UseSwaggerUI();
+
+				app.UseExceptionHandler(exceptionHandlerApp =>
+				{
+					exceptionHandlerApp.Run(async context =>
+					{
+						context.Response.StatusCode = StatusCodes.Status400BadRequest;
+						context.Response.ContentType = Application.Json;
+
+						await context.Response.WriteAsync("{}");
+					});
+				});
 			}
 			else
 			{
-				app.UseExceptionHandler("/Error");
+				//app.UseExceptionHandler("/Error");
 				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+
 				app.UseHsts();
 			}
 

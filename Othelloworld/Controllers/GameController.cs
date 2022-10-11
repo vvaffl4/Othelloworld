@@ -1,13 +1,10 @@
-﻿using Duende.IdentityServer.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Othelloworld.Data;
 using Othelloworld.Data.Models;
 using Othelloworld.Data.Repos;
 using Othelloworld.Services;
@@ -15,7 +12,6 @@ using Othelloworld.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 

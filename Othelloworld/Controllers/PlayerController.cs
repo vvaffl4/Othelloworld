@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Othelloworld.Data.Models;
 using Othelloworld.Data.Repos;
-using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Othelloworld.Controllers
