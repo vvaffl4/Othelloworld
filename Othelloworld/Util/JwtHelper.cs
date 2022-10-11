@@ -1,17 +1,20 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
+//using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System;
+using Microsoft.IdentityModel.JsonWebTokens;
+using System.Linq;
 
 namespace Othelloworld.Util
 {
-	public static class JwtHelper
+	public class JwtHelper
 	{
-		public static JwtSecurityToken GetJwtToken(
+		public string GetJwtToken(
 				string id,
 				string signingKey,
+				string encryptionKey,
 				string issuer,
 				string audience,
 				TimeSpan expiration,
@@ -34,21 +37,58 @@ namespace Othelloworld.Util
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
 			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-			return new JwtSecurityToken(
-					issuer: issuer,
-					audience: audience,
-					expires: DateTime.UtcNow.Add(expiration),
-					claims: claims,
-					signingCredentials: creds
-			);
+			var symmetricEncryptionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(encryptionKey));
+			var encryptionCreds = new EncryptingCredentials(key, SecurityAlgorithms.HmacSha256);
+
+			var jwtTokenHandler = new JsonWebTokenHandler();
+
+			return jwtTokenHandler.CreateToken(new SecurityTokenDescriptor
+			{
+				Issuer = issuer,
+				Audience = audience,
+				Expires = DateTime.UtcNow.Add(expiration),
+				Claims = claims.ToDictionary(claim => claim.Type, claim => (object)claim.Value),
+				SigningCredentials = creds,
+				EncryptingCredentials = encryptionCreds
+			});
+
+			//return new JwtSecurityToken(
+			//		issuer: issuer,
+			//		audience: audience,
+			//		expires: DateTime.UtcNow.Add(expiration),
+			//		claims: claims,
+			//		signingCredentials: creds
+			//);
 		}
 
-		public static JwtSecurityToken ReadJwtToken(
-				string tokenString)
+		public TokenValidationResult ValidateToken(
+			string token,
+			string signingKey,
+			string encryptionKey,
+			string issuer,
+			string audience)
 		{
-			var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
+			var jwtTokenHandler = new JsonWebTokenHandler();
 
-			return token;
+			var symmetricSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
+			var symmetricEncryptionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(encryptionKey));
+
+			return jwtTokenHandler.ValidateToken(
+					token,
+					new TokenValidationParameters
+					{
+						ValidateIssuer = true,
+						ValidateAudience = true,
+						RequireExpirationTime = true,
+						ValidIssuer = issuer,
+						ValidAudience = audience,
+						// public key for signing
+						IssuerSigningKey = symmetricSigningKey,
+
+						// private key for encryption
+						TokenDecryptionKey = symmetricEncryptionKey
+					});
+			//var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
 		}
 	}
 }

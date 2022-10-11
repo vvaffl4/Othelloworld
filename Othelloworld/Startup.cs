@@ -74,7 +74,7 @@ namespace Othelloworld
 						ValidateAudience = true,
 						ValidAudience = Configuration.GetValue<string>("Audience"),
 						ValidateIssuerSigningKey = true,
-						TokenDecryptionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("DecryptionKey"))),
+						TokenDecryptionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("EncryptionKey"))),
 						IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("SigningKey")))
 					};
 				});
@@ -98,6 +98,7 @@ namespace Othelloworld
 
 			// Dependency injection
 			services
+				.AddSingleton<JwtHelper, JwtHelper>()
 				.AddScoped<IGameRepository, GameRepository>()
 				.AddScoped<IGameService, GameService>()
 				.AddScoped<IPlayerRepository, PlayerRepository>()

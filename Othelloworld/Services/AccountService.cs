@@ -7,19 +7,32 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using Microsoft.Extensions.Configuration;
 
 namespace Othelloworld.Services
 {
 	public class AccountService : IAccountService
 	{
-		public JwtSecurityToken CreateJwtToken(
+		private IConfiguration _configuration;
+		private JwtHelper _jwtHelper;
+		public AccountService(
+			IConfiguration configuration, 
+			JwtHelper jwtHelper)
+		{
+			_configuration = configuration;
+			_jwtHelper = jwtHelper;
+		}
+
+		public string CreateJwtToken(
 			string id, 
 			string username,
-			IEnumerable<Claim> claims,
-			string signingKey,
-			string issuer,
-			string audience,
-			int timeoutMinutes)
+			IEnumerable<Claim> claims
+			//string signingKey,
+			//string credentialKey,
+			//string issuer,
+			//string audience,
+			//int timeoutMinutes
+			)
 		{
 			var tokenClaims = new List<Claim>
 			{
@@ -29,12 +42,13 @@ namespace Othelloworld.Services
 
 			tokenClaims.AddRange(claims);
 
-			return JwtHelper.GetJwtToken(
+			return _jwtHelper.GetJwtToken(
 				id,
-				signingKey,
-				issuer,
-				audience,
-				TimeSpan.FromMinutes(timeoutMinutes),
+				_configuration.GetValue<string>("SigningKey"),
+				_configuration.GetValue<string>("EncryptionKey"),
+				_configuration.GetValue<string>("Issuer"),
+				_configuration.GetValue<string>("Audience"),
+				TimeSpan.FromMinutes(_configuration.GetValue<int>("TokenTimeoutMinutes")),
 				tokenClaims);
 		}
 
@@ -43,9 +57,14 @@ namespace Othelloworld.Services
 			var tokenString = authorization
 				.Replace("bearer ", "", true, CultureInfo.CurrentCulture);
 
-			var token = JwtHelper.ReadJwtToken(tokenString);
+			var result = _jwtHelper.ValidateToken(
+				tokenString,
+				_configuration.GetValue<string>("SigningKey"),
+				_configuration.GetValue<string>("EncryptionKey"),
+				_configuration.GetValue<string>("Issuer"),
+				_configuration.GetValue<string>("Audience"));
 
-			return token.Claims.First(claim => claim.Type == JwtRegisteredClaimNames.Sub).Value;
+			return result.ClaimsIdentity.Claims.First(claim => claim.Type == JwtRegisteredClaimNames.Sub).Value;
 		}
 	}
 }

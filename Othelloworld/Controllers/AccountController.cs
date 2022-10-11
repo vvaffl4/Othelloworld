@@ -88,18 +88,18 @@ namespace Othelloworld.Controllers
 			var token = _accountService.CreateJwtToken(
 				accountId,
 				model.Username,
-				roles.Select(role => new Claim(ClaimTypes.Role, role)),
-				_configuration.GetValue<string>("SigningKey"),
-				_configuration.GetValue<string>("Issuer"),
-				_configuration.GetValue<string>("Audience"),
-				_configuration.GetValue<int>("TokenTimeoutMinutes")
+				roles.Select(role => new Claim(ClaimTypes.Role, role))
+				//_configuration.GetValue<string>("SigningKey"),
+				//_configuration.GetValue<string>("Issuer"),
+				//_configuration.GetValue<string>("Audience"),
+				//_configuration.GetValue<int>("TokenTimeoutMinutes")
 			);
 
 			return Created("Register", new
 			{
-				token = new JwtSecurityTokenHandler().WriteToken(token),
+				token = token, //new JwtSecurityTokenHandler().WriteToken(token),
 				username = model.Username,
-				expires = token.ValidTo
+				expires = TimeSpan.FromMinutes(_configuration.GetValue<int>("TokenTimeoutMinutes")).ToString()
 			});
 		}
 
@@ -122,17 +122,17 @@ namespace Othelloworld.Controllers
 			var token = _accountService.CreateJwtToken(
 				account.Id,
 				account.UserName,
-				roles.Select(role => new Claim(ClaimTypes.Role, role)),
-				_configuration.GetValue<string>("SigningKey"),
-				_configuration.GetValue<string>("Issuer"),
-				_configuration.GetValue<string>("Audience"),
-				_configuration.GetValue<int>("TokenTimeoutMinutes")
+				roles.Select(role => new Claim(ClaimTypes.Role, role))
+				//_configuration.GetValue<string>("SigningKey"),
+				//_configuration.GetValue<string>("Issuer"),
+				//_configuration.GetValue<string>("Audience"),
+				//_configuration.GetValue<int>("TokenTimeoutMinutes")
 			);
 
 			return Ok(new { 
-				token = new JwtSecurityTokenHandler().WriteToken(token),
+				token = token, // new JwtSecurityTokenHandler().WriteToken(token),
 				username = account.UserName,
-				expires = token.ValidTo
+				expires = TimeSpan.FromMinutes(_configuration.GetValue<int>("TokenTimeoutMinutes")).ToString()
 			});
 		}
 
