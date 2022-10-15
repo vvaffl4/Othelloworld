@@ -17,7 +17,6 @@ describe("Redux Games", () => {
 				status: GameStatus.Staging,
 				players: [{
 					gameToken: 'Game1Token',
-					username: 'Game1Player1',
 					color: Color.white,
 					isHost: true,
 					player: {

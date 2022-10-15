@@ -26,7 +26,9 @@ const Playfield: FC = () => {
   useEffect(() => {
     const player = playersInGame?.find(playerInGame => playerInGame!.player.username === username);
 
-    const intervalId = player && player.color === game.turn
+    const intervalId = player
+      && player.color === game.turn
+      && game.status
       ? undefined
       : setInterval(() => {
           dispatch(fetchGame());
@@ -34,8 +36,8 @@ const Playfield: FC = () => {
 
     return () => {
       clearInterval(intervalId);
-		}
-  }, [game.turn]);
+    }
+  }, [game.turn, game.status]);
 
 
   useEffect(() => {

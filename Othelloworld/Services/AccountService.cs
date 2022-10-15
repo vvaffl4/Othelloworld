@@ -61,9 +61,7 @@ namespace Othelloworld.Services
 				_credentials.Issuer,
 				_credentials.Audience);
 
-			if (!result.IsValid) throw new Exception("Given token is not valid");
-
-			return result.ClaimsIdentity.Claims.First(claim => claim.Type == JwtRegisteredClaimNames.Sub).Value;
+			return result.Claims.First(claim => claim.Type == "id").Value;
 		}
 	}
 }

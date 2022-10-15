@@ -45,6 +45,7 @@
     <None Remove="ClientApp\src\components\ErrorMessage.test.tsx" />
     <None Remove="ClientApp\src\components\ErrorMessage.tsx" />
     <None Remove="ClientApp\src\components\GameResult.tsx" />
+    <None Remove="ClientApp\src\components\HomeCard.tsx" />
     <None Remove="ClientApp\src\components\PlayerCard.tsx" />
     <None Remove="ClientApp\src\components\Profile.test.tsx" />
     <None Remove="ClientApp\src\components\Profile.tsx" />
@@ -78,6 +79,7 @@
     <None Remove="ClientApp\src\store\Games.ts" />
     <None Remove="ClientApp\src\store\Hooks.ts" />
     <None Remove="ClientApp\src\store\Nav.ts" />
+    <None Remove="ClientApp\src\store\News.ts" />
     <None Remove="ClientApp\src\store\UserInterface.ts" />
     <None Remove="ClientApp\src\store\World.ts" />
     <None Remove="ClientApp\src\TGlobe.tsx" />
@@ -95,6 +97,7 @@
     <TypeScriptCompile Include="ClientApp\src\components\ErrorMessage.test.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\ErrorMessage.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\GameResult.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\HomeCard.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\Profile.test.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\TurnHistory.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\PlayerCard.tsx" />
@@ -128,6 +131,7 @@
     <TypeScriptCompile Include="ClientApp\src\store\Hooks.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\index.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\Nav.ts" />
+    <TypeScriptCompile Include="ClientApp\src\store\News.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\UserInterface.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\World.ts" />
     <TypeScriptCompile Include="ClientApp\src\types\globe.d.ts" />

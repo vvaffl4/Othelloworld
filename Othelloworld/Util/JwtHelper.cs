@@ -62,7 +62,7 @@ namespace Othelloworld.Util
 			//);
 		}
 
-		public SecurityToken ValidateToken(
+		public ClaimsPrincipal ValidateToken(
 			string token,
 			SymmetricSecurityKey signingKey,
 			SecurityKey privateEncryptionKey,
@@ -73,7 +73,7 @@ namespace Othelloworld.Util
 			var tokenHandler = new JwtSecurityTokenHandler();
 
 			SecurityToken resultToken;
-			var result = tokenHandler.ValidateToken(
+			var claims = tokenHandler.ValidateToken(
 				token,
 				new TokenValidationParameters
 				{
@@ -87,7 +87,7 @@ namespace Othelloworld.Util
 				},
 				out resultToken);
 
-			return resultToken;
+			return claims;
 			//return jwtTokenHandler.ValidateToken(
 			//		token,
 			//		new TokenValidationParameters

@@ -5,8 +5,8 @@ import nav from './Nav';
 import world from './World';
 import auth from './Auth';
 import games from './Games';
-import game from './Game'
-// ...
+import game from './Game';
+import news from './News';
 
 const authState = sessionStorage.getItem('auth')
   ? JSON.parse(sessionStorage.getItem('auth')!)
@@ -19,7 +19,8 @@ const store = configureStore({
     world,
     auth,
     games,
-    game
+    game,
+    news
   },
   preloadedState: {
     auth: authState
