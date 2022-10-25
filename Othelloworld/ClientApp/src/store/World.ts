@@ -96,7 +96,7 @@ const worldSlice = createSlice({
 		blurCountry: (state) => {
 			state.focus = undefined
 		},
-		selectAndFocusCountry: (state, action: PayloadAction<{ isoCode: string, altitude: number }>) => {
+		selectAndFocusCountry: (state, action: PayloadAction<{ isoCode: string, altitude: number, settings?: Partial<WorldState["settings"]> }>) => {
 			const country = state.countries.find(country =>
 				country.properties.ISO_A2.toLowerCase() === action.payload.isoCode.toLowerCase());
 
@@ -110,6 +110,13 @@ const worldSlice = createSlice({
 					lat: country.geometry.mid[1],
 					altitude: action.payload.altitude
 				};
+			}
+
+			if (action.payload.settings) {
+				state.settings = {
+					...state.settings,
+					...action.payload.settings
+				}
 			}
 		}
 	}

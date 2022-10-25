@@ -42,7 +42,7 @@ const GameItem: FC<{ token: string }> = ({ token }) => {
         <TableCell component="th" scope="row">
           {game.name}
         </TableCell>
-        <TableCell align="right">{game.players && game.players.find(player => player.isHost)!.username}</TableCell>
+        <TableCell align="right">{game.players && game.players.find(player => player && player.isHost)!.player.username}</TableCell>
         <TableCell align="right">{game.description}</TableCell>
         <TableCell align="right">Normal</TableCell>
       </TableRow>
@@ -68,7 +68,7 @@ const GameItem: FC<{ token: string }> = ({ token }) => {
                       { game.name }
                     </TableCell>
                     <TableCell>{game.description}</TableCell>
-                    <TableCell align="right">{game.players.find(player => player.isHost)!.username}</TableCell>
+                    <TableCell align="right">{game.players.find(player => player && player.isHost)!.player.username}</TableCell>
                     <TableCell align="right">
                       <Button onClick={handlePlay}>
                         Play

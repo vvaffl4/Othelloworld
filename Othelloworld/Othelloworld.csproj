@@ -45,10 +45,14 @@
     <None Remove="ClientApp\src\components\ErrorMessage.test.tsx" />
     <None Remove="ClientApp\src\components\ErrorMessage.tsx" />
     <None Remove="ClientApp\src\components\GameResult.tsx" />
+    <None Remove="ClientApp\src\components\HomeBanner.tsx" />
     <None Remove="ClientApp\src\components\HomeCard.tsx" />
+    <None Remove="ClientApp\src\components\HomeCardList.tsx" />
     <None Remove="ClientApp\src\components\PlayerCard.tsx" />
     <None Remove="ClientApp\src\components\Profile.test.tsx" />
     <None Remove="ClientApp\src\components\Profile.tsx" />
+    <None Remove="ClientApp\src\components\ProfileGameHistory.tsx" />
+    <None Remove="ClientApp\src\components\ProfileGameHistoryItem.tsx" />
     <None Remove="ClientApp\src\components\react-router\ProtectedRoute.tsx" />
     <None Remove="ClientApp\src\components\Score.tsx" />
     <None Remove="ClientApp\src\components\Staging.tsx" />
@@ -97,8 +101,12 @@
     <TypeScriptCompile Include="ClientApp\src\components\ErrorMessage.test.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\ErrorMessage.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\GameResult.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\HomeBanner.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\HomeCard.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\HomeCardList.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\Profile.test.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\ProfileGameHistory.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\ProfileGameHistoryItem.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\TurnHistory.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\PlayerCard.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\Profile.tsx" />
@@ -142,7 +150,8 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="wwwroot\" />
+    <Folder Include="Pages\Models\" />
+    <Folder Include="wwwroot\img\" />
   </ItemGroup>
 
   <ItemGroup>

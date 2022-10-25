@@ -1,5 +1,7 @@
 ﻿using Othelloworld.Data.Models;
 using Othelloworld.Util;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Othelloworld.Data.Repos
@@ -13,5 +15,7 @@ namespace Othelloworld.Data.Repos
 		public void DeleteGame(Game game);
 
 		public Task<PagedList<Game>> GetGames(int pageNumber, int pageSize);
+
+		public Task<IEnumerable<Game>> GetGameHistory(string username);
 	}
 }

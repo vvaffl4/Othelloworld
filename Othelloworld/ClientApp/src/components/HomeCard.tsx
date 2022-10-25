@@ -1,27 +1,42 @@
 ﻿import { Button, Card, CardActions, CardContent, CardMedia, Typography } from '@mui/material';
 import { FC } from 'react';
 
-const HomeCard: FC<{ index: number }> = ({ index }) => {
-  const newsItem = useAppDispatcher(state => state.)
+const HomeCard: FC<{ title: string, image: string, content: string, timestamp: string }> = ({ title, image, content, timestamp }) => {
 
 	return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card
+      sx={{
+        maxWidth: 345,
+        border: '1px solid #ffffff17'
+      }}
+    >
       <CardMedia
+        sx={{
+          backgroundColor: '#f06292',
+          borderBottom: '1px solid #373737',
+          color: '#121212',
+          fontSize: 42,
+          fontWeight: 900,
+          lineHeight: '180px',
+          textAlign: 'center'
+        }}
         component="img"
-        height="140"
-        alt="green iguana"
+        height="180"
+        alt={ image }
+        src={ image }
       />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          Lizard
+          { title }
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Lizards are a widespread group of squamate reptiles, with over 6,000
-          species, ranging across all continents except Antarctica
+        <Typography gutterBottom variant="caption" color="text.secondary" component="div">
+          { new Date(timestamp).toUTCString() }
+        </Typography>
+        <Typography variant="body2">
+          { content }
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">Share</Button>
         <Button size="small">Learn More</Button>
       </CardActions>
     </Card>

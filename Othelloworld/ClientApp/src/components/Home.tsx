@@ -1,41 +1,41 @@
 ﻿import { Container, Grid, Paper, Typography } from '@mui/material';
 import { FC } from 'react';
-import HomeCard from './HomeCard';
+import HomeBanner from './HomeBanner';
+import HomeCardList from './HomeCardList';
 
 const Home: FC = () => {
+
 	return (
 		<Container>
 			<Typography
 				variant="h1"
 				color="white"
 				sx={{
-					padding: '100px 200px 0 0',
+					pt: 16,
+					//padding: '100px 200px 0 0',
 					fontWeight: 700,
 					textAlign: 'right'
 				}}
 			>
 				OTHELLO
 			</Typography>
+			<Typography
+				variant="h2"
+				color={ '#f06292' }
+				sx={{
+					textAlign: 'right'
+				}}
+			>
+				WORLD
+			</Typography>
 			<Paper
 				sx={{
-					m: 15,
+					mt: 16,
 					overflow: 'hidden'
 				}}
 			>
-				<Grid container spacing={2}>
-					<Grid item xs={4}>
-						<HomeCard/>
-					</Grid>
-					<Grid item xs={4}>
-						<HomeCard />
-					</Grid>
-					<Grid item xs={4}>
-						<HomeCard />
-					</Grid>
-					<Grid item xs={12}>
-						Click here for more
-					</Grid>
-				</Grid>
+				<HomeBanner/>
+				<HomeCardList/>
 			</Paper>
 		</Container>
 	)

@@ -49,7 +49,6 @@ const App = () => {
     createTheme(isDarkModeEnabled ? 'dark' : 'light')
     , [isDarkModeEnabled])
 
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

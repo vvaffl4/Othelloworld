@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Othelloworld.Controllers.Models;
 using Othelloworld.Data.Models;
 using Othelloworld.Data.Repos;
 using Othelloworld.Services;
@@ -17,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Othelloworld.Controllers
 {
-	[Authorize(Policy = JwtBearerDefaults.AuthenticationScheme, Roles = "user, admin")]
+	[Authorize(Policy = JwtBearerDefaults.AuthenticationScheme, Roles = "user, mod, admin")]
 	[ApiController]
 	[Route("[controller]")]
 	public class GameController : Controller
@@ -73,6 +75,18 @@ namespace Othelloworld.Controllers
 			return await _gameRepository.GetGames(pageNumber, pageSize);
 		}
 
+		[HttpGet("history/{username}")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType(StatusCodes.Status403Forbidden)]
+		public async Task<ActionResult<IEnumerable<Game>>> GetGameHistoryAsync(string username)
+		{
+			var games = await _gameRepository.GetGameHistory(username);
+
+			return Ok(games);
+		}
+
 		/// <summary>
 		/// Gets active game
 		/// </summary>
@@ -83,7 +97,19 @@ namespace Othelloworld.Controllers
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		public async Task<ActionResult<Game>> GetGameAsync()
 		{
-			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			string id;
+			try
+			{
+				id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			} catch (Exception exception)
+			{
+				// Log Exception
+				_logger.LogWarning(exception, "Authentication failed: Validating JWE Token");
+
+				// Return as little information as possible
+				return Unauthorized();
+			}
+
 			var account = await _userManager.FindByIdAsync(id);
 
 			if (account == null) return BadRequest("Token is invalid");
@@ -112,11 +138,27 @@ namespace Othelloworld.Controllers
 			if (model == null) return BadRequest("Game is null");
 			if (!ModelState.IsValid) return BadRequest("Invalid model state for game");
 
-			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			string id;
+			try
+			{
+				id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			}
+			catch (Exception exception)
+			{
+				// Log Exception
+				_logger.LogWarning(exception, "Authentication failed: Validating JWE Token");
+
+				// Return as little information as possible
+				return Unauthorized();
+			}
 
 			var account = await _userManager.FindByIdAsync(id);
 
 			if (account == null) return BadRequest("Token is invalid");
+
+			var player = _playerRepository.GetPlayer(account.UserName);
+
+			if (player.PlayerInGame.Any()) return BadRequest("Player already has a game");
 
 			var game = _gameService.CreateNewGame(account.UserName, model.Name, model.Description);
 
@@ -139,7 +181,19 @@ namespace Othelloworld.Controllers
 			if (model == null) return BadRequest("Game is null");
 			if (model.Token == null) return BadRequest("Invalid model state for game");
 
-			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			string id;
+			try
+			{
+				id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			}
+			catch (Exception exception)
+			{
+				// Log Exception
+				_logger.LogWarning(exception, "Authentication failed: Validating JWE Token");
+
+				// Return as little information as possible
+				return Unauthorized();
+			}
 
 			var account = await _userManager.FindByIdAsync(id);
 
@@ -193,9 +247,22 @@ namespace Othelloworld.Controllers
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		public async Task<ActionResult<Game>> PutStoneAsync([FromBody] int[] position)
 		{
+			string id;
+			try
+			{
+				id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			}
+			catch (Exception exception)
+			{
+				// Log Exception
+				_logger.LogWarning(exception, "Authentication failed: Validating JWE Token");
+
+				// Return as little information as possible
+				return Unauthorized();
+			}
+
 			if (position.Length != 2) return BadRequest("Position is invalid");
 			var pos = (position[0], position[1]);
-			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
 
 			var account = await _userManager.FindByIdAsync(id);
 			account.Player = _playerRepository.GetPlayer(account.UserName);
@@ -224,7 +291,7 @@ namespace Othelloworld.Controllers
 
 						var loser = result.Players.First(pig => pig.Color == Color.black);
 						loser.Result = GameResult.lost;
-						winner.Player.AmountLost = winner.Player.AmountLost + 1;
+						loser.Player.AmountLost = winner.Player.AmountLost + 1;
 					}
 					else if (black > white)
 					{
@@ -258,7 +325,19 @@ namespace Othelloworld.Controllers
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		public async Task<ActionResult<Game>> Pass()
 		{
-			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			string id;
+			try
+			{
+				id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			}
+			catch (Exception exception)
+			{
+				// Log Exception
+				_logger.LogWarning(exception, "Authentication failed: Validating JWE Token");
+
+				// Return as little information as possible
+				return Unauthorized();
+			}
 
 			var account = await _userManager.FindByIdAsync(id);
 			account.Player = _playerRepository.GetPlayer(account.UserName);
@@ -292,7 +371,19 @@ namespace Othelloworld.Controllers
 		[HttpPut("giveup")]
 		public async Task<ActionResult<Game>> GiveUp()
 		{
-			var id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			string id;
+			try
+			{
+				id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			}
+			catch (Exception exception)
+			{
+				// Log Exception
+				_logger.LogWarning(exception, "Authentication failed: Validating JWE Token");
+
+				// Return as little information as possible
+				return Unauthorized();
+			}
 
 			var account = await _userManager.FindByIdAsync(id);
 			var player = _gameRepository.Context.Players
@@ -312,33 +403,16 @@ namespace Othelloworld.Controllers
 			var wonPlayer = game.Players.FirstOrDefault(pig => pig.Username != account.UserName);
 
 			lostPlayer.Result = GameResult.lost;
+			lostPlayer.Player.AmountLost += 1;
+
 			wonPlayer.Result = GameResult.won;
+			wonPlayer.Player.AmountWon += 1;
 
 			game.Status = GameStatus.Finished;
 
 			await _gameRepository.Context.SaveChangesAsync();
 
 			return Ok(game);
-		}
-
-		public class CreateGameModel
-		{
-			[Required(ErrorMessage = "This field is required")]
-			[MinLength(3, ErrorMessage = "Your password must be longer than 2 characters.")]
-			[MaxLength(16, ErrorMessage = "Your password can't be longer than 16 characters.")]
-			[RegularExpression("^(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
-				ErrorMessage = "This game name is invalid.")]
-			public string Name { get; set; }
-
-			[MaxLength(400, ErrorMessage = "Your password can't be longer than 400 characters.")]
-			[RegularExpression("^(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
-				ErrorMessage = "This game name is invalid.")]
-			public string Description { get; set; }
-		}
-
-		public class JoinGameModel
-		{
-			public string Token { get; set; }
 		}
 	}
 }

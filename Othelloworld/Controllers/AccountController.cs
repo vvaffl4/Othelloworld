@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Othelloworld.Controllers.Models;
 using Othelloworld.Data.Models;
 using Othelloworld.Data.Repos;
@@ -17,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Othelloworld.Controllers
 {
-	[Authorize(Policy = JwtBearerDefaults.AuthenticationScheme, Roles = "user, admin")]
+	[Authorize(Policy = JwtBearerDefaults.AuthenticationScheme, Roles = "user, mod, admin")]
 	[ApiController]
 	[Route("[controller]")]
 	public class AccountController : ControllerBase
@@ -26,17 +27,20 @@ namespace Othelloworld.Controllers
 		private readonly SignInManager<Account> _signInManager;
 		private readonly IAccountService _accountService;
 		private readonly IPlayerRepository _playerRepository;
+		private readonly ILogger<AccountController> _logger;
 
 		public AccountController(
 			UserManager<Account> userManager,
 			SignInManager<Account> signInManager,
 			IAccountService accountService,
-			IPlayerRepository playerRepository)
+			IPlayerRepository playerRepository,
+			ILogger<AccountController> logger)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
 			_accountService = accountService;
 			_playerRepository = playerRepository;
+			_logger = logger;
 		}
 
 		[AllowAnonymous]
@@ -55,8 +59,7 @@ namespace Othelloworld.Controllers
 				Email = model.Email,
 				NormalizedEmail = model.Email,
 				EmailConfirmed = true,
-				PasswordHash = hasher.HashPassword(null, model.Password),
-				SecurityStamp = String.Empty
+				PasswordHash = hasher.HashPassword(null, model.Password)
 			};
 
 			var accountResult = await _userManager.CreateAsync(account, model.Password);
@@ -67,14 +70,16 @@ namespace Othelloworld.Controllers
 
 			if (!roleResult.Succeeded) return BadRequest(roleResult.Errors.Select(error => $"{error.Code}: {error.Description}"));
 
-			_playerRepository.CreatePlayer(new Player
+			var player = new Player
 			{
 				Username = model.Username,
 				AmountWon = 0,
 				AmountDraw = 0,
 				AmountLost = 0,
-				Country = model.Country
-			});
+				CountryCode = model.Country
+			};
+
+			_playerRepository.CreatePlayer(player);
 
 			await _signInManager.SignInAsync(account, false);
 
@@ -90,9 +95,41 @@ namespace Othelloworld.Controllers
 			return Created("Register", new
 			{
 				token = new JwtSecurityTokenHandler().WriteToken(token),
-				username = model.Username,
+				player = player,
+				//username = model.Username,
 				expires = token.ValidTo
 			});
+		}
+
+		[HttpPut]
+		public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
+		{
+			if (model == null) return BadRequest("Invalid body");
+			if (!ModelState.IsValid) return BadRequest("Invalid model state");
+
+			string id;
+			try
+			{
+				id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			}
+			catch (Exception exception)
+			{
+				// Log Exception
+				_logger.LogWarning(exception, "Authentication failed: Validating JWE Token");
+
+				// Return as little information as possible
+				return Unauthorized();
+			}
+
+			var account = await _userManager.FindByIdAsync(id);
+
+			if (account == null) return Unauthorized();
+
+			var result = await _userManager.ChangePasswordAsync(account, model.CurrentPassword, model.NewPassword);
+
+			if (!result.Succeeded) return BadRequest(result.Errors);
+
+			return Ok();
 		}
 
 		[AllowAnonymous]
@@ -111,6 +148,10 @@ namespace Othelloworld.Controllers
 
 			if (!result.Succeeded) return BadRequest("User does not have a valid role");
 
+			var player = _playerRepository.GetPlayer(account.UserName);
+
+			if (player == null) return BadRequest("Player doesn't exist");
+
 			var token = _accountService.CreateJwtToken(
 				account.Id,
 				account.UserName,
@@ -119,7 +160,8 @@ namespace Othelloworld.Controllers
 
 			return Ok(new { 
 				token = new JwtSecurityTokenHandler().WriteToken(token),
-				username = account.UserName,
+				player = player,
+				//username = account.UserName,
 				expires = token.ValidTo
 			});
 		}

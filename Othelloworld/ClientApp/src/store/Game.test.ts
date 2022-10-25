@@ -1,4 +1,5 @@
-﻿import reducer, { GameState, setBoard } from './Game';
+﻿import { GameStatus } from '../model/Game';
+import reducer, { GameState, setBoard } from './Game';
 
 // Define the initial state using that type
 const defaultState: GameState = {
@@ -7,6 +8,7 @@ const defaultState: GameState = {
 	player: 1,
 	turn: 1,
 	turns: [],
+	status: GameStatus.Staging,
 	history: [],
 	step: 0,
 	boards: [],

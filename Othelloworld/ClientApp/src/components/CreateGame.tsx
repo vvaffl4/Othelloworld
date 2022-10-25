@@ -1,4 +1,4 @@
-﻿import { Button, Checkbox, Container, Divider, FormControlLabel, Grid, Paper, TextField, Typography } from '@mui/material';
+﻿import { Box, Button, Checkbox, Container, Divider, FormControlLabel, Grid, LinearProgress, Paper, TextField, Typography } from '@mui/material';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createGame } from '../store/Game';
@@ -24,24 +24,25 @@ const CreateGame: FC = () => {
     name: '',
     description: ''
   });
-  const [isLoading, setLoading] = useState(false);
+  const [processing, isProcessing] = useState(false);
   const game = useAppSelector(state => state.game);
-  //const player = useAppSelector(state => state.)
 
   useEffect(() => {
-    dispatch(changeWorldSettings({
-      interactable: false,
-      orbitControl: false,
-      orbitAutoRotate: false,
-      countrySelect: false,
-      countrySelectMaxCount: 2
-    }));
-    dispatch(selectAndFocusCountry({ isoCode: 'nl', altitude: 1 }));
+    setTimeout(() => {
+      dispatch(changeWorldSettings({
+        interactable: false,
+        orbitControl: false,
+        orbitAutoRotate: false,
+        countrySelect: false,
+        countrySelectMaxCount: 2
+      }));
+      dispatch(selectAndFocusCountry({ isoCode: 'nl', altitude: 1 }));
+    }, 1000);
   }, []);
 
   useEffect(() => {
     if (game.hasGame) {
-      setLoading(false);
+      isProcessing(false);
       navigate('/play');
 		}
 	}, [game])
@@ -54,19 +55,25 @@ const CreateGame: FC = () => {
   }
 
   const handleCreateGame = () => {
+    isProcessing(true);
+
     dispatch(createGame(
       form,
       async (result) => {
-        const errors = Object.entries((await result.json()).errors)
-          .reduce((state, [key, value]) => ({
-            ...state,
-            [key.toLowerCase()]: (value as string[]).join('\n')
-          }), {});
+        const jsonResult = await result.json();
 
-        setErrors(errors);
+        if (jsonResult.errors) { 
+          const errors = Object.entries((await result.json()).errors)
+            .reduce((state, [key, value]) => ({
+              ...state,
+              [key.toLowerCase()]: (value as string[]).join('\n')
+            }), {});
+
+          setErrors(errors);
+        }
+
+        isProcessing(false);
       }));
-
-    setLoading(true);
 	}
 
 	return (
@@ -82,73 +89,88 @@ const CreateGame: FC = () => {
         overflow: 'hidden'
       }}>
         <form>
-          <Grid container>
-            <Grid
-              item
-              xs={6}
-              sx={{
-                p: 4
-              }}>
-              <Typography
-                variant="h3"
-                color='white'
-              >
-                Create Game
-              </Typography>
-              <Divider
-                sx={{
-                  mb: 2
-                }}
-              />
-              <TextField
-                required
-                fullWidth
-                id="name"
-                name="name"
-                label="Game name"
-                variant="standard"
-                error={errors.name !== undefined
-                  && errors.name != ''}
-                helperText={errors.name}
-                onChange={handleChange}
-              />
-              <TextField
-                required
-                fullWidth
-                id="description"
-                name="description"
-                label="Description"
-                variant="standard"
-                multiline
-                rows={5}
-                error={errors.description !== undefined
-                  && errors.description != ''}
-                helperText={errors.description}
-                onChange={handleChange}
-              />
-              <Button
-                variant='contained'
-                onClick={handleCreateGame}
-              >
-                Create
-              </Button>
-            </Grid>
-            <Grid
-              item
-              xs={6}
-              sx={{
-                p: 4,
-              }}
+          <Box
+            component="div"
+            sx={{
+              p: 4,
+              backgroundColor: '#000000',
+              borderBottom: '1px solid #ffffff17'
+            }}
+          >
+            <Typography
+              variant="h3"
+              color='white'
             >
-              <TextField
-                required
-                id="standard-required"
-                name="player_name"
-                label="Required"
-                variant="standard"
-              />
-            </Grid>
-          </Grid>
+              Create a Game
+            </Typography>
+          </Box>
+          {processing && (<LinearProgress />)}
+          <Box
+            component="div"
+            sx={{
+              p: 4
+						}}
+          >
+            <TextField
+              required
+              fullWidth
+              id="name"
+              name="name"
+              label="Game name"
+              variant="standard"
+              sx={{
+                pb: 2
+							}}
+              error={errors.name !== undefined
+                && errors.name != ''}
+              helperText={errors.name || 'The given game name can contain letters, numbers and spaces'}
+              disabled={processing}
+              onChange={handleChange}
+            />
+       {/*     <Typography*/}
+       {/*       component="div"*/}
+       {/*       variant="caption"*/}
+       {/*       sx={{*/}
+       {/*         pb: 2*/}
+							{/*}}*/}
+       {/*     >*/}
+       {/*       The given game name can contain letters, numbers and spaces*/}
+       {/*     </Typography>*/}
+            <TextField
+              required
+              fullWidth
+              id="description"
+              name="description"
+              label="Description"
+              variant="standard"
+              multiline
+              rows={5}
+              sx={{
+                pb: 2
+              }}
+              error={errors.description !== undefined
+                && errors.description != ''}
+              helperText={errors.description || 'The given game description can\'t be longer than 400 characters.'}
+              disabled={processing}
+              onChange={handleChange}
+            />
+            {/*<Typography*/}
+            {/*  component="div"*/}
+            {/*  variant="caption"*/}
+            {/*  sx={{*/}
+            {/*    pb: 2*/}
+            {/*  }}*/}
+            {/*>*/}
+            {/*  The given game description can't be longer than 400 characters.*/}
+            {/*</Typography>*/}
+            <Button
+              variant='contained'
+              disabled={processing}
+              onClick={handleCreateGame}
+            >
+              Create
+            </Button>
+          </Box>
         </form>
       </Paper>
     </Container>

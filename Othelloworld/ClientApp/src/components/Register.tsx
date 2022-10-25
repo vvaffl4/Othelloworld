@@ -1,9 +1,43 @@
-import { Box, Button, Checkbox, Container, Divider, FormControlLabel, Paper, Stack, TextField, Typography, useTheme } from "@mui/material";
+import { Box, Button, Checkbox, Container, Divider, FormControlLabel, Link, Paper, Stack, TextField, Typography, useTheme } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { register } from "../store/Auth";
 import { useAppDispatch, useAppSelector } from "../store/Hooks";
-import { changeWorldSettings } from "../store/World";
+import { changeWorldSettings, Country, selectCountry } from "../store/World";
+import * as React from 'react';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import { FixedSizeList, ListChildComponentProps } from 'react-window';
+import { shallowEqual } from "react-redux";
+import { Log } from "oidc-react";
+
+function renderRow(props: ListChildComponentProps) {
+  const dispatch = useAppDispatch();
+
+  const { index, style } = props;
+  const country = useAppSelector(state =>
+    state.world.countries[index],
+    shallowEqual);
+
+  const handleCountryClick = () => {
+    dispatch(selectCountry({ isoCode: country.properties.ISO_A2 }))
+	}
+
+  return (
+    <ListItem
+      style={style}
+      key={index}
+      component="div"
+      disablePadding
+      onClick={handleCountryClick}
+    >
+      <ListItemButton>
+        <ListItemText primary={country.properties.NAME} />
+      </ListItemButton>
+    </ListItem>
+  );
+}
 
 interface FormProps {
   username: string;
@@ -17,7 +51,13 @@ const Register: FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
+  const countries = useAppSelector(state =>
+    state.world.countries.map(country =>
+      Object.create(country) as Country),
+    shallowEqual);
   const country = useAppSelector(state => state.world.selected[0])
+
+  const [processing, isProcessing] = useState(false);
   const auth = useAppSelector(state => state.auth);
   const [form, setForm] = useState<FormProps>({
     username: '',
@@ -55,14 +95,20 @@ const Register: FC = () => {
   }, [])
 
   useEffect(() => {
-    console.log("auth.username: ", auth?.username);
-
-    if (auth?.username !== undefined) {
-      navigate(`/profile/${auth.username}`, { replace: true });
+    if (auth?.authenticated !== undefined) {
+      navigate(`/profile/${auth.player!.username}`, { replace: true });
     }
-  }, [auth.username]);
+  }, [auth.authenticated]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (!processing && country) {
+      setForm({ ...form, country: country.properties.NAME });
+    }
+  }, [processing, country]);
+
+  const handleChange = (event: React.FocusEvent<HTMLInputElement>) => {
+    console.log(event.target.value);
+
     setForm({
       ...form,
       [event.target.name]: event.target.value
@@ -70,29 +116,34 @@ const Register: FC = () => {
   } 
 
   const handleSubmit = () => {
-    //const newErrors: string[] = [];
-
-    if (form.password === form.validation) { 
-      dispatch(register(
-        form,
-        async (result) => {
-          const errors = Object.entries((await result.json()).errors)
-            .reduce((state, [key, value]) => ({
-              ...state,
-              [key.toLowerCase()]: (value as string[]).join('\n')
-            }), {});
-
-          setErrors(errors);
-				})
-      );
-    } else {
-      //newErrors.push('validation');
+    if (form.password !== form.validation) {
+      setErrors({ ...errors, validation: "Validation password does not match password" });
+      return;
     }
 
-    //setErrors(newErrors);
-  }
+    const countryCode = countries.find(country => country.properties.NAME === form.country)?.properties.ISO_A2;
 
-  console.log(errors);
+    if (countryCode === undefined) {
+      setErrors({ ...errors, country: "Country is invalid" });
+      return;
+		}
+
+    isProcessing(true);
+
+    dispatch(register(
+      { ...form, country: countryCode },
+      async (result) => {
+        const errors = Object.entries((await result.json()).errors)
+          .reduce((state, [key, value]) => ({
+            ...state,
+            [key.toLowerCase()]: (value as string[]).join('\n')
+          }), {});
+
+        isProcessing(false);
+        setErrors(errors);
+			})
+    );
+  }
 
   return (
     <Container
@@ -104,11 +155,25 @@ const Register: FC = () => {
 			}}
     >
       <Paper sx={{
-        padding: 2,
         overflow: 'hidden',
         backgroundColor: 'neutral'
       }}>
         <form>
+          <Box
+            component="div"
+            sx={{
+              p: 4,
+              backgroundColor: '#000000',
+              borderBottom: '1px solid #ffffff17'
+            }}
+          >
+            <Typography
+              variant="h3"
+              color='white'
+            >
+              Register
+            </Typography>
+          </Box>
           <Stack
             direction="row"
             divider={<Divider
@@ -117,36 +182,31 @@ const Register: FC = () => {
               flexItem
             />}
             spacing={2}
+            sx={{
+              p: 4
+						} }
           >
             <Box
               component="div"
-              style={{
+              sx={{
                 flex: 1
               }}
             >
-              <Typography
-                variant="h3"
-                color='white'
-              >
-                Register
-              </Typography>
-              <Divider
-                sx={{
-                  mb: 2
-                }}
-              />
               <TextField
                 required
                 fullWidth
                 id="username"
                 name="username"
                 label="Player name"
-                value={form.username}
                 variant="standard"
-                error={errors.username !== ''}
+                error={errors.username !== undefined && errors.username !== ''}
                 helperText={errors.username}
-                onChange={handleChange}
+                disabled={processing}
+                onBlur={handleChange}
               />
+              <Typography variant="caption">
+                The given username can only a-z, 0-9, or a lower dash, and must have a length between 3 - 12 characters.
+              </Typography>
               <TextField
                 required
                 fullWidth
@@ -154,12 +214,15 @@ const Register: FC = () => {
                 name="email"
                 label="E-mail"
                 type="email"
-                value={form.email}
                 variant="standard"
-                error={errors.email !== ''}
+                error={errors.email !== undefined && errors.email !== ''}
                 helperText={errors.email}
-                onChange={handleChange}
+                disabled={processing}
+                onBlur={handleChange}
               />
+              <Typography variant="caption">
+                The given e-mail must be an official e-mail that can be reached.
+              </Typography>
               <TextField
                 required
                 fullWidth
@@ -167,12 +230,21 @@ const Register: FC = () => {
                 name="password"
                 label="Password"
                 type="password"
-                value={form.password}
                 variant="standard"
-                error={errors.password !== ''}
+                error={errors.password !== undefined && errors.password !== ''}
                 helperText={errors.password}
-                onChange={handleChange}
+                disabled={processing}
+                onBlur={handleChange}
               />
+              <Typography variant="caption">
+                The given password must have the following criteria
+                <ul>
+                  <li>Have at least one uppercase character</li>
+                  <li>Have at least one lowercase character</li>
+                  <li>Have at least one special character</li>
+                  <li>Have at least 12 characters</li>
+                </ul>
+              </Typography>
               <TextField
                 required
                 fullWidth
@@ -180,19 +252,28 @@ const Register: FC = () => {
                 name="validation"
                 label="Repeat Password"
                 type="password"
-                value={form.validation}
                 variant="standard"
-                error={errors.password !== ''}
-                helperText={errors.password}
-                onChange={handleChange}
+                error={errors.validation !== undefined && errors.validation !== ''}
+                helperText={errors.validation}
+                disabled={processing}
+                onBlur={handleChange}
               />
               <FormControlLabel
                 control={
                   <Checkbox
-                    name="tos" />}
-                label="Terms of Service, bladibladibla" />
+                    name="tos"
+                    disabled={processing}
+                  />
+                }
+                label={
+                  <Typography variant="caption">
+                    By checking this checkbox, you've agreed with our <Link href="#">Terms of Service</Link>.
+                  </Typography>
+                }
+                  />
               <Button
                 variant='contained'
+                disabled={processing}
                 onClick={handleSubmit}
               >
                 Create
@@ -208,13 +289,27 @@ const Register: FC = () => {
                 required
                 id="standard-required"
                 name="country"
-                label="Required"
+                label="Country"
                 variant="standard"
+                error={errors.country !== undefined && errors.country !== ''}
+                helperText={errors.country}
+                fullWidth
                 value={country
                   ? country.properties.NAME
                   : ''}
+                disabled={processing}
                 onChange={handleChange}
               />
+              <Divider />
+              <FixedSizeList
+                height={400}
+                width={'100%'}
+                itemSize={46}
+                itemCount={countries.length}
+                overscanCount={10}
+              >
+                {renderRow}
+              </FixedSizeList>
             </Box>
           </Stack>
         </form>

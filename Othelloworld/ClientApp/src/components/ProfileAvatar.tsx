@@ -36,7 +36,7 @@ const ProfileAvatar: FC = () => {
           onClick={handleOpenUserMenu}
           sx={{ p: 0 }}
         >
-          <BadgeAvatar countryIso="nl" />
+          <BadgeAvatar countryIso={auth.player!.countryCode.toLowerCase()} />
         </IconButton>
       </Tooltip >
       <Menu
@@ -77,7 +77,7 @@ const ProfileAvatar: FC = () => {
         </MenuItem>
         <MenuItem>
           <ListItemButton
-            href={`profile/${auth?.username}`}
+            href={`profile/${auth!.player!.username}`}
           >
             My Profile
           </ListItemButton>

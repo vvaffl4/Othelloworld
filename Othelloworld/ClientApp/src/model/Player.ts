@@ -4,4 +4,5 @@ export default interface Player {
 	amountWon: number;
 	amountLost: number;
 	amountDraw: number;
+	countryCode: string;
 }

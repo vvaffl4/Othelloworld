@@ -19,15 +19,15 @@ const Playfield: FC = () => {
   const ContextBridge = useContextBridge(ReactReduxContext);
   const dispatch = useAppDispatch();
 
-  const username = useAppSelector(state => state.auth.username);
+  const player = useAppSelector(state => state.auth.player);
   const playersInGame = useAppSelector(state => state.game.players, shallowEqual);
   const game = useAppSelector(state => state.game, shallowEqual);
 
   useEffect(() => {
-    const player = playersInGame?.find(playerInGame => playerInGame!.player.username === username);
+    const playerInGame = playersInGame?.find(playerInGame => playerInGame!.player.username === player!.username);
 
-    const intervalId = player
-      && player.color === game.turn
+    const intervalId = playerInGame
+      && playerInGame.color === game.turn
       && game.status
       ? undefined
       : setInterval(() => {
@@ -113,9 +113,10 @@ const Playfield: FC = () => {
                   playerInGame: playersInGame
                     .find(playerInGame => playerInGame!.color === color)!
                 }))
-                .map(({ color, playerInGame }) => (
+                .map(({ color, playerInGame }, index) => (
                   <Score
-                    side={playerInGame.player.username === username ? 'left' : 'right'}
+                    key={index}
+                    side={playerInGame.player.username === player!.username ? 'left' : 'right'}
                     playerInGame={playerInGame}
                     score={color === Color.black ? blackCount : whiteCount}
                   />

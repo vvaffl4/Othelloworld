@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Othelloworld.Data.Models;
 using Othelloworld.Data.Repos;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Othelloworld.Controllers
 {
-	[Authorize(Roles = "user, admin")]
+	[Authorize(Roles = "user, mod, admin")]
 	[ApiController]
 	[Route("[controller]")]
 	public class PlayerController : Controller
@@ -28,6 +30,14 @@ namespace Othelloworld.Controllers
 				.FirstAsync();
 
 			return Ok(player);
+		}
+
+		[HttpGet("countries")]
+		public ActionResult<IEnumerable<Country>> GetCountries()
+		{
+			IEnumerable<Country> countries = _playerRepository.GetCountries();
+
+			return Ok(countries);
 		}
 	}
 }

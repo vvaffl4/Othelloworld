@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Othelloworld.Data.Models;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Othelloworld.Data.Repos
@@ -26,5 +27,8 @@ namespace Othelloworld.Data.Repos
 		{
 			throw new System.NotImplementedException();
 		}
+
+		public IEnumerable<Country> GetCountries() =>
+			_context.Countries;
 	}
 }

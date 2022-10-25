@@ -9,7 +9,6 @@ export interface AuthState extends Token {
 
 const initialState: AuthState = {
 	token: '',
-	username: '',
 	expires: '',
 	authenticated: false
 };
@@ -20,7 +19,7 @@ const authSlice = createSlice({
 	reducers: {
 		setToken: (state, action: PayloadAction<Token>) => {
 			state.token = action.payload.token;
-			state.username = action.payload.username;
+			state.player = action.payload.player;
 			state.expires = action.payload.expires;
 			state.authenticated = true;
 		},

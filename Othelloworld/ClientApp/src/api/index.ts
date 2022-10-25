@@ -118,6 +118,19 @@ export const getGame = (token: Token) =>
 		.then(parseResultToJson)
 		.then(json => json as Game);
 
+export const getGameHistory = (token: Token, username: string) =>
+	fetch(`/game/history/${username}`,
+		{
+			method: 'GET',
+			headers: {
+				'Accept': 'application/json',
+				'Authorization': `Bearer ${token.token}`
+			}
+		})
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
+		.then(json => json as Game[]);
+
 export const putStone = (token: Token, position: [number, number]) =>
 	fetch(`/game`,
 		{

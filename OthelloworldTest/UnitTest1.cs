@@ -4,6 +4,8 @@ using Othelloworld.Services;
 using System.Diagnostics;
 using Assert = NUnit.Framework.Assert;
 
+#nullable disable
+
 namespace OthelloworldTest
 {
 	[SetUpFixture]

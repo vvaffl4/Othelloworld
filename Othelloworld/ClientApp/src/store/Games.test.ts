@@ -23,7 +23,8 @@ describe("Redux Games", () => {
 						username: 'Game1Player1',
 						amountWon: 0,
 						amountDraw: 0,
-						amountLost: 0
+						amountLost: 0,
+						countryCode: 'NL'
 					},
 					result: GameResult.undecided
 				}, undefined],

@@ -21,8 +21,9 @@ namespace Othelloworld.Data
 		public DbSet<Player> Players { get; set; }
 		public DbSet<Game> Games { get; set; }
 		private DbSet<PlayerInGame> PlayersInGame { get; set; }
-
 		private DbSet<Turn> Turns { get; set; }
+
+		public DbSet<Country> Countries { get; set; }
 
 		public OthelloDbContext(
 			DbContextOptions<OthelloDbContext> options) : base(options)
@@ -32,6 +33,7 @@ namespace Othelloworld.Data
 		{
 			base.OnModelCreating(builder);
 
+			CountrySeeder.Add(builder);
 
 			var gameTokens = new string[]{
 				Guid.NewGuid().ToString(),
@@ -41,11 +43,13 @@ namespace Othelloworld.Data
 			};
 
 			// any unique string id
-			const string ADMIN_ROLE_ID = "ad376a8f-9eab-4bb9-9fca-30b01540f445";
 			const string USER_ROLE_ID = "ad376a8f-9eab-4444-9fca-30b01540f445";
+			const string MODERATOR_ROLE_ID = "ad376a8f-9eab-4567-9fca-30b01540f445";
+			const string ADMIN_ROLE_ID = "ad376a8f-9eab-4bb9-9fca-30b01540f445";
 
 			// users
 			const string ADMIN_ID = "a18be9c0-aa65-4af8-bd17-00bd9344e575";
+			var MOD_1_ID = Guid.NewGuid().ToString();
 			var USER_1_ID = Guid.NewGuid().ToString();
 			var USER_2_ID = Guid.NewGuid().ToString();
 			var USER_3_ID = Guid.NewGuid().ToString();
@@ -59,6 +63,12 @@ namespace Othelloworld.Data
 					Id = USER_ROLE_ID,
 					Name = "user",
 					NormalizedName = "user"
+				},
+				new IdentityRole
+				{
+					Id = MODERATOR_ROLE_ID,
+					Name = "mod",
+					NormalizedName = "mod"
 				},
 				new IdentityRole
 				{
@@ -78,7 +88,18 @@ namespace Othelloworld.Data
 					Email = "admin@gmail.com",
 					NormalizedEmail = "admin@gmail.com",
 					EmailConfirmed = true,
-					PasswordHash = hasher.HashPassword(null, "Admin123!"),
+					PasswordHash = hasher.HashPassword(null, "Administrator123!"),
+					SecurityStamp = String.Empty
+				},
+				new Account
+				{
+					Id = MOD_1_ID,
+					UserName = "mod",
+					NormalizedUserName = "mod",
+					Email = "mod@gmail.com",
+					NormalizedEmail = "mod@gmail.com",
+					EmailConfirmed = true,
+					PasswordHash = hasher.HashPassword(null, "Moderator123!"),
 					SecurityStamp = String.Empty
 				},
 				new Account
@@ -136,6 +157,11 @@ namespace Othelloworld.Data
 				},
 				new IdentityUserRole<string>
 				{
+					RoleId = MODERATOR_ROLE_ID,
+					UserId = MOD_1_ID,
+				},
+				new IdentityUserRole<string>
+				{
 					RoleId = USER_ROLE_ID,
 					UserId = USER_1_ID,
 				},
@@ -164,15 +190,23 @@ namespace Othelloworld.Data
 					AmountWon = 2,
 					AmountLost = 3,
 					AmountDraw = 0,
-					Country = "nl"
-				}, 
+					CountryCode = "NL"
+				},
+				new Player
+				{
+					Username = "mod",
+					AmountWon = 1,
+					AmountLost = 3,
+					AmountDraw = 1,
+					CountryCode = "NL"
+				},
 				new Player
 				{
 					Username = "hello1",
 					AmountWon = 2,
 					AmountLost = 3,
 					AmountDraw = 0,
-					Country = "de"
+					CountryCode = "DE"
 				},
 				new Player
 				{
@@ -180,7 +214,7 @@ namespace Othelloworld.Data
 					AmountWon = 2,
 					AmountLost = 3,
 					AmountDraw = 0,
-					Country = "gb"
+					CountryCode = "GB"
 				},
 				new Player
 				{
@@ -188,7 +222,7 @@ namespace Othelloworld.Data
 					AmountWon = 2,
 					AmountLost = 3,
 					AmountDraw = 0,
-					Country = "nl"
+					CountryCode = "NL"
 				},
 				new Player
 				{
@@ -196,28 +230,12 @@ namespace Othelloworld.Data
 					AmountWon = 2,
 					AmountLost = 3,
 					AmountDraw = 0,
-					Country = ""
+					CountryCode = "EG"
 				},
 			};
 
 			var playersInGame = new PlayerInGame[]
 			{
-				//new PlayerInGame
-				//{
-				//	Username = "hello1",
-				//	Color = Color.white,
-				//	GameToken = gameTokens[0],
-				//	IsHost = true,
-				//	Result = GameResult.undecided
-				//},
-				//new PlayerInGame
-				//{
-				//	Username = "hello2",
-				//	Color = Color.black,
-				//	GameToken = gameTokens[0],
-				//	IsHost = false,
-				//	Result = GameResult.undecided
-				//},
 				new PlayerInGame
 				{
 					Username = "hello1",
@@ -339,11 +357,12 @@ namespace Othelloworld.Data
 			};
 
 			// Player
-			builder.Entity<Player>(entity =>
+			builder.Entity<Player>(entity => {
 				entity.HasOne(player => player.Account)
 					.WithOne(account => account.Player)
 					.HasForeignKey<Player>(player => player.Username)
-					.HasPrincipalKey<Account>(account => account.UserName));
+					.HasPrincipalKey<Account>(account => account.UserName);
+			});
 			builder.Entity<Player>().HasData(players);
 			
 			// Game

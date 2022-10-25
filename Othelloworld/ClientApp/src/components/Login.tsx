@@ -1,15 +1,29 @@
-import { Button, List, ListItem, Popover, TextField } from '@mui/material';
+import { Button, LinearProgress, List, ListItem, Popover, Slide, TextField } from '@mui/material';
 import { pink } from '@mui/material/colors';
 import { ChangeEvent, FC, useState } from 'react';
 import { login } from '../store/Auth';
 import { useAppDispatch } from '../store/Hooks';
 
+interface FormProps {
+  email: string;
+  password: string;
+}
+
 const Login: FC = () => {
   const dispatch = useAppDispatch();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [processing, isProcessing] = useState(false);
+
+
+  const [form, setForm] = useState<FormProps>({
+    email: '',
+    password: ''
+  });
+  const [errors, setErrors] = useState<Partial<FormProps>>({
+    email: '',
+    password: ''
+  });
 
   const handleOpenLoginMenu = (event: React.MouseEvent<HTMLAnchorElement>) => {
     setAnchorEl(event.currentTarget);
@@ -19,19 +33,37 @@ const Login: FC = () => {
     setAnchorEl(null);
   }
 
-  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) =>
-    setEmail(event.target.value);
-
-  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) =>
-    setPassword(event.target.value);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value
+    });
+  }
 
   const handleLogin = () => {
+    isProcessing(true);
     dispatch(login(
-      { email, password },
-      async result => {
-        console.log(await result.json());
-			}));
+      form,
+      handleInvalidInput
+    ));
   }
+
+  const handleInvalidInput = async (result) => {
+    isProcessing(false);
+    const jsonResult = await result.json();
+
+    console.log(jsonResult);
+
+    if (jsonResult) {
+      const errors = Object.entries(jsonResult.errors)
+        .reduce((state, [key, value]) => ({
+          ...state,
+          [key.toLowerCase()]: (value as string[]).join('\n')
+        }), {});
+
+      setErrors(errors);
+		}
+	}
 
   return (
     <>
@@ -53,12 +85,14 @@ const Login: FC = () => {
           vertical: 'top',
           horizontal: 'right',
         }}
+        sx={{
+          zIndex: (theme) => theme.zIndex.appBar - 1
+        }}
+        TransitionComponent={
+          Slide
+				}
       >
-        <List
-          // sx={{
-          //   backgroundColor: pink[400]
-          // }}        
-        >
+        <List>
           <ListItem
             sx={{
               pb: 0
@@ -67,8 +101,12 @@ const Login: FC = () => {
             <TextField 
               variant="filled"
               size="small"
-              label="username or e-mail"
+              label="E-mail"
               type="email"
+              name="email"
+              disabled={processing}
+              error={errors.email !== ''}
+              helperText={errors.email}
               InputProps={{
                 sx: {
                   '::before, :hover:not(.Mui-disabled)::before': {
@@ -80,8 +118,8 @@ const Login: FC = () => {
                   }
                 }
               }}
-              value={email}
-              onChange={handleEmailChange}
+              value={form.email}
+              onChange={handleChange}
             />
           </ListItem>
           <ListItem
@@ -94,6 +132,10 @@ const Login: FC = () => {
               size="small"
               label="password"
               type="password"
+              name="password"
+              disabled={processing}
+              error={errors.password !== ''}
+              helperText={errors.password}
               InputProps={{
                 sx: {
                   borderRadius: '0 0 4px 4px',
@@ -114,18 +156,21 @@ const Login: FC = () => {
                   }
                 }
               }}
-              value={password}
-              onChange={handlePasswordChange}
+              value={form.password}
+              onChange={handleChange}
             />
           </ListItem>
           <ListItem>
             <Button
               size='small'
-              onClick={handleLogin}>
+              disabled={processing}
+              onClick={handleLogin}
+            >
               Log in
             </Button>
           </ListItem>
         </List>
+        {processing && (<LinearProgress />)}
       </Popover>
     </>
   );

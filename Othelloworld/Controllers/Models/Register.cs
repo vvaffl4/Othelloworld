@@ -6,8 +6,8 @@ namespace Othelloworld.Controllers.Models
 	public class RegisterModel
 	{
 		[Required(ErrorMessage = "This field is required")]
-		[MinLength(3, ErrorMessage = "Your password must be longer than 2 characters.")]
-		[MaxLength(16, ErrorMessage = "Your password can't be longer than 16 characters.")]
+		[MinLength(3, ErrorMessage = "Your username must be longer than 2 characters.")]
+		[MaxLength(16, ErrorMessage = "Your username can't be longer than 16 characters.")]
 		[RegularExpression("^(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
 			ErrorMessage = "This is not a valid username.")]
 		public string Username { get; set; }
@@ -21,9 +21,11 @@ namespace Othelloworld.Controllers.Models
 		[MinLength(12, ErrorMessage = "Your password must be longer than 11 characters.")]
 		[MaxLength(128, ErrorMessage = "Your password can't be longer than 128 characters.")]
 		[RegularExpression(
-			"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$^+=!*()@%&])$",
+			"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\\W).*$",
 			ErrorMessage = "Your password should at least have one lowercase, one highercase character, one number and one symbol.")]
 		public string Password { get; set; }
+
+		[RegularExpression("^[A-Z]{2}$", ErrorMessage = "Incorrect Country Code")]
 		public string Country { get; set; }
 	}
 }

@@ -4,6 +4,7 @@ using Othelloworld.Util;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Data;
+using System.Collections.Generic;
 
 namespace Othelloworld.Data.Repos
 {
@@ -39,5 +40,15 @@ namespace Othelloworld.Data.Repos
 						.OrderBy(game => game.Name), 
 					pageNumber, 
 					pageSize));
+
+		public Task<IEnumerable<Game>> GetGameHistory(string username) =>
+			Task.FromResult(
+				FindAll()
+					.Where(game => game.Players.Any(pig => pig.Player.Username == username))
+						.Include(game => game.Players)
+						.ThenInclude(playerInGame => playerInGame.Player)
+						.OrderBy(game => game.Name)
+					.AsEnumerable()
+			);
 	}
 }

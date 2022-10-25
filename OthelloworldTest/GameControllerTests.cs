@@ -16,10 +16,12 @@ using System.Linq.Expressions;
 using Assert = NUnit.Framework.Assert;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http;
+using Othelloworld.Controllers.Models;
+
+#nullable disable
 
 namespace OthelloworldTest
 {
-#pragma warning disable CS8618
 	[TestFixture]
 	public class GameControllerTest
 	{
@@ -200,7 +202,7 @@ namespace OthelloworldTest
 		[Test]
 		public async Task CreateNewGameWithWrongModelFromGameControllerReturnsBadRequest()
 		{
-			var createGameModelMock = new GameController.CreateGameModel { Name = "" };
+			var createGameModelMock = new CreateGameModel { Name = "" };
 
 			var controller = CreateMockedGameController();
 			var validationResults = ValidateModelState(createGameModelMock);
@@ -219,7 +221,7 @@ namespace OthelloworldTest
 		[Test]
 		public async Task CreateNewGameWithIdFromGameControllerReturnsBadRequest()
 		{
-			var createGameModelMock = new GameController.CreateGameModel { Name = "Game11", Description = "Description11" };
+			var createGameModelMock = new CreateGameModel { Name = "Game11", Description = "Description11" };
 
 			var controller = CreateMockedGameController();
 

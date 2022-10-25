@@ -1,5 +1,6 @@
 ﻿using Othelloworld.Data.Models;
 using Othelloworld.Util;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Othelloworld.Data.Repos
@@ -10,5 +11,7 @@ namespace Othelloworld.Data.Repos
 		public void CreatePlayer(Player player);
 		public void UpdatePlayer(Player player);
 		public void DeletePlayer(Player player);
+
+		public IEnumerable<Country> GetCountries();
 	}
 }

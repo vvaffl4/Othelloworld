@@ -12,7 +12,10 @@ namespace Othelloworld.Data.Models
 		public string Username { get; set; }
 		[JsonIgnore]
 		public Account Account { get; set; }
-		public string Country { get; set; }
+
+		[ForeignKey("Country_Code")]
+		public string CountryCode { get; set; }
+		public Country Country { get; set; }
 		public int AmountWon { get; set; }
 		public int AmountLost { get; set; }
 		public int AmountDraw { get; set; }
