@@ -1,11 +1,17 @@
 ﻿@page "/Admin/Accounts/{username}/Details"
 @model IndexModel
-@functions {
+@{
 
+	var Roles = new List<string>()
+		.Append("user")
+		.Append("mod")
+		.Append("admin")
+		.ToList();
 }
 
 <h3>@ViewData["Title"]</h3>
 <form id="details" method="post">
+	<input type="hidden" asp-for="Account.Id"/>
 	<ul>
 		<li class="row mb-3">
 			<div class="col-md-3 text-end">Id</div>
@@ -39,6 +45,19 @@
 				<div class="input-group">
 					<input id="passwordhash_input" type="text" class="form-control" placeholder="Email" asp-for="Account.PasswordHash" disabled />
 					<button id="password_reset_button" type="button" class="btn btn-outline-primary" >Reset</button>
+				</div>
+			</div>
+		</li>
+		<li class="row mb-3">
+			<div class="col-md-3 text-end">Role</div>
+			<div class="col-md-9">
+				<div class="input-group">
+					<select class="form-select form-select-sm" aria-label=".form-select-sm example" asp-for="NewRole">
+						@foreach (var role in Roles)
+						{
+							<option value="@role" selected="@(role == Model.Role)">@role</option>
+						}
+					</select>
 				</div>
 			</div>
 		</li>
