@@ -31,9 +31,9 @@ const authSlice = createSlice({
 	}
 });
 
-export const register = (account: AccountDTO, errorCallback: ErrorResponse): ApiRequest =>
+export const register = (account: AccountDTO, captchaToken: string, errorCallback: ErrorResponse): ApiRequest =>
 	async (dispatch, _, { register }) =>
-		register(account)
+		register(account, captchaToken)
 			.then(token => dispatch(authSlice.actions.setToken(token)))
 			.catch(errorCallback);
 export const login = (credentials: LoginDTO, errorCallback: ErrorResponse): ApiRequest =>

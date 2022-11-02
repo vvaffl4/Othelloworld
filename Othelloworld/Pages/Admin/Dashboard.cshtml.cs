@@ -19,7 +19,9 @@ namespace Othelloworld.Pages.Admin
 		{
 			if (ModelState.IsValid)
 			{
-				if (User.IsAuthenticated() && User.IsInRole("admin"))
+				if (User.IsAuthenticated() 
+					&& (User.IsInRole("admin")
+					|| User.IsInRole("mod")))
 				{
 					return Page();
 				}

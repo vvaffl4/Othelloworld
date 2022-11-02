@@ -1,5 +1,5 @@
 import { Box, Button, Checkbox, Container, Divider, FormControlLabel, Link, Paper, Stack, TextField, Typography, useTheme } from "@mui/material";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { register } from "../store/Auth";
 import { useAppDispatch, useAppSelector } from "../store/Hooks";
@@ -10,7 +10,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { shallowEqual } from "react-redux";
-import { Log } from "oidc-react";
+import ReCAPTCHAElement, { ReCAPTCHA } from "react-google-recaptcha"
 
 function renderRow(props: ListChildComponentProps) {
   const dispatch = useAppDispatch();
@@ -57,6 +57,7 @@ const Register: FC = () => {
     shallowEqual);
   const country = useAppSelector(state => state.world.selected[0])
 
+  const captchaRef = useRef<ReCAPTCHA>(!null)
   const [processing, isProcessing] = useState(false);
   const auth = useAppSelector(state => state.auth);
   const [form, setForm] = useState<FormProps>({
@@ -130,8 +131,11 @@ const Register: FC = () => {
 
     isProcessing(true);
 
+    const token = captchaRef.current.getValue();
+
     dispatch(register(
       { ...form, country: countryCode },
+      token,
       async (result) => {
         const errors = Object.entries((await result.json()).errors)
           .reduce((state, [key, value]) => ({
@@ -270,7 +274,11 @@ const Register: FC = () => {
                     By checking this checkbox, you've agreed with our <Link href="#">Terms of Service</Link>.
                   </Typography>
                 }
-                  />
+              />
+              <ReCAPTCHAElement
+                ref={captchaRef}
+                sitekey={process.env.REACT_APP_SITE_KEY}
+              />
               <Button
                 variant='contained'
                 disabled={processing}

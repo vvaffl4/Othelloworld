@@ -24,7 +24,7 @@ const checkResponseStatus = (result: Response) =>
 
 const parseResultToJson = ((result: Response) => result.json());
 
-export const register = (account: AccountDTO) =>
+export const register = (account: AccountDTO, captchaToken: string) =>
 	fetch('/account/register',
 		{
 			method: 'POST',
@@ -32,7 +32,7 @@ export const register = (account: AccountDTO) =>
 				'Content-Type': 'application/json',
 				'Accept': 'application/json'
 			},
-			body: JSON.stringify(account)
+			body: JSON.stringify({ ...account, captchaToken })
 		})
 		.then(checkResponseStatus)
 		.then(parseResultToJson)

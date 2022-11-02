@@ -31,6 +31,10 @@ const ProfileGameHistoryItem: FC<ProfileGameHistoryItemProps> = ({ expanded, res
 			gameResultText = 'DRAW';
 			gameResultColor = 'neutral';
 			break;
+		default:
+			gameResultText = 'UD';
+			gameResultColor = 'neutral';
+			break;
 	}
 
 	return (

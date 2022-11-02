@@ -60,13 +60,12 @@ namespace Othelloworld.Pages
 				ModelState.AddModelError(string.Empty, ErrorMessage);
 			}
 
-			if (User.IsAuthenticated() && User.IsInRole("admin"))
+			if (User.IsAuthenticated() 
+				&& (User.IsInRole("admin")
+				|| User.IsInRole("mod")))
 			{
 				return RedirectToPage("./Admin/Dashboard");
 			}
-
-			// Clear the existing external cookie to ensure a clean login process
-			await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
 			return Page();
 		}

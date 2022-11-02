@@ -45,7 +45,7 @@ const ProfileGameHistory: FC<ProfileGameHistoryProps> = ({ username }) => {
 					}
 
 					const userPlayer = game.players.find(pig => pig?.player.username === username)!;
-					const opponentPlayer = game.players.find(pig => pig?.player.username !== username)!;
+					const opponentPlayer = game.players.find(pig => pig?.player.username !== username);
 
 					return (
 						<ProfileGameHistoryItem
@@ -53,7 +53,7 @@ const ProfileGameHistory: FC<ProfileGameHistoryProps> = ({ username }) => {
 							expanded={selectedIndex === index}
 							result={userPlayer.result}
 							playerOne={userPlayer.player.username}
-							playerTwo={opponentPlayer.player.username}
+							playerTwo={opponentPlayer ? opponentPlayer.player.username: ''}
 							whiteCount={61}
 							blackCount={28}
 							onClick={handleItemClick}

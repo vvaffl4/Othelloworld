@@ -150,7 +150,6 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="Pages\Models\" />
     <Folder Include="wwwroot\img\" />
   </ItemGroup>
 

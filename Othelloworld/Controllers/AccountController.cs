@@ -4,15 +4,21 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using Othelloworld.Controllers.Models;
 using Othelloworld.Data.Models;
 using Othelloworld.Data.Repos;
 using Othelloworld.Services;
+using Othelloworld.Util;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -23,23 +29,29 @@ namespace Othelloworld.Controllers
 	[Route("[controller]")]
 	public class AccountController : ControllerBase
 	{
+		private readonly HttpClient _httpClient;
 		private readonly UserManager<Account> _userManager;
 		private readonly SignInManager<Account> _signInManager;
 		private readonly IAccountService _accountService;
 		private readonly IPlayerRepository _playerRepository;
+		private readonly Credentials _credentials;
 		private readonly ILogger<AccountController> _logger;
 
 		public AccountController(
+			HttpClient httpClient,
 			UserManager<Account> userManager,
 			SignInManager<Account> signInManager,
 			IAccountService accountService,
 			IPlayerRepository playerRepository,
+			Credentials credentials,
 			ILogger<AccountController> logger)
 		{
+			_httpClient = httpClient;
 			_userManager = userManager;
 			_signInManager = signInManager;
 			_accountService = accountService;
 			_playerRepository = playerRepository;
+			_credentials = credentials;
 			_logger = logger;
 		}
 
@@ -48,6 +60,20 @@ namespace Othelloworld.Controllers
 		public async Task<IActionResult> Register(RegisterModel model)
 		{
 			if (!ModelState.IsValid) return BadRequest("Supplied bad model");
+
+			var query = new Dictionary<string, string>
+			{
+				["secret"] = _credentials.CaptchaSecret,
+				["response"] = model.captchaToken
+			};
+
+			using (var client = new WebClient())
+			{
+				var response = client.DownloadString(QueryHelpers.AddQueryString("https://www.google.com/recaptcha/api/siteverify", query));
+				var success = (bool)JObject.Parse(response)["success"];
+
+				if (!success) return BadRequest("Captcha is invalid");
+			}
 
 			var hasher = new PasswordHasher<Account>();
 			var accountId = Guid.NewGuid().ToString();

@@ -95,7 +95,10 @@ const Profile: FC = () => {
 									textAlign: 'center',
 									fontSize: 24
 								}}
-								label={`${(player && player!.amountWon + player!.amountLost > 0) && (player!.amountWon / (player!.amountWon + player!.amountLost) * 100).toFixed(2)}%`}
+								label={(player && player!.amountWon + player!.amountLost > 0)
+									? `${(player!.amountWon / (player!.amountWon + player!.amountLost) * 100).toFixed(2)}%`
+									: ''
+								}
 							/>
 						</Divider>
 						<Stack

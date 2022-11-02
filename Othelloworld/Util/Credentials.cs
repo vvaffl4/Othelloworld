@@ -15,12 +15,14 @@ namespace Othelloworld.Util
 			string audience,
 			string encryptionKey,
 			string signingKey,
+			string captchaSecret,
 			TimeSpan tokenTimeSpan)
 		{
 			_key = RSA.Create(3072);
 
 			Issuer = issuer;
 			Audience = audience;
+			CaptchaSecret = captchaSecret;
 			TokenTimeSpan = tokenTimeSpan;
 
 			PrivateEncryptionKey = new RsaSecurityKey(_key) { KeyId = encryptionKey };
@@ -44,5 +46,6 @@ namespace Othelloworld.Util
 		public string Issuer { get; }
 		public string Audience { get; }
 		public TimeSpan TokenTimeSpan { get; }
+		public string CaptchaSecret { get; }
 	}
 }

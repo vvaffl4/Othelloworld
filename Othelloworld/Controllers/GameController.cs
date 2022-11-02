@@ -397,6 +397,7 @@ namespace Othelloworld.Controllers
 			var game = _gameRepository.Context.Games
 				.Where(game => game.Token == player.PlayerInGame.First().GameToken)
 				.Include(game => game.Players)
+				.ThenInclude(pig => pig.Player)
 				.FirstOrDefault();
 
 			var lostPlayer = game.Players.FirstOrDefault(pig => pig.Username == account.UserName);

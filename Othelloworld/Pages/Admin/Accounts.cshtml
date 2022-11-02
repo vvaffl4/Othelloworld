@@ -9,6 +9,7 @@
       <th scope="col">#</th>
       <th scope="col">Username</th>
       <th scope="col">Email</th>
+      <th scope="col">Role</th>
       <th scope="col">Actions</th>
     </tr>
   </thead>
@@ -25,6 +26,9 @@
         </td>
         <td>
           @Html.DisplayFor(_ => account.Email)
+        </td>
+        <td>
+          @Html.DisplayFor(_ => account.Role)
         </td>
         <td>
           <a asp-page="Accounts/Details" asp-route-username="@account.UserName">Details</a>

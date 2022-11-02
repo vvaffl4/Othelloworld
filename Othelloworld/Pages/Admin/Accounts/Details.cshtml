@@ -12,6 +12,9 @@
 <h3>@ViewData["Title"]</h3>
 <form id="details" method="post">
 	<input type="hidden" asp-for="Account.Id"/>
+	<input type="hidden" asp-for="Account.ConcurrencyStamp"/>
+	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+	<partial name="../../_StatusMessage.cshtml" model="@Model.StatusMessage" />
 	<ul>
 		<li class="row mb-3">
 			<div class="col-md-3 text-end">Id</div>
@@ -64,7 +67,7 @@
 		<li class="row mb-3">
 			<div class="col-md-10 text-end">
 				<div class="btn-group" role="group" aria-label="Basic mixed styles example">
-					<button id="cancel" class="btn btn-danger" asp-page="/Admin/Accounts">Cancel</button>
+					<button id="cancel" class="btn" asp-page="/Admin/Accounts">Return</button>
 					<input id="confirm" type="submit" class="btn btn-success" value="Confirm" />
 				</div>
 			</div>

@@ -221,8 +221,11 @@ export const gameSlice = createSlice({
 		},
 		setStep: (state, action: PayloadAction<number>) => {
 			state.step = action.payload;
-			state.placeholders = createPlaceholderMap(state.boards[state.step], state.turns[state.step].color);
-			state.turn = state.turns[state.step].color as Color;
+
+			const color = (2 - state.step % 2) as Color;
+
+			state.placeholders = createPlaceholderMap(state.boards[state.step], color);
+			state.turn = color;
 		},
 		setGame: (state, action: PayloadAction<Game>) => {
 			const messages = [
@@ -262,13 +265,14 @@ export const gameSlice = createSlice({
 			].sort((a, b) => new Date(a.item.datetime).getTime() - new Date(b.item.datetime).getTime());
 
 			state.step = action.payload.turns.length;
-			state.boards = [
-				...state.boards,
-				action.payload.board
-			]; // createTurnBoards(action.payload.turns);
+			state.boards = createTurnBoards(action.payload.turns);
+			//[
+			//	...state.boards,
+			//	action.payload.board
+			//];
 			state.players = action.payload.players;
 
-			//state.placeholders = createPlaceholderMap(state.boards[state.step], action.payload.playerTurn);
+			state.placeholders = createPlaceholderMap(state.boards[state.step], action.payload.playerTurn);
 			state.hasGame = true;
 
 			//console.log(createTurnBoards(action.payload.turns));

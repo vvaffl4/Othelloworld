@@ -13,7 +13,6 @@ const Board: FC<{position: Vector3 }> = (props) => {
   const spaceSize = boardSize / boardSpaces;    
 
   const ref = useRef<THREE.PlaneGeometry>(null!);
-  const [turn, setTurn] = useState<number>(1);
 
   const dispatch = useAppDispatch();
   const game = useAppSelector(state => state.game, shallowEqual);
@@ -36,6 +35,8 @@ const Board: FC<{position: Vector3 }> = (props) => {
       dispatch(putStone([xIndex, yIndex])); 
     }
   }, [game.boards[game.step]]);
+
+  console.log('board change');
 
   return (
     <>

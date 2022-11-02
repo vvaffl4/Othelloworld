@@ -27,5 +27,7 @@ namespace Othelloworld.Controllers.Models
 
 		[RegularExpression("^[A-Z]{2}$", ErrorMessage = "Incorrect Country Code")]
 		public string Country { get; set; }
+
+		public string captchaToken { get; set; }
 	}
 }

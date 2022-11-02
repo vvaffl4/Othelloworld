@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Http;
 using static System.Net.Mime.MediaTypeNames;
 using Othelloworld.Util;
 using System.Security.Cryptography;
+using Othelloworld.Controllers;
 
 namespace Othelloworld
 {
@@ -57,14 +58,16 @@ namespace Othelloworld
 				Configuration.GetValue<string>("Audience"),
 				Configuration.GetValue<string>("EncryptionKey"),
 				Configuration.GetValue<string>("SigningKey"),
+				Configuration.GetValue<string>("SecretCaptchaKey"),
 				TimeSpan.FromMinutes(Configuration.GetValue<int>("TokenTimeoutMinutes"))
 			);
 
 			services.AddAuthentication()
 				.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 				{
+					options.Cookie.HttpOnly = false;
 					options.LoginPath = "/Admin";
-					options.AccessDeniedPath = "/Error";
+					options.AccessDeniedPath = "/";
 
 				})// auth =>
 					//{
@@ -106,10 +109,13 @@ namespace Othelloworld
 				options.AddPolicy(JwtBearerDefaults.AuthenticationScheme, onlySecondJwtSchemePolicy);
 			});
 
+			services.AddHttpClient<AccountController>("https://www.google.com/recaptcha/api/siteverify");
+
 			// Dependency injection
 			services
 				.AddSingleton(credentials)
 				.AddSingleton<JwtHelper, JwtHelper>()
+				.AddScoped<IAccountRepository, AccountRepository>()
 				.AddScoped<IGameRepository, GameRepository>()
 				.AddScoped<IGameService, GameService>()
 				.AddScoped<IPlayerRepository, PlayerRepository>()
