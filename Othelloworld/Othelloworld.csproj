@@ -42,9 +42,14 @@
   <ItemGroup>
     <None Remove="ClientApp\src\components\BadgeAvatar.tsx" />
     <None Remove="ClientApp\src\components\Challenge.tsx" />
+    <None Remove="ClientApp\src\components\ChangePassword.tsx" />
     <None Remove="ClientApp\src\components\ErrorMessage.test.tsx" />
     <None Remove="ClientApp\src\components\ErrorMessage.tsx" />
+    <None Remove="ClientApp\src\components\ForgotPassword.tsx" />
+    <None Remove="ClientApp\src\components\GameListItem.tsx" />
+    <None Remove="ClientApp\src\components\GameOption.tsx" />
     <None Remove="ClientApp\src\components\GameResult.tsx" />
+    <None Remove="ClientApp\src\components\GiveUpDialog.tsx" />
     <None Remove="ClientApp\src\components\HomeBanner.tsx" />
     <None Remove="ClientApp\src\components\HomeCard.tsx" />
     <None Remove="ClientApp\src\components\HomeCardList.tsx" />
@@ -54,6 +59,7 @@
     <None Remove="ClientApp\src\components\ProfileGameHistory.tsx" />
     <None Remove="ClientApp\src\components\ProfileGameHistoryItem.tsx" />
     <None Remove="ClientApp\src\components\react-router\ProtectedRoute.tsx" />
+    <None Remove="ClientApp\src\components\RecoverPassword.tsx" />
     <None Remove="ClientApp\src\components\Score.tsx" />
     <None Remove="ClientApp\src\components\Staging.tsx" />
     <None Remove="ClientApp\src\components\threejs\Camera.tsx" />
@@ -68,6 +74,7 @@
     <None Remove="ClientApp\src\model\Account.ts" />
     <None Remove="ClientApp\src\model\Game.ts" />
     <None Remove="ClientApp\src\model\Message.ts" />
+    <None Remove="ClientApp\src\model\PagedList.ts" />
     <None Remove="ClientApp\src\model\Player.ts" />
     <None Remove="ClientApp\src\model\PlayerInGame.ts" />
     <None Remove="ClientApp\src\model\Token.ts" />
@@ -75,6 +82,7 @@
     <None Remove="ClientApp\src\Play.tsx" />
     <None Remove="ClientApp\src\ProfileAvatar.tsx" />
     <None Remove="ClientApp\src\RGlobe.tsx" />
+    <None Remove="ClientApp\src\services\BoardService.ts" />
     <None Remove="ClientApp\src\Store.ts" />
     <None Remove="ClientApp\src\store\Auth.test.ts" />
     <None Remove="ClientApp\src\store\Auth.ts" />
@@ -98,6 +106,15 @@
     <TypeScriptCompile Include="ClientApp\src\components\Challenge.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\components\GameOption.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\GiveUpDialog.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\RecoverPassword.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\components\ForgotPassword.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\components\ChangePassword.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\ErrorMessage.test.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\ErrorMessage.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\GameResult.tsx" />
@@ -106,6 +123,9 @@
     <TypeScriptCompile Include="ClientApp\src\components\HomeCardList.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\Profile.test.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\ProfileGameHistory.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\GameListItem.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\components\ProfileGameHistoryItem.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\TurnHistory.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\PlayerCard.tsx" />
@@ -124,6 +144,7 @@
     <TypeScriptCompile Include="ClientApp\src\model\Account.ts" />
     <TypeScriptCompile Include="ClientApp\src\model\Game.ts" />
     <TypeScriptCompile Include="ClientApp\src\model\Message.ts" />
+    <TypeScriptCompile Include="ClientApp\src\model\PagedList.ts" />
     <TypeScriptCompile Include="ClientApp\src\model\Player.ts" />
     <TypeScriptCompile Include="ClientApp\src\model\PlayerInGame.ts" />
     <TypeScriptCompile Include="ClientApp\src\model\Token.ts" />
@@ -131,6 +152,7 @@
     <TypeScriptCompile Include="ClientApp\src\components\ProfileAvatar.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\RGlobe.tsx" />
     <TypeScriptCompile Include="ClientApp\src\model\Turn.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\BoardService.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\Auth.test.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\Auth.ts" />
     <TypeScriptCompile Include="ClientApp\src\store\Game.ts" />

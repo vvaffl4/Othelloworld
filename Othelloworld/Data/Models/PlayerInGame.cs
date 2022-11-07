@@ -23,6 +23,7 @@ namespace Othelloworld.Data.Models
 	{
 		[JsonIgnore]
 		[ForeignKey("Player_Username_ID")]
+		[Column(TypeName = "varchar(16)")]
 		public string Username { get; set; }
 
 		public Player Player { get; set; }
@@ -34,6 +35,7 @@ namespace Othelloworld.Data.Models
 
 		[JsonIgnore]
 		[ForeignKey("Game_Token_ID")]
+		[Column(TypeName = "varchar(64)")]
 		public string GameToken { get; set; }
 		public Game Game { get; set; }
 	}

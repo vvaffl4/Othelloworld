@@ -1,6 +1,8 @@
-﻿import { Box, Typography, useTheme } from '@mui/material';
+﻿import { Avatar, Box, Stack, Typography, useTheme } from '@mui/material';
 import { FC } from 'react';
 import PlayerInGame, { Color } from '../model/PlayerInGame';
+import CircleIcon from '@mui/icons-material/Circle';
+import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 
 interface ScoreSideProps {
   playerInGame: PlayerInGame;
@@ -35,28 +37,46 @@ const ScoreBottomLeft: FC<ScoreSideProps> = ({ playerInGame, score }) => {
         }
       }}
     >
-      <Typography
-        sx={{
-          mt: '-120px',
-          pl: '25px',
-          fontSize: 72,
-          fontWeight: 'bold',
-          textShadow: `-7px 7px ${theme.palette.primary[theme.palette.mode]}`
-        }}
+      <Stack
+        direction="column"
+        alignItems="center"
       >
-        { score }
-      </Typography>
-      <Typography>
-        { playerInGame.color === Color.white
-          ? 'White'
-          : 'Black'
-        }
-      </Typography>
-      <Typography
-        variant="h5"
-      >
-        {playerInGame.player.username}
-      </Typography>
+        <Typography
+          sx={{
+            mt: '-120px',
+            pl: '25px',
+            fontSize: 72,
+            fontWeight: 'bold',
+            textShadow: `-7px 7px ${theme.palette.primary[theme.palette.mode]}`
+          }}
+        >
+          { score }
+        </Typography>
+        <Avatar alt="country-flag">
+          <span
+            className={`fi fi-${playerInGame.player.countryCode.toLowerCase()} fis`}
+            style={{
+              display: 'inline-block',
+              fontSize: 36,
+              width: '100%',
+              height: '100%'
+            }}
+          />
+        </Avatar>
+        <Box
+          component="div"
+        >
+          {playerInGame.color === Color.white
+            ? (<CircleIcon />)
+            : (<CircleOutlinedIcon />)
+          }
+        </Box>
+        <Typography
+          variant="h5"
+        >
+          {playerInGame.player.username}
+        </Typography>
+      </Stack>
     </Box>
   );
 }
@@ -89,17 +109,37 @@ const ScoreTopRight: FC<ScoreSideProps> = ({ playerInGame, score }) => {
         }
       }}
     >
+      <Stack
+        direction="column"
+        alignItems="center"
+      >
       <Typography
         variant="h5"
+        sx={{
+          pt: 1
+				}}
       >
         {playerInGame.player.username}
       </Typography>
-      <Typography>
-        { playerInGame.color === Color.white
-          ? 'White'
-          : 'Black'
+        <Box
+          component="div"
+        >
+        {playerInGame.color === Color.white
+          ? (<CircleIcon />)
+          : (<CircleOutlinedIcon />)
         }
-      </Typography>
+      </Box>
+        <Avatar alt="country-flag">
+        <span
+          className={`fi fi-${playerInGame.player.countryCode.toLowerCase()} fis`}
+          style={{
+            display: 'inline-block',
+            fontSize: 36,
+            width: '100%',
+            height: '100%'
+          }}
+        />
+      </Avatar>
       <Typography
         sx={{
           mt: '40px',
@@ -111,6 +151,7 @@ const ScoreTopRight: FC<ScoreSideProps> = ({ playerInGame, score }) => {
       >
         { score }
       </Typography>
+      </Stack>
     </Box>
   );
 }

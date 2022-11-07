@@ -16,12 +16,13 @@ namespace Othelloworld.Data.Models
 
 	public class Game
 	{
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		//[JsonIgnore]
 		[Key]
+		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+		[Column(TypeName = "varchar(64)")]
 		public string Token { get; set; }
 
 		[Required]
+		[Column(TypeName = "varchar(64)")]
 		public string Name { get; set; }
 
 		public GameStatus Status { get; set; }
@@ -30,6 +31,8 @@ namespace Othelloworld.Data.Models
 		public ICollection<Turn> Turns { get; set; }
 
 		public Color PlayerTurn { get; set; }
+
+		[Column(TypeName = "varchar(400)")]
 		public string Description { get; set; }
 
 		[NotMapped]
@@ -72,6 +75,7 @@ namespace Othelloworld.Data.Models
 
 		[JsonIgnore]
 		[Required]
+		[Column(TypeName = "varchar(400)")]
 		public string InternalBoard { get; set; }
 	}
 }

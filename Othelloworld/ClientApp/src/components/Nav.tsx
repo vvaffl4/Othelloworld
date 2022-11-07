@@ -1,14 +1,21 @@
 import Brightness1OutlinedIcon from '@mui/icons-material/Brightness1Outlined';
 import Brightness2Icon from '@mui/icons-material/Brightness2';
 import { AppBar, Button, ButtonGroup, Toolbar, Typography, useTheme } from "@mui/material";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Login from "./Login";
 import ProfileAvatar from "./ProfileAvatar";
-import { useAppDispatch, useAppSelector } from "../store/Hooks";
+import { useAppSelector } from "../store/Hooks";
 
 const Nav: FC = () => {
+  const navigate = useNavigate();
   const authenticated = useAppSelector(state => state.auth.authenticated);
+
+  //useEffect(() => {
+  //  if (!authenticated) {
+  //    navigate('/');
+  //  }
+  //}, [authenticated])
 
   return (
     <AppBar>

@@ -1,4 +1,4 @@
-﻿import { Paper, Typography, useTheme } from '@mui/material';
+﻿import { Box, Paper, Stack, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import { FC, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -133,33 +133,41 @@ const RGlobe: FC = () => {
           const container = document.createElement('div');
 
           createRoot(container).render((
-            <Paper
-              sx={{
-                mb: '100%',
-                p: 1,
-                textAlign: 'center',
-                backgroundColor: theme.palette.neutral[theme.palette.mode]
-						  }}
+            <Stack
+              direction="column"
+              alignItems="center"
+              spacing={-1}
             >
               <span
-                className={`fi fi-${data.properties.ISO_A2.toLowerCase()}`}
+                className={`fi fi-${data.properties.ISO_A2.toLowerCase()} fis`}
                 style={{
                   display: 'inline-block',
+                  width: '40px',
+                  height: '40px',
                   fontSize: 36,
-                  width: '100%'
-							  }}
+                  borderRadius: '100%'
+                }}
               />
-              <Typography
-                variant="h6"
+              <Paper
                 sx={{
-                  color: theme.palette.text.primary
-							  }}
+                  mb: '100%',
+                  p: 1,
+                  textAlign: 'center',
+                  backgroundColor: theme.palette.neutral[theme.palette.mode]
+						    }}
               >
-                {data.properties.NAME}
-              </Typography>
-              <Typography>
-              </Typography>
-            </Paper>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: theme.palette.text.primary
+							    }}
+                >
+                  {data.properties.NAME}
+                </Typography>
+                <Typography>
+                </Typography>
+              </Paper>
+            </Stack>
           ));
 
           return container

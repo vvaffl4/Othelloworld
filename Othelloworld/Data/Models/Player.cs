@@ -9,11 +9,13 @@ namespace Othelloworld.Data.Models
 	{
 		[Key]
 		[ForeignKey("Account_ID")]
+		[Column(TypeName = "varchar(16)")]
 		public string Username { get; set; }
 		[JsonIgnore]
 		public Account Account { get; set; }
 
 		[ForeignKey("Country_Code")]
+		[Column(TypeName = "varchar(2)")]
 		public string CountryCode { get; set; }
 		public Country Country { get; set; }
 		public int AmountWon { get; set; }

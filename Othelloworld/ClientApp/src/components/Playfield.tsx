@@ -13,7 +13,7 @@ import Timeline from './Timeline';
 import Camera from './threejs/Camera';
 import { changeWorldSettings } from '../store/World';
 import TurnHistory from './TurnHistory';
-import GameResult from './GameResult';
+import { countColors } from '../services/BoardService';
 
 const Playfield: FC = () => {
   const ContextBridge = useContextBridge(ReactReduxContext);
@@ -44,14 +44,7 @@ const Playfield: FC = () => {
     dispatch(changeWorldSettings({ show: false }));
   }, []);
 
-  const [emptyCount, whiteCount, blackCount] = game.boards[game.step].reduce((state, value) =>
-    value.reduce((state, value) => [
-      state[Color.none] + Number(value == Color.none),
-      state[Color.white] + Number(value == Color.white),
-      state[Color.black] + Number(value == Color.black)
-    ], [0, 0, 0])
-      .map((count, index) => count + state[index])
-    , [0, 0, 0]);
+  const [emptyCount, whiteCount, blackCount] = countColors(game.boards[game.step]);
 
   return (
     <Box 

@@ -20,6 +20,7 @@
     "@types/three": "^0.143.0",
     "browserify-fs": "^1.0.0",
     "cross-env": "^7.0.3",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "i": "^0.3.7",
     "jasmine": "^4.3.0",
     "jasmine-browser-runner": "^1.1.0",

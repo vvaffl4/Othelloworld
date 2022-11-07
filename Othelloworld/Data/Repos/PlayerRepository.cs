@@ -19,7 +19,8 @@ namespace Othelloworld.Data.Repos
 			FindByCondition(player => player.Username == username)
 				.Include(player => player.PlayerInGame.Where(pig => 
 					pig.Game.Status == GameStatus.Playing
-					|| pig.Game.Status == GameStatus.Staging).Take(1))
+					|| pig.Game.Status == GameStatus.Staging
+				).Take(1))
 				.AsNoTracking()
 				.FirstOrDefault();
 

@@ -14,8 +14,6 @@ const CreateGame: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
   const [form, setForm] = useState<FormProps>({
     name: '',
     description: ''
@@ -25,19 +23,24 @@ const CreateGame: FC = () => {
     description: ''
   });
   const [processing, isProcessing] = useState(false);
+  const player = useAppSelector(state => state.auth.player);
   const game = useAppSelector(state => state.game);
 
   useEffect(() => {
-    setTimeout(() => {
-      dispatch(changeWorldSettings({
+    //setTimeout(() => {
+    //  dispatch(changeWorldSettings());
+    dispatch(selectAndFocusCountry({
+      isoCode: player!.username,
+      altitude: 1,
+      settings: {
         interactable: false,
         orbitControl: false,
         orbitAutoRotate: false,
         countrySelect: false,
         countrySelectMaxCount: 2
-      }));
-      dispatch(selectAndFocusCountry({ isoCode: 'nl', altitude: 1 }));
-    }, 1000);
+      }
+    }));
+    //}, 1000);
   }, []);
 
   useEffect(() => {
@@ -45,7 +48,7 @@ const CreateGame: FC = () => {
       isProcessing(false);
       navigate('/play');
 		}
-	}, [game])
+	}, [game.hasGame])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setForm({

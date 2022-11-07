@@ -4,12 +4,14 @@ using System.Linq;
 
 namespace Othelloworld.Util
 {
-	public class PagedList<T> : List<T>
+	public class PagedList<T>
 	{
 		public int CurrentPage { get; set; }
 		public int TotalPages { get; set; }
 		public int PageSize { get; set; }
 		public int TotalCount { get; set; }
+
+		public ICollection<T> Items { get; set; }
 		public bool HasPrev =>
 			CurrentPage > 1;
 		public bool HasNext => 
@@ -18,14 +20,16 @@ namespace Othelloworld.Util
 		{
 			TotalCount = count;
 			PageSize = pageSize;
-			CurrentPage = pageNumber;
-			TotalPages = (int)Math.Floor(count / (double)pageSize + 0.5);
-			AddRange(items);
+			TotalPages = (int)Math.Ceiling(count / (double)pageSize);
+			CurrentPage = Math.Min(TotalPages, pageNumber);
+			Items = items;
 		}
 
 		public static PagedList<T> GetPagedList(IQueryable<T> source, int pageNumber, int pageSize) =>
 			new PagedList<T>(
-				source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList(),
+				source.Skip(Math.Min(pageNumber - 1, source.Count() / pageSize) * pageSize)
+					.Take(pageSize)
+					.ToList(),
 				source.Count(),
 				pageNumber,
 				pageSize

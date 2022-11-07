@@ -12,6 +12,7 @@ using Duende.IdentityServer.Extensions;
 
 namespace Othelloworld.Pages
 {
+	[ValidateAntiForgeryToken]
 	public class IndexModel : PageModel
 	{
 		private readonly SignInManager<Account> _signInManager;

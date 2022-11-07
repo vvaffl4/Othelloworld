@@ -10,7 +10,9 @@ namespace Othelloworld.Data.Repos
 		private OthelloDbContext _context;
 		private UserManager<Account> _userManager;
 
-		public AccountRepository(OthelloDbContext context, UserManager<Account> userManager) 
+		public AccountRepository(
+			OthelloDbContext context,
+			UserManager<Account> userManager) 
 		{ 
 			_context = context;
 			_userManager = userManager;

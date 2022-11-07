@@ -19,8 +19,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Numerics;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Othelloworld.Controllers
 {
@@ -33,6 +35,7 @@ namespace Othelloworld.Controllers
 		private readonly UserManager<Account> _userManager;
 		private readonly SignInManager<Account> _signInManager;
 		private readonly IAccountService _accountService;
+		private readonly IMailService _mailService;
 		private readonly IPlayerRepository _playerRepository;
 		private readonly Credentials _credentials;
 		private readonly ILogger<AccountController> _logger;
@@ -42,6 +45,7 @@ namespace Othelloworld.Controllers
 			UserManager<Account> userManager,
 			SignInManager<Account> signInManager,
 			IAccountService accountService,
+			IMailService mailService,
 			IPlayerRepository playerRepository,
 			Credentials credentials,
 			ILogger<AccountController> logger)
@@ -50,6 +54,7 @@ namespace Othelloworld.Controllers
 			_userManager = userManager;
 			_signInManager = signInManager;
 			_accountService = accountService;
+			_mailService = mailService;
 			_playerRepository = playerRepository;
 			_credentials = credentials;
 			_logger = logger;
@@ -59,21 +64,9 @@ namespace Othelloworld.Controllers
 		[HttpPost("register")]
 		public async Task<IActionResult> Register(RegisterModel model)
 		{
+			if (model == null) return BadRequest("Invalid body");
 			if (!ModelState.IsValid) return BadRequest("Supplied bad model");
-
-			var query = new Dictionary<string, string>
-			{
-				["secret"] = _credentials.CaptchaSecret,
-				["response"] = model.captchaToken
-			};
-
-			using (var client = new WebClient())
-			{
-				var response = client.DownloadString(QueryHelpers.AddQueryString("https://www.google.com/recaptcha/api/siteverify", query));
-				var success = (bool)JObject.Parse(response)["success"];
-
-				if (!success) return BadRequest("Captcha is invalid");
-			}
+			if (!(await _accountService.VerifyCaptchaTokenAsync(model.captchaToken))) return BadRequest("Captcha is invalid");
 
 			var hasher = new PasswordHasher<Account>();
 			var accountId = Guid.NewGuid().ToString();
@@ -127,11 +120,12 @@ namespace Othelloworld.Controllers
 			});
 		}
 
-		[HttpPut]
+		[HttpPut("changepassword")]
 		public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
 		{
 			if (model == null) return BadRequest("Invalid body");
 			if (!ModelState.IsValid) return BadRequest("Invalid model state");
+			if (!(await _accountService.VerifyCaptchaTokenAsync(model.captchaToken))) return BadRequest("Captcha is invalid");
 
 			string id;
 			try
@@ -155,7 +149,87 @@ namespace Othelloworld.Controllers
 
 			if (!result.Succeeded) return BadRequest(result.Errors);
 
+			var player = _playerRepository.GetPlayer(account.UserName);
+
+			if (player == null) return BadRequest("Player doesn't exist");
+
+			var roles = await _userManager.GetRolesAsync(account);
+
+			var token = _accountService.CreateJwtToken(
+				account.Id,
+				account.UserName,
+				roles.Select(role => new Claim(ClaimTypes.Role, role))
+			);
+
+			return Ok(new
+			{
+				token = new JwtSecurityTokenHandler().WriteToken(token),
+				player = player,
+				expires = token.ValidTo
+			});
+		}
+
+		[AllowAnonymous]
+		[HttpPost("forgotpassword")]
+		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
+		{
+			if (model == null) return BadRequest("Invalid body");
+			if (!ModelState.IsValid) return BadRequest("Invalid model state");
+			if (!(await _accountService.VerifyCaptchaTokenAsync(model.CaptchaToken))) return BadRequest("Captcha is invalid");
+
+			var account = await _userManager.FindByEmailAsync(model.Email);
+
+			if (account == null) return Unauthorized(new { errors = new { email = new string[] { "Email is invalid" } } });
+
+			var urlEncodedEmail = HttpUtility.UrlEncode(model.Email);
+			var resetToken = await _userManager.GeneratePasswordResetTokenAsync(account);
+			var urlEncodedResetToken = HttpUtility.UrlEncode(resetToken);
+			var host = HttpContext.Request.Host.Value;
+
+			_mailService.SendMail(
+				"passwordrecovery@othelloworld.hbo-ict.org",
+				"Recover your password!",
+				$"Blablabla, password, blablabla recover, blablabla, click this link: {host}/recoverpassword/{urlEncodedEmail}/{urlEncodedResetToken}");
+
 			return Ok();
+		}
+
+		[AllowAnonymous]
+		[HttpPost("recoverpassword")]
+		public async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordModel model)
+		{
+			if (model == null) return BadRequest("Invalid body");
+			if (!ModelState.IsValid) return BadRequest("Invalid model state");
+			if (!(await _accountService.VerifyCaptchaTokenAsync(model.captchaToken))) return BadRequest("Captcha is invalid");
+
+			var account = await _userManager.FindByEmailAsync(model.Email);
+
+			if (account == null) return Unauthorized();
+
+			var result = await _userManager.ResetPasswordAsync(account, model.ResetToken, model.NewPassword);
+
+			if (!result.Succeeded) return BadRequest("Password recovery information is incorrect");
+
+			var roles = await _userManager.GetRolesAsync(account);
+
+			if (!result.Succeeded) return BadRequest("User does not have a valid role");
+
+			var player = _playerRepository.GetPlayer(account.UserName);
+
+			if (player == null) return BadRequest("Player doesn't exist");
+
+			var token = _accountService.CreateJwtToken(
+				account.Id,
+				account.UserName,
+				roles.Select(role => new Claim(ClaimTypes.Role, role))
+			);
+
+			return Ok(new
+			{
+				token = new JwtSecurityTokenHandler().WriteToken(token),
+				player = player,
+				expires = token.ValidTo
+			});
 		}
 
 		[AllowAnonymous]
@@ -163,12 +237,15 @@ namespace Othelloworld.Controllers
 		public async Task<IActionResult> Login(LoginModel model)
 		{
 			if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(value => value.Errors));
-			if (model.Email.IsNullOrEmpty() || model.Password.IsNullOrEmpty()) BadRequest("Email or Password is incorrect!");
+			if (model.Email.IsNullOrEmpty() || model.Password.IsNullOrEmpty()) return BadRequest(new { errors = new { password = new string[] { "Login info is invalid" } } });
 
 			var account = await _userManager.FindByEmailAsync(model.Email);
+
+			if (account == null) return BadRequest(new { errors = new { password = new string[] { "Login info is invalid" } } });
+
 			var result = await _signInManager.PasswordSignInAsync(account.UserName, model.Password, false, false);
 
-			if (!result.Succeeded) return BadRequest(result.ToString());
+			if (!result.Succeeded) return BadRequest(new { errors = new { password = new string[] { "Login info is invalid" }}});
 
 			var roles = await _userManager.GetRolesAsync(account);
 
@@ -187,7 +264,6 @@ namespace Othelloworld.Controllers
 			return Ok(new { 
 				token = new JwtSecurityTokenHandler().WriteToken(token),
 				player = player,
-				//username = account.UserName,
 				expires = token.ValidTo
 			});
 		}

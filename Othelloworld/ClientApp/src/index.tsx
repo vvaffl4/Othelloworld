@@ -12,8 +12,11 @@ import HomeContainer from "./components/HomeContainer";
 import "./index.css";
 import Play from "./components/Play";
 import Register from "./components/Register";
+import ChangePassword from "./components/ChangePassword";
 import store from "./store";
 import { SnackbarProvider } from "notistack";
+import ForgotPassword from "./components/ForgotPassword";
+import RecoverPassword from "./components/RecoverPassword";
 
 createRoot(
   document.getElementById('root')!
@@ -31,6 +34,9 @@ createRoot(
                 <Route element={<HomeContainer />}>
                   <Route index element={<Home />} />
                   <Route path="register" element={<Register />} />
+                  <Route path="changepassword" element={<ChangePassword />} />
+                  <Route path="forgotpassword" element={<ForgotPassword />} />
+                  <Route path="recoverpassword/:email/:resetToken" element={<RecoverPassword />} />
                   <Route path="browse" element={<GameList />} />
                 </Route>
                 <Route path="play">
@@ -38,7 +44,7 @@ createRoot(
                   <Route path="browse" element={<GameList />} />
                   <Route path="" element={<Play />} />
                 </Route> 
-                <Route path="profile/:username" element={<Profile /> }/>
+                <Route path="profile/:username" element={<Profile />} />
               </Route>
             </Routes>
             </BrowserRouter>

@@ -34,7 +34,13 @@ const store = configureStore({
 })
 
 store.subscribe(() => {
-  sessionStorage.setItem('auth', JSON.stringify(store.getState().auth));
+  var auth = store.getState().auth;
+
+  if (auth.authenticated) {
+    sessionStorage.setItem('auth', JSON.stringify(store.getState().auth));
+  } else {
+    sessionStorage.removeItem('auth');
+	}
 })
 
 export default store;

@@ -1,6 +1,6 @@
-import { Button, LinearProgress, List, ListItem, Popover, Slide, TextField } from '@mui/material';
+import { Button, LinearProgress, Link, List, ListItem, Popover, Slide, TextField } from '@mui/material';
 import { pink } from '@mui/material/colors';
-import { ChangeEvent, FC, useState } from 'react';
+import { FC, useState } from 'react';
 import { login } from '../store/Auth';
 import { useAppDispatch } from '../store/Hooks';
 
@@ -51,8 +51,6 @@ const Login: FC = () => {
   const handleInvalidInput = async (result) => {
     isProcessing(false);
     const jsonResult = await result.json();
-
-    console.log(jsonResult);
 
     if (jsonResult) {
       const errors = Object.entries(jsonResult.errors)
@@ -168,6 +166,9 @@ const Login: FC = () => {
             >
               Log in
             </Button>
+          </ListItem>
+          <ListItem>
+            <Link href="forgotpassword">Forgot Password?</Link>
           </ListItem>
         </List>
         {processing && (<LinearProgress />)}

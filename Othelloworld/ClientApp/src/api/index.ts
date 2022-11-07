@@ -1,4 +1,5 @@
 ﻿import Game from "../model/Game";
+import PagedList from "../model/PagedList";
 import Player from "../model/Player";
 import Token from "../model/Token";
 import { Country } from "../store/World";
@@ -33,6 +34,49 @@ export const register = (account: AccountDTO, captchaToken: string) =>
 				'Accept': 'application/json'
 			},
 			body: JSON.stringify({ ...account, captchaToken })
+		})
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
+		.then(json => json as Token);
+
+export const changePassword = (passwordChange: { currentPassword: string, newPassword: string }, captchaToken: string, token: Token) =>
+	fetch('/account/changepassword',
+		{
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+				'Authorization': `Bearer ${token.token}`
+			},
+			body: JSON.stringify({ ...passwordChange, captchaToken })
+		})
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
+		.then(json => json as Token);
+
+export const forgotPassword = (account: { email: string }, captchaToken: string) =>
+	fetch('/account/forgotpassword',
+		{
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json'
+			},
+			body: JSON.stringify({ ...account, captchaToken })
+		})
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
+		.then(json => json as Token);
+
+export const recoverPassword = (passwordRecovery: { newPassword: string, email: string, resetToken: string }, captchaToken: string) =>
+	fetch('/account/recoverpassword',
+		{
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json'
+			},
+			body: JSON.stringify({ ...passwordRecovery, captchaToken })
 		})
 		.then(checkResponseStatus)
 		.then(parseResultToJson)
@@ -93,8 +137,8 @@ export const joinGame = (token: Token, gameToken: string) =>
 		.then(parseResultToJson)
 		.then(json => json as Game)
 
-export const getGames = (token: Token) =>
-	fetch(`/game/pages?pageNumber=1&pageSize=3`,
+export const getGames = (pageNumber: number, pageSize: number, token: Token) =>
+	fetch(`/game/pages?pageNumber=${pageNumber}&pageSize=${pageSize}`,
 		{
 			method: 'GET',
 			headers: {
@@ -103,7 +147,19 @@ export const getGames = (token: Token) =>
 		})
 		.then(checkResponseStatus)
 		.then(parseResultToJson)
-		.then(json => json as Game[]);
+		.then(json => json as PagedList<Game>);
+
+export const searchGames = (searchValue: string, pageNumber: number, pageSize: number, token: Token) =>
+	fetch(`/game/search/${searchValue}?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+		{
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${token.token}`
+			}
+		})
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
+		.then(json => json as PagedList<Game>);
 
 export const getGame = (token: Token) =>
 	fetch(`/game`,
@@ -186,7 +242,7 @@ export const getPlayer = (token: Token, username: string) =>
 		.then(json => json as Player);
 
 export const fetchCountries = () =>
-	fetch('./countries.geojson')
+	fetch('./countries.json')
 		.then(checkResponseStatus)
 		.then(parseResultToJson)
 		.then(json => json as Country[]);

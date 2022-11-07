@@ -23,12 +23,30 @@ namespace Othelloworld.Data.Repos
 			Update(game);
 		public void DeleteGame(Game game) => 
 			Delete(game);
+
+		public void DeleteGames(IEnumerable<Game> games) =>
+			Delete(games);
+
 		public Game GetGame(string token) => 
 			FindByCondition(game => game.Token == token)
 				.Include(game => game.Turns)
 				.Include(game => game.Players)
 				.ThenInclude(playerInGame => playerInGame.Player)
 				.FirstOrDefault();
+
+		public Task<PagedList<Game>> SearchGames(string value, int pageNumber, int pageSize) =>
+			Task.FromResult(
+				PagedList<Game>.GetPagedList(
+					FindAll()
+						.Where(game => game.Status == GameStatus.Staging
+							&& (game.Name.Contains(value)
+							|| game.Description.Contains(value)))
+						.Include(game => game.Players)
+						.ThenInclude(playerInGame => playerInGame.Player)
+						.OrderBy(game => game.Name), 
+					pageNumber, 
+					pageSize));
+
 
 		public Task<PagedList<Game>> GetGames(int pageNumber, int pageSize) =>
 			Task.FromResult(

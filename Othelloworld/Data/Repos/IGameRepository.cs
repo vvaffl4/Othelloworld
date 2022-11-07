@@ -13,6 +13,9 @@ namespace Othelloworld.Data.Repos
 		public void CreateGame(Game game);
 		public void UpdateGame(Game game);
 		public void DeleteGame(Game game);
+		public void DeleteGames(IEnumerable<Game> games);
+
+		public Task<PagedList<Game>> SearchGames(string value, int pageNumber, int pageSize);
 
 		public Task<PagedList<Game>> GetGames(int pageNumber, int pageSize);
 

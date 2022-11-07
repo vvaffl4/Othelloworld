@@ -15,5 +15,5 @@ export default interface Game {
 	players: [PlayerInGame, PlayerInGame?];
 	board: number[][];
 	playerTurn: number;
-	turns: Turn[]
+	turns: Turn[];
 }

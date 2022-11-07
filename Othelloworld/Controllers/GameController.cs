@@ -50,13 +50,13 @@ namespace Othelloworld.Controllers
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="search"></param>
+		/// <param name="value"></param>
+		/// <param name="pageNumber"></param>
+		/// <param name="pageSize"></param>
 		/// <returns></returns>
-		[HttpGet("search")]
-		public ActionResult<IEnumerable<Game>> SearchGames(string search) =>
-			_gameRepository.FindByCondition(g =>
-				g.Name.Contains(search)
-				|| g.Description.Contains(search)).ToList();
+		[HttpGet("search/{value}")]
+		public async Task<ActionResult<PagedList<Game>>> SearchGames(string value, [FromQuery] int pageNumber, [FromQuery] int pageSize) =>
+			await _gameRepository.SearchGames(value, pageNumber, pageSize);
 
 		/// <summary>
 		/// 
@@ -70,7 +70,7 @@ namespace Othelloworld.Controllers
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
-		public async Task<ActionResult<PagedList<Game>>> GetGamesAsync([FromQuery] int pageNumber, int pageSize)
+		public async Task<ActionResult<PagedList<Game>>> GetGamesAsync([FromQuery] int pageNumber, [FromQuery] int pageSize)
 		{
 			return await _gameRepository.GetGames(pageNumber, pageSize);
 		}
@@ -162,6 +162,8 @@ namespace Othelloworld.Controllers
 
 			var game = _gameService.CreateNewGame(account.UserName, model.Name, model.Description);
 
+			game.Turns = new List<Turn>();
+
 			_gameRepository.CreateGame(game);
 			return Created("CreateGame", game);
 		}
@@ -198,21 +200,6 @@ namespace Othelloworld.Controllers
 			var account = await _userManager.FindByIdAsync(id);
 
 			if (account == null) return BadRequest("Token is invalid");
-
-			//var game = _gameRepository.GetGame(model.Token);
-
-			//if (game == null) return BadRequest("Game Token is invalid");
-
-			//game.Players.Add(new PlayerInGame
-			//{
-			//	Username = account.UserName,
-			//	GameToken = game.Token,
-			//	IsHost = false,
-			//	Color = Color.white
-			//});
-			//game.Status = GameStatus.Playing;
-
-			//_gameRepository.Update(game);
 
 			var game = await _gameRepository.Context.Games
 				.Where(game => game.Token == model.Token)
@@ -388,6 +375,7 @@ namespace Othelloworld.Controllers
 			var account = await _userManager.FindByIdAsync(id);
 			var player = _gameRepository.Context.Players
 				.Where(player => player.Username == account.UserName)
+				.AsNoTracking()
 				.Include(player => player.PlayerInGame)
 				.AsNoTracking()
 				.FirstOrDefault();
@@ -396,8 +384,10 @@ namespace Othelloworld.Controllers
 
 			var game = _gameRepository.Context.Games
 				.Where(game => game.Token == player.PlayerInGame.First().GameToken)
+				.AsNoTracking()
 				.Include(game => game.Players)
 				.ThenInclude(pig => pig.Player)
+				.AsNoTracking()
 				.FirstOrDefault();
 
 			var lostPlayer = game.Players.FirstOrDefault(pig => pig.Username == account.UserName);
@@ -411,7 +401,8 @@ namespace Othelloworld.Controllers
 
 			game.Status = GameStatus.Finished;
 
-			await _gameRepository.Context.SaveChangesAsync();
+			await Task.Run(() => _gameRepository.UpdateGame(game));
+			//await _gameRepository.Context.SaveChangesAsync();
 
 			return Ok(game);
 		}

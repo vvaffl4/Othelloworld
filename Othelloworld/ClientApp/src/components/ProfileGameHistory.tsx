@@ -2,6 +2,7 @@
 import { FC, useEffect, useState } from 'react';
 import { getGameHistory } from '../api';
 import Game from '../model/Game';
+import { countColors } from '../services/BoardService';
 import { useAppSelector } from '../store/Hooks';
 import ProfileGameHistoryItem from './ProfileGameHistoryItem';
 
@@ -28,7 +29,9 @@ const ProfileGameHistory: FC<ProfileGameHistoryProps> = ({ username }) => {
 	return (
 		<>
 			<Divider textAlign="center">
-				<Typography>
+				<Typography
+					variant="h6"
+				>
 					Game History
 				</Typography>
 			</Divider>
@@ -47,6 +50,8 @@ const ProfileGameHistory: FC<ProfileGameHistoryProps> = ({ username }) => {
 					const userPlayer = game.players.find(pig => pig?.player.username === username)!;
 					const opponentPlayer = game.players.find(pig => pig?.player.username !== username);
 
+					const [emptyCount, whiteCount, blackCount] = countColors(game.board);
+
 					return (
 						<ProfileGameHistoryItem
 							key={index}
@@ -54,8 +59,8 @@ const ProfileGameHistory: FC<ProfileGameHistoryProps> = ({ username }) => {
 							result={userPlayer.result}
 							playerOne={userPlayer.player.username}
 							playerTwo={opponentPlayer ? opponentPlayer.player.username: ''}
-							whiteCount={61}
-							blackCount={28}
+							whiteCount={whiteCount}
+							blackCount={blackCount}
 							onClick={handleItemClick}
 						/>
 					)}

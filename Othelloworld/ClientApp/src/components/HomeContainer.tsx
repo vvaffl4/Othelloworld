@@ -6,7 +6,7 @@ const HomeContainer: FC = () => {
     <div
       style={{
         position: 'absolute',
-        top: 100,
+        top: 0,
         left: 0,
         right: 0
       }}

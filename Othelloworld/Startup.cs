@@ -49,7 +49,7 @@ namespace Othelloworld
 				options.UseSqlServer(Configuration.GetConnectionString("OThelloWorldDatabase")));
 
 			services.AddDefaultIdentity<Account>(options => options.SignIn.RequireConfirmedAccount = false)
-				.AddRoles<IdentityRole>()
+				.AddRoles<AccountRole>()
 				.AddEntityFrameworkStores<OthelloDbContext>()
 				.AddDefaultTokenProviders();
 
@@ -109,7 +109,7 @@ namespace Othelloworld
 				options.AddPolicy(JwtBearerDefaults.AuthenticationScheme, onlySecondJwtSchemePolicy);
 			});
 
-			services.AddHttpClient<AccountController>("https://www.google.com/recaptcha/api/siteverify");
+			services.AddHttpClient();
 
 			// Dependency injection
 			services
@@ -117,9 +117,10 @@ namespace Othelloworld
 				.AddSingleton<JwtHelper, JwtHelper>()
 				.AddScoped<IAccountRepository, AccountRepository>()
 				.AddScoped<IGameRepository, GameRepository>()
-				.AddScoped<IGameService, GameService>()
 				.AddScoped<IPlayerRepository, PlayerRepository>()
-				.AddScoped<IAccountService, AccountService>();
+				.AddScoped<IGameService, GameService>()
+				.AddScoped<IAccountService, AccountService>()
+				.AddScoped<IMailService, DevMailService>();
 
 			services.AddControllers()
 				.AddJsonOptions(x => {

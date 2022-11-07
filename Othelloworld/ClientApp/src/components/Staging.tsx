@@ -1,4 +1,4 @@
-﻿import { Box, Container, Grid, Typography, Paper } from '@mui/material';
+﻿import { Box, Container, Grid, Typography, Paper, CircularProgress, Stack } from '@mui/material';
 import { FC, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchGame } from '../store/Game';
@@ -13,6 +13,7 @@ const Staging: FC = () => {
 
   useEffect(() => {
     dispatch(changeWorldSettings({
+      show: true,
       zoom: 3
     }))
     
@@ -162,10 +163,19 @@ const Staging: FC = () => {
             left: 0,
             right: 0,
             bottom: 0,
+            pt: 4,
             backgroundColor: (theme) => theme.palette.background.paper
           }}
         >
-
+          <Stack
+            direction="column"
+            alignItems="center"
+          >
+            <CircularProgress color="primary" />
+            <Typography>
+              Waiting for opponent
+            </Typography>
+          </Stack>
          </Box>
       </Paper>
 		</Container>

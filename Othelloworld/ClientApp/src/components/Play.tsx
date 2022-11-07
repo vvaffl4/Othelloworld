@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { fetchGame } from '../store/Game';
 import { useAppDispatch, useAppSelector } from '../store/Hooks';
 import Game from './Game';
+import GameOption from './GameOption';
 
 
 const Play: FC = () => {
@@ -33,90 +34,19 @@ const Play: FC = () => {
 				right: 0
 			}}
 		>
-			{
-				isLoading
+		{
+			isLoading
+				? (
+					<CircularProgress />
+				)
+				: hasGame
 					? (
-						<CircularProgress />
+						<Game />
 					)
-					: hasGame
-						? (
-							<Game />
-						)
-						: (
-							<Box
-								component="div"
-								sx={{
-									marginTop: '500px'
-								}}
-							>
-								<Container>
-									<Paper
-										elevation={4}
-										sx={{ p: 4 }}
-									>
-										<Grid
-											container
-											spacing={4}
-										>
-											<Grid item xs={6}>
-												<Card variant="outlined">
-													<CardContent>
-														<Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-															Normal
-														</Typography>
-														<Typography variant="h5" component="div">
-															Browse for a game
-														</Typography>
-														<Typography sx={{ mb: 1.5 }} color="text.secondary">
-															Are you up for the challenge?
-														</Typography>
-														<Typography variant="body2">
-															Look for games hosted by people all over the world! Challenge another player!
-														</Typography>
-													</CardContent>
-													<CardActions>
-														<Button
-															fullWidth
-															variant="contained"
-															href="browse"
-														>
-															Browse Games
-														</Button>
-													</CardActions>
-												</Card>
-											</Grid>
-											<Grid item xs={6}>
-												<Card variant="outlined">
-													<CardContent>
-														<Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-															Normal
-														</Typography>
-														<Typography variant="h5" component="div">
-															Create a new game.
-														</Typography>
-														<Typography sx={{ mb: 1.5 }} color="text.secondary">
-															Who will you face?!
-														</Typography>
-														<Typography variant="body2">
-															Create a new game and play with people from all over the world!
-														</Typography>
-													</CardContent>
-													<CardActions>
-														<Button
-															fullWidth
-															variant="contained"
-															href="new"
-														>
-															Create Game
-														</Button>
-													</CardActions>
-												</Card>
-											</Grid>
-										</Grid>
-									</Paper>
-								</Container>
-							</Box>
-						)}
+					: (
+						<GameOption />
+					)
+			}
 		</Box>
 	);
 }

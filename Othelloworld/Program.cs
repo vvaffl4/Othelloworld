@@ -27,14 +27,6 @@ namespace Othelloworld
 					{
 						options.AddServerHeader = false;
 					});
-
-					//if ( RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-					//{
-					//} else
-					//{
-					//	webBuilder.UseIIS();
-					//}
-
 				});
 	}
 }

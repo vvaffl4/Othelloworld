@@ -30,8 +30,8 @@ describe("profile", () => {
 			} as Player);
 		});
 
-		var getPlayerSpy = jest.spyOn(Api, 'getPlayer')
-			.mockImplementation(getPlayerMock);
+		//var getPlayerSpy = jest.spyOn(Api, 'getPlayer')
+		//	.mockImplementation(getPlayerMock);
 
 		jest.spyOn(Hooks, 'useAppSelector')
 			.mockReturnValue({

@@ -1,0 +1,16 @@
+﻿@page "/Admin/Accounts/{username}/Delete"
+@model DeleteModel
+@{
+	ViewData["Title"] = $"Are you sure you want to delete '{Model.Account.UserName}'?";
+}
+
+<h3>@ViewData["Title"]</h3>
+<form id="delete" method="post">
+	<input type="hidden" asp-for="Account.Id" />
+	<div class="col-md-10 text-end">
+		<div class="btn-group" role="group" aria-label="Basic mixed styles example">
+			<button id="cancel" class="btn" asp-page="/Admin/Accounts">Return</button>
+			<input id="confirm" type="submit" class="btn btn-success" value="Confirm" />
+		</div>
+	</div>
+</form>

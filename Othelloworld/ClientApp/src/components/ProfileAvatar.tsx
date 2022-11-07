@@ -1,17 +1,20 @@
-﻿import { styled } from '@mui/material/styles';
-import { Avatar, Badge, Collapse, Divider, FormControlLabel, IconButton, ListItemButton, ListItemText, Menu, MenuItem, Switch, Theme, Tooltip, useTheme } from '@mui/material';
-import { FC, useState } from 'react';
+﻿import { Collapse, Divider, FormControlLabel, IconButton, ListItemButton, ListItemText, Menu, MenuItem, Switch, Tooltip, useTheme } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/Hooks';
 import { setPaletteMode } from '../store/UserInterface';
 import { logout } from '../store/Auth';
 import BadgeAvatar from './BadgeAvatar';
 import { shallowEqual } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileAvatar: FC = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
   const auth = useAppSelector(state => state.auth, shallowEqual);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -21,12 +24,22 @@ const ProfileAvatar: FC = () => {
     setAnchorEl(null);
   }
 
+  const handleProfile = () => {
+    navigate(`profile/${auth!.player!.username}`);
+	}
+
+  const handleChangePassword = () => {
+    navigate('changepassword')
+	}
+
   const handleLogout = () => {
     dispatch(logout());
   }
 
   const handlePaletteModeChange = (_: any, checked: boolean) => {
     dispatch(setPaletteMode(checked ? 'dark' : 'light'))
+
+    theme.palette.mode = checked ? 'dark' : 'light';
   }
 
   return (
@@ -75,20 +88,28 @@ const ProfileAvatar: FC = () => {
               label="Dark Mode" />
           </ListItemText>
         </MenuItem>
-        <MenuItem>
-          <ListItemButton
-            href={`profile/${auth!.player!.username}`}
+        <MenuItem
+          onClick={handleProfile}
+        >
+          <ListItemText
           >
             My Profile
-          </ListItemButton>
+          </ListItemText>
         </MenuItem>
         <Divider />
+        <MenuItem
+          onClick={handleChangePassword}
+        >
+          <ListItemText>
+            Change Password
+          </ListItemText>
+        </MenuItem>
         <MenuItem>
-          <ListItemButton
+          <ListItemText
             onClick={handleLogout}
           >
             Logout
-          </ListItemButton>
+          </ListItemText>
         </MenuItem>
       </Menu>
     </>

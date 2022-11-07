@@ -48,6 +48,7 @@ interface FormProps {
 }
 
 const Register: FC = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -60,6 +61,7 @@ const Register: FC = () => {
   const captchaRef = useRef<ReCAPTCHA>(!null)
   const [processing, isProcessing] = useState(false);
   const auth = useAppSelector(state => state.auth);
+
   const [form, setForm] = useState<FormProps>({
     username: '',
     email: '',
@@ -150,179 +152,200 @@ const Register: FC = () => {
   }
 
   return (
-    <Container
-      sx={{
-        position: 'absolute',
-        top: '600px',
-        left: 0,
-        right: 0
-			}}
-    >
-      <Paper sx={{
-        overflow: 'hidden',
-        backgroundColor: 'neutral'
-      }}>
-        <form>
-          <Box
-            component="div"
-            sx={{
-              p: 4,
-              backgroundColor: '#000000',
-              borderBottom: '1px solid #ffffff17'
-            }}
-          >
-            <Typography
-              variant="h3"
-              color='white'
-            >
-              Register
-            </Typography>
-          </Box>
-          <Stack
-            direction="row"
-            divider={<Divider
-              orientation="vertical"
-              variant="middle"
-              flexItem
-            />}
-            spacing={2}
-            sx={{
-              p: 4
-						} }
-          >
+    <>
+      {!country && (
+        <Typography
+          variant="h3"
+          sx={{
+            textAlign: 'center',
+            textShadow: '0px 0px 20px #000, 0px 0px 20px #000, 0px 0px 20px #000'
+          }}
+        >
+          Select your country!
+        </Typography>
+      ) }
+      <Container
+        sx={{
+          position: 'absolute',
+          top: '600px',
+          left: 0,
+          right: 0
+			  }}
+      >
+        <Paper sx={{
+          overflow: 'hidden',
+          backgroundColor: 'neutral'
+        }}>
+          <form>
             <Box
               component="div"
               sx={{
-                flex: 1
+                p: 4,
+                backgroundColor: '#000000',
+                borderBottom: '1px solid #ffffff17'
               }}
             >
-              <TextField
-                required
-                fullWidth
-                id="username"
-                name="username"
-                label="Player name"
-                variant="standard"
-                error={errors.username !== undefined && errors.username !== ''}
-                helperText={errors.username}
-                disabled={processing}
-                onBlur={handleChange}
-              />
-              <Typography variant="caption">
-                The given username can only a-z, 0-9, or a lower dash, and must have a length between 3 - 12 characters.
+              <Typography
+                variant="h3"
+                color='white'
+              >
+                Register
               </Typography>
-              <TextField
-                required
-                fullWidth
-                id="email"
-                name="email"
-                label="E-mail"
-                type="email"
-                variant="standard"
-                error={errors.email !== undefined && errors.email !== ''}
-                helperText={errors.email}
-                disabled={processing}
-                onBlur={handleChange}
-              />
-              <Typography variant="caption">
-                The given e-mail must be an official e-mail that can be reached.
-              </Typography>
-              <TextField
-                required
-                fullWidth
-                id="password"
-                name="password"
-                label="Password"
-                type="password"
-                variant="standard"
-                error={errors.password !== undefined && errors.password !== ''}
-                helperText={errors.password}
-                disabled={processing}
-                onBlur={handleChange}
-              />
-              <Typography variant="caption">
-                The given password must have the following criteria
-                <ul>
-                  <li>Have at least one uppercase character</li>
-                  <li>Have at least one lowercase character</li>
-                  <li>Have at least one special character</li>
-                  <li>Have at least 12 characters</li>
-                </ul>
-              </Typography>
-              <TextField
-                required
-                fullWidth
-                id="validation"
-                name="validation"
-                label="Repeat Password"
-                type="password"
-                variant="standard"
-                error={errors.validation !== undefined && errors.validation !== ''}
-                helperText={errors.validation}
-                disabled={processing}
-                onBlur={handleChange}
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    name="tos"
-                    disabled={processing}
+            </Box>
+            <Stack
+              direction="row"
+              divider={<Divider
+                orientation="vertical"
+                variant="middle"
+                flexItem
+              />}
+              spacing={2}
+              sx={{
+                p: 4
+						  } }
+            >
+              <Box
+                component="div"
+                sx={{
+                  flex: 1
+                }}
+              >
+                <TextField
+                  required
+                  fullWidth
+                  id="username"
+                  name="username"
+                  label="Player name"
+                  variant="standard"
+                  error={errors.username !== undefined && errors.username !== ''}
+                  helperText={errors.username}
+                  disabled={processing}
+                  onBlur={handleChange}
+                />
+                <Typography variant="caption">
+                  The given username can only a-z, 0-9, or a lower dash, and must have a length between 3 - 12 characters.
+                </Typography>
+                <TextField
+                  required
+                  fullWidth
+                  id="email"
+                  name="email"
+                  label="E-mail"
+                  type="email"
+                  variant="standard"
+                  error={errors.email !== undefined && errors.email !== ''}
+                  helperText={errors.email}
+                  disabled={processing}
+                  onBlur={handleChange}
+                />
+                <Typography variant="caption">
+                  The given e-mail must be an official e-mail that can be reached.
+                </Typography>
+                <TextField
+                  required
+                  fullWidth
+                  id="password"
+                  name="password"
+                  label="Password"
+                  type="password"
+                  variant="standard"
+                  error={errors.password !== undefined && errors.password !== ''}
+                  helperText={errors.password}
+                  disabled={processing}
+                  onBlur={handleChange}
+                />
+                <Typography variant="caption">
+                  The given password must have the following criteria
+                  <ul>
+                    <li>Have at least one uppercase character</li>
+                    <li>Have at least one lowercase character</li>
+                    <li>Have at least one special character</li>
+                    <li>Have at least 12 characters</li>
+                  </ul>
+                </Typography>
+                <TextField
+                  required
+                  fullWidth
+                  id="validation"
+                  name="validation"
+                  label="Repeat Password"
+                  type="password"
+                  variant="standard"
+                  error={errors.validation !== undefined && errors.validation !== ''}
+                  helperText={errors.validation}
+                  disabled={processing}
+                  onBlur={handleChange}
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name="tos"
+                      disabled={processing}
+                    />
+                  }
+                  label={
+                    <Typography variant="caption">
+                      By checking this checkbox, you've agreed with our <Link href="#">Terms of Service</Link>.
+                    </Typography>
+                  }
+                />
+                <Box
+                  component="div"
+                  sx={{
+                    py: 2
+                  }}
+                >
+                  <ReCAPTCHAElement
+                    ref={captchaRef}
+                    sitekey={process.env.REACT_APP_SITE_KEY}
+                    theme={theme.palette.mode}
                   />
-                }
-                label={
-                  <Typography variant="caption">
-                    By checking this checkbox, you've agreed with our <Link href="#">Terms of Service</Link>.
-                  </Typography>
-                }
-              />
-              <ReCAPTCHAElement
-                ref={captchaRef}
-                sitekey={process.env.REACT_APP_SITE_KEY}
-              />
-              <Button
-                variant='contained'
-                disabled={processing}
-                onClick={handleSubmit}
+                  </Box>
+                <Button
+                  variant='contained'
+                  disabled={processing}
+                  onClick={handleSubmit}
+                >
+                  Create
+                </Button>
+              </Box>
+              <Box
+                component="div"
+                style={{
+                  flex: 1
+                }}
               >
-                Create
-              </Button>
-            </Box>
-            <Box
-              component="div"
-              style={{
-                flex: 1
-              }}
-            >
-              <TextField
-                required
-                id="standard-required"
-                name="country"
-                label="Country"
-                variant="standard"
-                error={errors.country !== undefined && errors.country !== ''}
-                helperText={errors.country}
-                fullWidth
-                value={country
-                  ? country.properties.NAME
-                  : ''}
-                disabled={processing}
-                onChange={handleChange}
-              />
-              <Divider />
-              <FixedSizeList
-                height={400}
-                width={'100%'}
-                itemSize={46}
-                itemCount={countries.length}
-                overscanCount={10}
-              >
-                {renderRow}
-              </FixedSizeList>
-            </Box>
-          </Stack>
-        </form>
-      </Paper>
-    </Container>
+                <TextField
+                  required
+                  id="standard-required"
+                  name="country"
+                  label="Country"
+                  variant="standard"
+                  error={errors.country !== undefined && errors.country !== ''}
+                  helperText={errors.country}
+                  fullWidth
+                  value={country
+                    ? country.properties.NAME
+                    : ''}
+                  disabled={processing}
+                  onChange={handleChange}
+                />
+                <Divider />
+                <FixedSizeList
+                  height={400}
+                  width={'100%'}
+                  itemSize={46}
+                  itemCount={countries.length}
+                  overscanCount={10}
+                >
+                  {renderRow}
+                </FixedSizeList>
+              </Box>
+            </Stack>
+          </form>
+        </Paper>
+      </Container>
+    </>
   );
 }
 
