@@ -241,6 +241,20 @@ export const getPlayer = (token: Token, username: string) =>
 		.then(parseResultToJson)
 		.then(json => json as Player);
 
+
+export const confirmResults = (token: Token) =>
+	fetch(`/game/confirm`,
+		{
+			method: 'POST',
+			headers: {
+				'Accept': 'application/json',
+				'Authorization': `Bearer ${token.token}`
+			}
+		})
+		.then(checkResponseStatus)
+		.then(parseResultToJson)
+		.then(json => json as Game);
+
 export const fetchCountries = () =>
 	fetch('./countries.json')
 		.then(checkResponseStatus)

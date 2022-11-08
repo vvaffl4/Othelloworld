@@ -20,14 +20,13 @@ namespace Othelloworld.Data.Repos
 				.Include(player => player.PlayerInGame.Where(pig => 
 					pig.Game.Status == GameStatus.Playing
 					|| pig.Game.Status == GameStatus.Staging
+					|| !pig.ConfirmResults
 				).Take(1))
 				.AsNoTracking()
 				.FirstOrDefault();
 
-		public void UpdatePlayer(Player player)
-		{
-			throw new System.NotImplementedException();
-		}
+		public void UpdatePlayer(Player player) =>
+			Update(player);
 
 		public IEnumerable<Country> GetCountries() =>
 			_context.Countries;

@@ -38,21 +38,6 @@ namespace Othelloworld.Data
 
 			CountrySeeder.Add(builder);
 
-			//var gameTokens = new string[]{
-			//	Guid.NewGuid().ToString(),
-			//	Guid.NewGuid().ToString(),
-			//	Guid.NewGuid().ToString(),
-			//	Guid.NewGuid().ToString(),
-			//	Guid.NewGuid().ToString(),
-			//	Guid.NewGuid().ToString(),
-			//	Guid.NewGuid().ToString(),
-			//	Guid.NewGuid().ToString(),
-			//	Guid.NewGuid().ToString(),
-			//	Guid.NewGuid().ToString(),
-			//	Guid.NewGuid().ToString(),
-			//	Guid.NewGuid().ToString()
-			//};
-
 			// Count of Users and Games
 			var USER_COUNT = 100;
 			var GAME_COUNT = 50;
@@ -71,18 +56,9 @@ namespace Othelloworld.Data
 			var USER_ROLE_ID = Guid.NewGuid().ToString();
 			var MODERATOR_ROLE_ID = Guid.NewGuid().ToString();
 			var ADMIN_ROLE_ID = Guid.NewGuid().ToString();
-			//const string USER_ROLE_ID = "ad376a8f-9eab-4444-9fca-30b01540f445";
-			//const string MODERATOR_ROLE_ID = "ad376a8f-9eab-4567-9fca-30b01540f445";
-			//const string ADMIN_ROLE_ID = "ad376a8f-9eab-4bb9-9fca-30b01540f445";
 
 			// users
 			var ADMIN_ID = Guid.NewGuid().ToString();
-			//const string ADMIN_ID = "a18be9c0-aa65-4af8-bd17-00bd9344e575";
-			//var MOD_1_ID = Guid.NewGuid().ToString();
-			//var USER_1_ID = Guid.NewGuid().ToString();
-			//var USER_2_ID = Guid.NewGuid().ToString();
-			//var USER_3_ID = Guid.NewGuid().ToString();
-			//var USER_4_ID = Guid.NewGuid().ToString();
 
 			// Create Roles
 			builder.Entity<AccountRole>().HasData(new AccountRole[]
@@ -188,6 +164,50 @@ namespace Othelloworld.Data
 					}
 			}));
 
+			// Add almost done admin game
+			var ADMIN_GAME = Guid.NewGuid().ToString();
+
+			builder.Entity<Game>().HasData(new Game
+			{
+				Token = ADMIN_GAME,
+				Name = "Game",
+				Description = "A description",
+				Status = GameStatus.Playing,
+				PlayerTurn = Color.white,
+				Board = new IEnumerable<Color>[]
+					{
+						new int[8]{1, 1, 1, 1, 1, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 1, 1, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 1, 0, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 1, 2, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 2, 1, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 1, 1, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 1, 1, 1, 1, 1}.Cast<Color>(),
+						new int[8]{1, 1, 1, 1, 1, 1, 1, 1}.Cast<Color>()
+					},
+				Turns = new List<Turn>()
+			});
+
+			// Add Admin and hello50 to admin game
+			builder.Entity<PlayerInGame>().HasData(new PlayerInGame
+			{
+				Username = "admin",
+				Color = Color.white,
+				GameToken = ADMIN_GAME,
+				IsHost = true,
+				Result = GameResult.undecided,
+				ConfirmResults = false
+			});
+
+			builder.Entity<PlayerInGame>().HasData(new PlayerInGame
+			{
+				Username = "hello50",
+				Color = Color.black,
+				GameToken = ADMIN_GAME,
+				IsHost = true,
+				Result = GameResult.undecided,
+				ConfirmResults = false
+			});
 
 			// Add 1 player to each game
 			builder.Entity<PlayerInGame>().HasData(GAME_TOKENS.Select((guid, index) => new PlayerInGame
@@ -196,7 +216,8 @@ namespace Othelloworld.Data
 				Color = Color.white,
 				GameToken = guid,
 				IsHost = true,
-				Result = GameResult.undecided
+				Result = GameResult.undecided,
+				ConfirmResults = false
 			}));
 
 			//builder.Entity<Account>().HasData(new Account[] {

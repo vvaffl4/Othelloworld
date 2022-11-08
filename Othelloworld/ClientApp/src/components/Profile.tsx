@@ -24,6 +24,8 @@ const Profile: FC = () => {
 				.then((player) => {
 					setPlayer(player);
 
+					console.log(player);	
+
 					dispatch(selectAndFocusCountry({
 						isoCode: player.countryCode,
 						altitude: 2,

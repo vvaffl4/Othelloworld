@@ -48,7 +48,7 @@
     <None Remove="ClientApp\src\components\ForgotPassword.tsx" />
     <None Remove="ClientApp\src\components\GameListItem.tsx" />
     <None Remove="ClientApp\src\components\GameOption.tsx" />
-    <None Remove="ClientApp\src\components\GameResult.tsx" />
+    <None Remove="ClientApp\src\components\GameResults.tsx" />
     <None Remove="ClientApp\src\components\GiveUpDialog.tsx" />
     <None Remove="ClientApp\src\components\HomeBanner.tsx" />
     <None Remove="ClientApp\src\components\HomeCard.tsx" />
@@ -117,7 +117,7 @@
     <TypeScriptCompile Include="ClientApp\src\components\ChangePassword.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\ErrorMessage.test.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\ErrorMessage.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\components\GameResult.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\GameResults.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\HomeBanner.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\HomeCard.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\HomeCardList.tsx" />

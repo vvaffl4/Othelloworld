@@ -14,6 +14,8 @@ import Camera from './threejs/Camera';
 import { changeWorldSettings } from '../store/World';
 import TurnHistory from './TurnHistory';
 import { countColors } from '../services/BoardService';
+import GameResults from './GameResults';
+import { GameStatus } from '../model/Game';
 
 const Playfield: FC = () => {
   const ContextBridge = useContextBridge(ReactReduxContext);
@@ -38,7 +40,6 @@ const Playfield: FC = () => {
       clearInterval(intervalId);
     }
   }, [game.turn, game.status]);
-
 
   useEffect(() => {
     dispatch(changeWorldSettings({ show: false }));
@@ -78,7 +79,12 @@ const Playfield: FC = () => {
           <Canvas
             frameloop="demand"
             style={{
-              zIndex: 1
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 0
 			      }}
           >
             <ContextBridge>
@@ -96,7 +102,8 @@ const Playfield: FC = () => {
               bottom: 0,
               left: 0,
               right: 0,
-              pointerEvents: 'none'
+              pointerEvents: 'none',
+              zIndex: 1
             }}
           >
             {
@@ -117,6 +124,7 @@ const Playfield: FC = () => {
             }
             <Timeline />
           </Box>
+          <GameResults finished={game.status === GameStatus.Finished} />
         </Box>
         <Box
           id="sidebar"

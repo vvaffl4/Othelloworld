@@ -105,7 +105,12 @@ export const gameSlice = createSlice({
 			console.log(action.payload)
 
 			state.turn = action.payload.playerTurn as Color;
-			state.turns = action.payload.turns;
+
+			if (action.payload.turns) {
+				state.turns = action.payload.turns
+			} else {
+				state.turns = [];
+			}
 			state.status = action.payload.status;
 
 			var results: Result[] = [];
@@ -122,7 +127,7 @@ export const gameSlice = createSlice({
 					type: 'chat',
 					item: message
 				}) as HistoryItem),
-				...action.payload.turns.map(turn => ({
+				...state.turns.map(turn => ({
 					type: 'history',
 					item: turn
 				}) as HistoryItem),
@@ -132,8 +137,8 @@ export const gameSlice = createSlice({
 				}) as HistoryItem)
 			].sort((a, b) => new Date(a.item.datetime).getTime() - new Date(b.item.datetime).getTime());
 
-			state.step = action.payload.turns.length;
-			state.boards = createTurnBoards(action.payload.turns);
+			state.step = state.turns.length;
+			state.boards = createTurnBoards(state.turns);
 			//[
 			//	...state.boards,
 			//	action.payload.board
@@ -169,6 +174,30 @@ export const gameSlice = createSlice({
 				state.placeholders = createPlaceholderMap(state.boards[state.step], action.payload.playerTurn);
 				state.hasGame = true;
 			}
+		},
+		dropGame: (state) => {
+			state.hasGame = false;
+			state.players = undefined;
+			state.player = 1;
+			state.turn = 1;
+			state.turns = [];
+			state.status = GameStatus.Staging;
+			state.history = [];
+			state.step = 0;
+			state.boards = [[
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 2, 1, 0, 0, 0],
+				[0, 0, 0, 1, 2, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+			]];
+			state.placeholders = [];
+			state.controls = {
+				mode: 'perspective'
+			};
 		},
 		putStone: (state, { payload: [locX, locY] }: PayloadAction<[number, number]>) => {
 			if (locX < 0
@@ -230,6 +259,6 @@ export const giveUp = (): ApiRequest =>
 			.then(game => dispatch(setGame(game)))
 			.catch(console.error);
 
-export const { startGame, setBoard, setStep, setGame, toggleCameraMode } = gameSlice.actions
+export const { startGame, setBoard, setStep, setGame, dropGame, toggleCameraMode } = gameSlice.actions
 
 export default gameSlice.reducer

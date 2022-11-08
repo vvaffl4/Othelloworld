@@ -33,6 +33,8 @@ namespace Othelloworld.Data.Models
 		public GameResult Result { get; set; }
 		public Color Color { get; set; }
 
+		public bool ConfirmResults { get; set; }
+
 		[JsonIgnore]
 		[ForeignKey("Game_Token_ID")]
 		[Column(TypeName = "varchar(64)")]

@@ -376,7 +376,7 @@ namespace Othelloworld.Controllers
 			var player = _gameRepository.Context.Players
 				.Where(player => player.Username == account.UserName)
 				.AsNoTracking()
-				.Include(player => player.PlayerInGame)
+				.Include(player => player.PlayerInGame.Where(pig => !pig.ConfirmResults))
 				.AsNoTracking()
 				.FirstOrDefault();
 
@@ -401,8 +401,41 @@ namespace Othelloworld.Controllers
 
 			game.Status = GameStatus.Finished;
 
-			await Task.Run(() => _gameRepository.UpdateGame(game));
-			//await _gameRepository.Context.SaveChangesAsync();
+			_gameRepository.UpdateGame(game);
+
+			return Ok(game);
+		}
+
+		[HttpPost("confirm")]
+		public async Task<ActionResult<Game>> Confirm()
+		{
+			string id;
+			try
+			{
+				id = _accountService.GetAccountId(Request.Headers["Authorization"]);
+			}
+			catch (Exception exception)
+			{
+				// Log Exception
+				_logger.LogWarning(exception, "Authentication failed: Validating JWE Token");
+
+				// Return as little information as possible
+				return Unauthorized();
+			}
+
+			var account = await _userManager.FindByIdAsync(id);
+			var player = _playerRepository.GetPlayer(account.UserName);
+
+			if (!player.PlayerInGame.Any()) return NotFound("Player doesn't have a game");
+
+			var playerInGame = player.PlayerInGame.First();
+			var game = _gameRepository.GetGame(playerInGame.GameToken);
+
+			if (game == null) return NotFound("Player doesn't have a game");
+
+			playerInGame.ConfirmResults = true;
+
+			_playerRepository.UpdatePlayer(player);
 
 			return Ok(game);
 		}

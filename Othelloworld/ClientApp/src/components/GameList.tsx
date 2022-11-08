@@ -56,7 +56,11 @@ const GameList: FC = () => {
 	};
 
 	const handleRefresh = () => {
-		dispatch(fetchGames(gameList.currentPage, gameList.pageSize));
+		if (searchValue.length > 0) {
+			dispatch(searchGames(searchValue, gameList.currentPage, gameList.pageSize));
+		} else {
+			dispatch(fetchGames(gameList.currentPage, gameList.pageSize));
+		}
 		isProcessing(true);
 	}
 

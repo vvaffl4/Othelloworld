@@ -13,6 +13,7 @@ const GiveUpDialog: FC<GiveUpDialogProps> = ({ show, onClose }) => {
 
   const handleGiveUp = () => {
     dispatch(giveUp());
+    onClose();
 	}
 
 	return (
